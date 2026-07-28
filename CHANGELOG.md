@@ -40,6 +40,8 @@
   optional recovery-copy write, preventing storage quota from stranding egress.
 - Pages verification and deployment actions now use their Node 24-compatible
   major releases, removing the deprecated Node 20 action warning.
+- The canonical extraction example now uses the exact millisecond UTC timestamp
+  shape required by the shared galaxy validator and emitted by the browser.
 
 Historical implementation changes remain in
 [`game/CHANGELOG.md`](game/CHANGELOG.md).
