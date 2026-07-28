@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Battle/Star.SOL tactical launcher for the real Godot Web extraction simulation.">
+  <meta name="theme-color" content="#020617">
+  <title>Battle/Star.SOL // Tactical Mission</title>
+  <style>
+    :root{--cyan:#38bdf8;--mag:#e879f9;--green:#22c55e;--amber:#fbbf24;--red:#f87171;--ink:#e2e8f0;--dim:#94a3b8;--panel:#08101f;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#020617;color:var(--ink);font-family:var(--mono)}
+    body{background:radial-gradient(900px 600px at 70% 20%,#0b1b31 0%,#020617 72%)}
+    .shell{max-width:1500px;margin:auto;padding:14px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:10px}
+    h1{font-size:15px;letter-spacing:.12em;margin:0;color:#fff}h1 b{color:var(--mag)}
+    #runtime-status{font-size:10px;color:var(--amber);letter-spacing:.08em}
+    .grid{display:grid;grid-template-columns:270px minmax(0,1fr);gap:12px}
+    aside,.stage{border:1px solid #20324b;border-radius:10px;background:rgba(7,15,29,.94)}
+    aside{padding:13px}h2{font-size:10px;color:var(--cyan);letter-spacing:.12em;margin:0 0 10px}
+    .kv{padding:6px 0;border-bottom:1px solid #16243a}.kv span{display:block;color:var(--dim);font-size:8px}.kv b{display:block;margin-top:2px;font-size:11px;color:#fff;overflow-wrap:anywhere}
+    ul{padding-left:18px;margin:8px 0;color:var(--dim);font-size:10px;line-height:1.55}
+    .note{margin-top:12px;padding:9px;border:1px solid #2e4667;border-radius:7px;color:var(--dim);font-size:9px;line-height:1.5}.note b{color:var(--green)}
+    .stage{padding:8px}#mount{display:block;width:100%;aspect-ratio:16/9;min-height:420px;border:0;border-radius:6px;background:#000}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;padding-top:8px}
+    button{border:1px solid #2b4565;border-radius:8px;background:#0c2136;color:#eef8ff;font:700 10px var(--mono);letter-spacing:.05em;padding:9px 12px;cursor:pointer}button:hover{border-color:var(--cyan)}button.primary{border-color:#22c55e88;background:#0b3027}
+    #result{margin-top:12px;padding:10px;border:1px solid #253a55;border-radius:8px;font-size:10px;line-height:1.55;color:var(--dim)}#result strong{display:block;color:var(--green);font-size:13px;letter-spacing:.08em}
+    @media(max-width:850px){.grid{grid-template-columns:1fr}.shell{padding:8px}#mount{min-height:0}header{align-items:flex-start;flex-direction:column}}
+  </style>
+  <script src="bridge.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <h1>▣ <b>BATTLE/STAR.SOL</b> // TACTICAL EXTRACTION</h1>
+      <div id="runtime-status">LOADING REAL GODOT TACTICAL RUNTIME…</div>
+    </header>
+    <div class="grid">
+      <aside>
+        <h2>Inbound deployment</h2>
+        <div class="kv"><span>SECTOR</span><b id="sector"></b></div>
+        <div class="kv"><span>FACTION</span><b id="faction"></b></div>
+        <div class="kv"><span>MISSION SEED</span><b id="seed"></b></div>
+        <div class="kv"><span>SQUAD</span><b id="squad"></b></div>
+        <h2 style="margin-top:14px">Objectives</h2>
+        <ul id="objectives"></ul>
+        <div class="note"><b>THIS IS THE GAME.</b><br>Select the Commander, spend the Base-10 AP pool, end the turn to resolve both squad agents and enemy factions, or use <b>EXTRACT / F8</b> in the tactical runtime to return results to the local campaign vault.</div>
+        <div id="result" hidden><strong id="outcome"></strong><span id="result-line"></span></div>
+      </aside>
+      <section class="stage">
+        <iframe id="mount" title="Battle Star SOL Godot tactical game" allow="fullscreen; autoplay"></iframe>
+        <div class="toolbar">
+          <button id="fullscreen" class="primary">⛶ OPEN TACTICAL FULL SCREEN</button>
+          <button id="download">⇩ DOWNLOAD DEPLOYMENT JSON</button>
+          <button id="return">◂ RETURN TO A.T.L.A.S.</button>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const bridge = window.BSS_BRIDGE;
+      let input = null;
+      try { input = bridge.readEncodedPayload(); } catch (error) {
+        console.warn("[BattleStarSol] URL deployment rejected.", error);
+      }
+      if (!input) {
+        try { input = JSON.parse(localStorage.getItem(bridge.DEPLOY_KEY) || "null"); } catch {}
+      }
+      if (!input) {
+        input = bridge.createDeployMessage(null, bridge.loadProfile(), {
+          id: "battlestar:proving-ground:fallback",
+          seed: 999999,
+        });
+      }
+
+      const { message, deploy } = bridge.unwrapDeploy(input);
+      const mount = document.getElementById("mount");
+      const setText = (id, value) => { document.getElementById(id).textContent = String(value); };
+      setText("sector", deploy.sector);
+      setText("faction", deploy.faction);
+      setText("seed", deploy.seed);
+      setText("squad", `${deploy.squad.length} units · ${deploy.squad.map((unit) => unit.name).join(", ")}`);
+      const objectives = document.getElementById("objectives");
+      for (const objective of deploy.objectives) {
+        const item = document.createElement("li");
+        item.textContent = String(objective);
+        objectives.appendChild(item);
+      }
+
+      const encoded = bridge.toBase64Utf8(JSON.stringify(message || deploy));
+      mount.src = `tactical/index.html?p=${encodeURIComponent(encoded)}`;
+      mount.addEventListener("load", () => {
+        setText("runtime-status", "GODOT RUNTIME LOADED · PLAYABLE · BASE-10 AP");
+        document.getElementById("runtime-status").style.color = "var(--green)";
+      }, { once: true });
+
+      let resolvedId = "";
+      let fullScreenWindow = null;
+      const receiveExtraction = (data) => {
+        let normalized;
+        try { normalized = bridge.normalizeExtraction(data); } catch (error) {
+          console.warn("[BattleStarSol] Extraction rejected.", error);
+          return;
+        }
+        if (!normalized || normalized.message.id === resolvedId) return;
+        resolvedId = normalized.message.id;
+        const extraction = normalized.extraction;
+        try {
+          const applied = bridge.applyExtraction(bridge.loadProfile(), normalized);
+          bridge.saveProfile(applied.profile);
+        } catch (error) {
+          console.warn("[BattleStarSol] Could not apply extraction before return.", error);
+        }
+        try {
+          const recoveryMessage = bridge.compactExtractionMessage(normalized.message);
+          localStorage.setItem(bridge.EXTRACTION_KEY, JSON.stringify(recoveryMessage));
+          localStorage.setItem("bss_extraction_result", JSON.stringify(recoveryMessage.payload.extraction));
+        } catch (error) {
+          console.warn("[BattleStarSol] Could not store extraction recovery copy.", error);
+        }
+        document.getElementById("result").hidden = false;
+        setText("outcome", `EXTRACTION // ${extraction.outcome || "UNKNOWN"}`);
+        setText("result-line", `${Number(extraction.survivors || 0)} survivors · seed ${Number(extraction.seed || deploy.seed)}`);
+        setText("runtime-status", "EXTRACTION RECEIVED · RETURNING TO STRATEGY");
+        const origin = location.protocol === "file:" ? "*" : location.origin;
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage(normalized.message, origin);
+          window.opener.postMessage({
+            channel: "battlestar",
+            kind: "extraction",
+            payload: extraction,
+            galaxy_message: normalized.message,
+          }, origin);
+        }
+        setTimeout(returnToStrategy, 1400);
+      };
+
+      window.addEventListener("message", (event) => {
+        if (event.source !== mount.contentWindow && event.source !== fullScreenWindow) return;
+        if (location.protocol !== "file:" && event.origin !== location.origin) return;
+        receiveExtraction(event.data);
+      });
+
+      function strategyUrl() {
+        const state = String(deploy.atlas_state || "#");
+        return `index.html${state.startsWith("#") ? state : `#${state}`}`;
+      }
+
+      function returnToStrategy() {
+        if (window.opener && !window.opener.closed) {
+          window.opener.focus();
+          window.close();
+          if (window.closed) return;
+        }
+        location.replace(strategyUrl());
+      }
+
+      document.getElementById("fullscreen").addEventListener("click", () => {
+        fullScreenWindow = window.open(mount.src, "_blank");
+      });
+      document.getElementById("download").addEventListener("click", () => {
+        const blob = new Blob([`${JSON.stringify(message || deploy, null, 2)}\n`], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `battlestar-deployment-${deploy.seed}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+      document.getElementById("return").addEventListener("click", returnToStrategy);
+    });
+  </script>
+</body>
+</html>

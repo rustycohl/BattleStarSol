@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://groundzerogames.net/contracts/galaxy-message.schema.json",
+  "title": "Ground Zero Games galaxy message",
+  "description": "Transport-neutral envelope exchanged by independently deployable GZG galaxies.",
+  "type": "object",
+  "required": [
+    "gzg",
+    "version",
+    "id",
+    "type",
+    "source",
+    "target",
+    "created_at",
+    "payload"
+  ],
+  "properties": {
+    "gzg": {
+      "const": "galaxy-message"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "type": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+    },
+    "source": {
+      "$ref": "#/$defs/endpoint"
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "galaxy",
+        "capability"
+      ],
+      "properties": {
+        "galaxy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "capability": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "payload": {
+      "type": "object"
+    },
+    "proof": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "digest"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "sha-256"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "endpoint": {
+      "type": "object",
+      "required": [
+        "galaxy",
+        "version",
+        "instance"
+      ],
+      "properties": {
+        "galaxy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "instance": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

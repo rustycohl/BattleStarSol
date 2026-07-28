@@ -1,0 +1,62 @@
+{
+  "gzg": "galaxy-message",
+  "version": "1.0",
+  "id": "battlestar:84021:1",
+  "type": "battlestar.deploy",
+  "source": {
+    "galaxy": "BattleStarSol",
+    "version": "0.1.1-prealpha.1",
+    "instance": "browser-local"
+  },
+  "target": {
+    "galaxy": "xCommand",
+    "capability": "tactical.deploy"
+  },
+  "created_at": "2026-07-28T12:00:00.000Z",
+  "correlation_id": "atlas-selection-demo-001",
+  "payload": {
+    "schema": "gzg.battlestar.deploy/1.0",
+    "deploy": {
+      "type": "deploy",
+      "payload_contract_version": "1.0",
+      "generator_version": 1,
+      "rules_version": "alpha-1",
+      "sector": "Proving Ground",
+      "faction": "HAD // HEAVY ARMOR DIVISION",
+      "seed": 84021,
+      "atlas_state": "#",
+      "squad": [
+        {
+          "name": "VANGUARD-1",
+          "cls": "Heavy"
+        },
+        {
+          "name": "SCOUT-3",
+          "cls": "Recon"
+        },
+        {
+          "name": "MEDIC-2",
+          "cls": "Support"
+        }
+      ],
+      "objectives": [
+        "Recon selected coordinates",
+        "Neutralize hostiles",
+        "Extract"
+      ],
+      "map": {
+        "target": {
+          "type": "coordinate",
+          "name": "Proving Ground",
+          "latitude": 34.0522,
+          "longitude": -118.2437
+        }
+      },
+      "resources": {
+        "neural": 50,
+        "capital": 25000,
+        "alloys": 100
+      }
+    }
+  }
+}

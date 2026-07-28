@@ -1,0 +1,63 @@
+{
+  "atlas_contract_version": "1.0",
+  "source": "web/atlas/index.html",
+  "runtime_truth": {
+    "display_profiles": [
+      "satellite",
+      "elevation",
+      "procedural",
+      "power",
+      "cybertech",
+      "thermal",
+      "infrastructure",
+      "financial"
+    ],
+    "performance_governor_fps": [
+      15,
+      30,
+      60,
+      120,
+      "max"
+    ],
+    "layer_count": 18,
+    "external_runtime_dependencies": [
+      "Tailwind CDN",
+      "Google Fonts and Material Icons",
+      "Three.js and OrbitControls CDNs",
+      "remote Earth textures",
+      "optional live public APIs"
+    ]
+  },
+  "hash_feed": {
+    "format": "#feed=<url-encoded JSON>",
+    "entities": [
+      {
+        "id": "string",
+        "lat": "number",
+        "lon": "number",
+        "alt": "number in km",
+        "layer": "string",
+        "color": "#RRGGBB",
+        "label": "string",
+        "owned": "boolean; owned entities remain visible under Shadow Play"
+      }
+    ],
+    "shadow_play": {
+      "filter": "detection_radius",
+      "sensor_units": [
+        {
+          "id": "string",
+          "lat": "number",
+          "lon": "number",
+          "radius_km": "number"
+        }
+      ]
+    }
+  },
+  "status": {
+    "hash_entity_ingestion": "implemented",
+    "detection_radius_filter": "implemented as an approximate degree-distance filter",
+    "remote_feed_url_polling": "not implemented",
+    "account_or_shard_authorization": "not implemented"
+  }
+}

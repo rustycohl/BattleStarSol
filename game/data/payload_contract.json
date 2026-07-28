@@ -1,0 +1,30 @@
+{
+  "payload_contract_version": "1.0",
+  "canonical_input": "flat deploy payload",
+  "compatibility_input": "tactical_state object containing deploy",
+  "required": [
+    "type",
+    "sector",
+    "faction",
+    "seed",
+    "squad",
+    "objectives",
+    "resources"
+  ],
+  "versions": {
+    "generator_version": "Changes only when identical seed + parameters would generate a different map.",
+    "rules_version": "Changes when authoritative action or combat rules change."
+  },
+  "transport": {
+    "core": [
+      "local file import/export",
+      "URL ?p=<base64 UTF-8 JSON>",
+      "same-origin localStorage",
+      "same-origin postMessage"
+    ],
+    "optional_dynamic_relay": "HTTP GET/POST is supported by PayloadBridge only when a real dynamic endpoint is configured. A static host cannot receive POST requests."
+  },
+  "determinism": "Map generation, weapon scattering, AI scoring jitter, combat evasion, and salvage rolls derive from the explicit mission seed. Narrative wording uses a separate derived stream.",
+  "schema": "payload.schema.json",
+  "example": "deploy.example.json"
+}

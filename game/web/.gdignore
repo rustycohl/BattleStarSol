@@ -1,0 +1,2 @@
+# Browser-only release tree. Godot exports the tactical runtime here but must
+# not import the embedded static A.T.L.A.S. assets as game resources.

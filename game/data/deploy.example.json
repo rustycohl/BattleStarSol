@@ -1,0 +1,32 @@
+{
+  "type": "deploy",
+  "payload_contract_version": "1.0",
+  "generator_version": 1,
+  "rules_version": "alpha-1",
+  "sector": "5. North American Megacity",
+  "faction": "HAD // VANGUARD-1",
+  "seed": 84021,
+  "squad": [
+    {
+      "name": "Vanguard-1",
+      "cls": "Heavy"
+    },
+    {
+      "name": "Scout-3",
+      "cls": "Recon"
+    }
+  ],
+  "objectives": [
+    "Extract data core",
+    "Exfil at LZ-Alpha"
+  ],
+  "resources": {
+    "neural": 50,
+    "capital": 25000
+  },
+  "map": {
+    "mode": "height",
+    "width": 20,
+    "height": 20
+  }
+}

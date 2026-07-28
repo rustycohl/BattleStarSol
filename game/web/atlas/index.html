@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A.T.L.A.S. // Standalone Strategic Galaxy</title>
+  <meta name="description" content="A.T.L.A.S. is the standalone, browser-local strategic globe and deployment-selection galaxy for Ground Zero Games.">
+  <meta name="theme-color" content="#020617">
+
+  <link href="vendor/fonts/material-icons.css" rel="stylesheet">
+  <link href="atlas.generated.css" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <script src="vendor/three.r128.min.js"></script>
+  <script src="vendor/OrbitControls.r128.js"></script>
+  <script src="galaxy-io.js" defer></script>
+
+  <style>
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    body { overscroll-behavior: none; }
+
+    .saas-checkbox {
+      -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
+      border: 1px solid #334155; border-radius: 3px; background: #0f172a; cursor: pointer; position: relative; transition: all 0.2s;
+    }
+    .saas-checkbox:checked { background: #2563eb; border-color: #3b82f6; }
+    .saas-checkbox:checked::after {
+      content: ''; position: absolute; top: 2px; left: 4px; width: 4px; height: 8px; border: solid white;
+      border-width: 0 2px 2px 0; transform: rotate(45deg);
+    }
+    .loading-spinner {
+      border: 2px solid rgba(59, 130, 246, 0.2); border-left-color: #3b82f6; border-radius: 50%;
+      width: 12px; height: 12px; animation: spin 1s linear infinite; display: none;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .feed-item { animation: slideIn 0.3s ease-out forwards; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    #file-mode-notice {
+      display: none; position: fixed; z-index: 70; top: 66px; left: 50%;
+      transform: translateX(-50%); max-width: min(760px, calc(100vw - 32px));
+      align-items: center; gap: 14px; padding: 10px 14px; border-radius: 8px;
+      border: 1px solid rgba(251,191,36,.55); background: rgba(12,17,29,.96);
+      box-shadow: 0 12px 30px rgba(0,0,0,.55); color: #cbd5e1;
+      font: 11px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    #file-mode-notice.show { display: flex; }
+    #file-mode-notice strong { color: #fbbf24; white-space: nowrap; }
+    #file-mode-notice a {
+      flex: none; color: #7dd3fc; border: 1px solid rgba(56,189,248,.45);
+      border-radius: 5px; padding: 5px 8px; text-decoration: none;
+    }
+    #file-mode-notice a:hover { background: rgba(56,189,248,.12); }
+  </style>
+</head>
+
+<body oncontextmenu="return true;" class="h-screen w-screen bg-slate-950 text-slate-300 font-sans overflow-hidden flex flex-col selection:bg-blue-500/30">
+
+  <div id="file-mode-notice" role="status">
+    <strong>LIMITED FILE MODE</strong>
+    <span>Chrome blocks local files from becoming WebGL textures. A procedural
+      Earth is active. Run <b>npm start</b> for satellite textures and complete
+      local operation.</span>
+    <a id="file-http-link" href="http://127.0.0.1:8780/">OPEN HTTP COPY</a>
+  </div>
+
+  <header class="h-14 shrink-0 border-b border-slate-800 bg-slate-950 flex items-center justify-between px-4 z-30 relative shadow-md">
+    <div class="flex items-center space-x-3 shrink-0">
+      <div class="w-8 h-8 rounded bg-blue-600/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.2)]">
+        <span class="material-icons-outlined text-lg">public</span>
+      </div>
+      <div>
+        <h1 class="text-sm font-semibold tracking-tight text-white leading-tight flex items-center gap-2">
+          A.T.L.A.S.
+        <span class="text-[8px] font-mono text-slate-500 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded tracking-wider">v0.1.0-alpha.2</span>
+        </h1>
+        <div class="text-[9px] font-mono text-emerald-500 tracking-widest uppercase flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>STANDALONE STRATEGIC GALAXY</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search / Fly-to -->
+    <div class="flex items-center mx-4 flex-1 max-w-xs relative">
+      <span class="material-icons-outlined text-[14px] text-slate-500 absolute left-2 pointer-events-none">search</span>
+      <input type="text" id="search-box" placeholder="Search entities... (Enter to fly)"
+        class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500/60 rounded pl-8 pr-3 py-1.5 text-[11px] text-slate-200 placeholder-slate-600 outline-none font-mono transition-colors">
+      <div id="search-results" class="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded shadow-xl z-50 hidden max-h-48 overflow-y-auto text-[10px] font-mono"></div>
+    </div>
+
+    <div class="flex items-center space-x-6 overflow-x-auto no-scrollbar flex-1 justify-end pl-4">
+      <button id="btn-snapshot" class="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/50 text-blue-400 hover:text-white rounded transition-colors text-[10px] font-bold uppercase tracking-wide">
+        <span class="material-icons-outlined text-[14px]">share</span>
+        <span>Copy Snapshot URL</span>
+      </button>
+      <button id="btn-export-selection" disabled class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-500 rounded text-[10px] font-bold uppercase tracking-wide disabled:cursor-not-allowed" title="Select a coordinate or deployable event first">
+        <span class="material-icons-outlined text-[14px]">download</span>
+        <span>Export Selection</span>
+      </button>
+      <div class="w-px h-6 bg-slate-800 shrink-0"></div>
+
+      <div class="flex flex-col flex-shrink-0">
+        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Active Entities</span>
+        <div class="flex items-center space-x-1.5 mt-0.5">
+          <span id="stat-nodes-indicator" class="w-1.5 h-1.5 rounded-full bg-slate-800"></span>
+          <span id="stat-nodes" class="text-xs font-mono text-slate-600">0</span>
+        </div>
+      </div>
+      <div class="w-px h-6 bg-slate-800 shrink-0"></div>
+
+      <div class="flex flex-col flex-shrink-0">
+        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Pub Compute</span>
+        <div class="flex items-center space-x-1.5 mt-0.5">
+          <span id="stat-flops-indicator" class="w-1.5 h-1.5 rounded-full bg-slate-800"></span>
+          <span id="stat-flops" class="text-xs font-mono text-slate-600">OFFLINE</span>
+        </div>
+      </div>
+      <div class="w-px h-6 bg-slate-800 shrink-0"></div>
+
+      <div class="flex flex-col flex-shrink-0">
+        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Core Traffic</span>
+        <div class="flex items-center space-x-1.5 mt-0.5">
+          <span id="stat-ixp-indicator" class="w-1.5 h-1.5 rounded-full bg-slate-800"></span>
+          <span id="stat-ixp" class="text-xs font-mono text-slate-600">OFFLINE</span>
+        </div>
+      </div>
+      <div class="w-px h-6 bg-slate-800 shrink-0"></div>
+
+      <div class="flex flex-col flex-shrink-0">
+        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Fin Volume</span>
+        <div class="flex items-center space-x-1.5 mt-0.5">
+          <span id="stat-fin-indicator" class="w-1.5 h-1.5 rounded-full bg-slate-800"></span>
+          <span id="stat-fin" class="text-xs font-mono text-slate-600">OFFLINE</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex-1 flex min-h-0 relative">
+    <aside class="w-[300px] shrink-0 border-r border-slate-800 bg-slate-900/50 flex flex-col z-10 backdrop-blur-sm relative">
+      <div class="p-4 flex-1 overflow-y-auto flex flex-col gap-5">
+
+        <!-- Live API & Governor -->
+        <div>
+          <div class="mb-4 bg-slate-950 border border-slate-800 rounded p-2">
+            <div class="flex justify-between items-center mb-1">
+               <div class="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center space-x-1"><span class="material-icons-outlined text-[12px] text-blue-400">wifi_tethering</span><span class="text-blue-400">Public URL Feed</span></div>
+               <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="api-uplink-toggle" class="sr-only peer">
+                  <div class="w-6 h-3 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-slate-500 after:border-slate-500 after:border after:rounded-full after:h-2.5 after:w-2.5 after:transition-all peer-checked:bg-blue-600 peer-checked:after:bg-white"></div>
+               </label>
+            </div>
+            <p class="text-[8px] text-slate-500 leading-tight">Toggle ingestion from user-provided public web functions and URL parameters versus local simulation.</p>
+          </div>
+
+          <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center justify-between">
+            <div class="flex items-center space-x-1"><span class="material-icons-outlined text-[12px]">memory</span><span>Performance Governor</span></div>
+            <span id="fps-display" class="text-emerald-400 font-mono">15 FPS</span>
+          </div>
+          <div class="flex bg-slate-950 border border-slate-800 rounded p-0.5">
+            <button data-fps="15" class="fps-btn flex-1 py-1 text-[10px] font-mono bg-slate-800 text-white rounded shadow transition-colors" title="Eco / Background Monitoring">15</button>
+            <button data-fps="30" class="fps-btn flex-1 py-1 text-[10px] font-mono text-slate-500 hover:text-white rounded transition-colors" title="Standard (Default)">30</button>
+            <button data-fps="60" class="fps-btn flex-1 py-1 text-[10px] font-mono text-slate-500 hover:text-white rounded transition-colors" title="Fluid Briefing Mode">60</button>
+            <button data-fps="120" class="fps-btn flex-1 py-1 text-[10px] font-mono text-slate-500 hover:text-white rounded transition-colors" title="Unrestricted">MAX</button>
+          </div>
+        </div>
+
+        <!-- Display Profiles (8 Modes) -->
+        <div>
+          <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center space-x-1">
+            <span class="material-icons-outlined text-[12px]">layers</span><span>Display Profile</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button data-style="satellite" class="btn-style py-1.5 rounded text-[11px] font-medium bg-blue-600 text-white border border-blue-500 transition-colors">Satellite</button>
+            <button data-style="terrain" class="btn-style py-1.5 rounded text-[11px] font-medium bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800 transition-colors">Elevation</button>
+            <button data-style="procedural" class="btn-style py-1.5 rounded text-[11px] font-medium bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800 transition-colors">Procedural</button>
+            <button data-style="night" class="btn-style py-1.5 rounded text-[11px] font-medium bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800 transition-colors">Power Grids</button>
+            <button data-style="cyber" class="btn-style py-1.5 rounded text-[11px] font-medium bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800 transition-colors">Cybertech</button>
+            <button data-style="thermal" class="btn-style py-1.5 rounded text-[11px] font-medium bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800 transition-colors">Thermal</button>
+            <button data-style="infra" class="btn-style py-1.5 rounded text-[11px] font-medium bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800 transition-colors">Infrastructure</button>
+            <button data-style="financial" class="btn-style py-1.5 rounded text-[11px] font-medium bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800 transition-colors">Financial</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center space-x-1">
+              <span class="material-icons-outlined text-[12px]">filter_list</span><span>Active Layers (<span id="layer-count">0/18</span>)</span>
+            </div>
+            <div class="space-x-1.5 flex items-center">
+              <button id="btn-select-all" class="text-[9px] text-blue-400 hover:text-blue-300 uppercase transition-colors">All</button>
+              <span class="text-slate-700 text-[9px]">|</span>
+              <button id="btn-select-none" class="text-[9px] text-blue-400 hover:text-blue-300 uppercase transition-colors">None</button>
+            </div>
+          </div>
+
+          <div id="layer-list" class="flex flex-col gap-0 border border-slate-800 rounded bg-slate-950 overflow-hidden shadow-inner">
+
+            <!-- Infrastructure & Compute (4) -->
+            <div class="bg-slate-900 px-2 py-1 border-b border-slate-800/50 text-[9px] font-bold text-slate-500 uppercase">Infrastructure & Compute</div>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.5)]"></span><span class="text-[11px] text-slate-300">Data Centers & Cloud</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-dc" class="loading-spinner"></div><input type="checkbox" id="layer-dc" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-fuchsia-400 shadow-[0_0_5px_rgba(232,121,249,0.5)]"></span><span class="text-[11px] text-slate-300">AI & HPC Clusters (Volumetric)</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-ai" class="loading-spinner"></div><input type="checkbox" id="layer-ai" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_5px_rgba(250,204,21,0.5)]"></span><span class="text-[11px] text-slate-300">Financial Hubs</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-fin" class="loading-spinner"></div><input type="checkbox" id="layer-fin" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.5)]"></span><span class="text-[11px] text-slate-300">IXPs & Backbone Fiber</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-ixp" class="loading-spinner"></div><input type="checkbox" id="layer-ixp" class="saas-checkbox layer-toggle"></div>
+            </label>
+
+            <!-- Mobility & Logistics (3) -->
+            <div class="bg-slate-900 px-2 py-1 border-b border-slate-800/50 text-[9px] font-bold text-slate-500 uppercase">Mobility & Logistics</div>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]"></span><span class="text-[11px] text-slate-300">Global Trade & Shipping</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-ship" class="loading-spinner"></div><input type="checkbox" id="layer-ship" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-slate-100 shadow-[0_0_5px_rgba(248,250,252,0.5)]"></span><span class="text-[11px] text-slate-300">Air Traffic Networks</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-air" class="loading-spinner"></div><input type="checkbox" id="layer-air" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_5px_rgba(249,115,22,0.5)]"></span><span class="text-[11px] text-slate-300">Road Networks</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-road" class="loading-spinner"></div><input type="checkbox" id="layer-road" class="saas-checkbox layer-toggle"></div>
+            </label>
+
+            <!-- Space Taxonomy (5) -->
+            <div class="bg-slate-900 px-2 py-1 border-b border-slate-800/50 text-[9px] font-bold text-slate-500 uppercase">Orbital Taxonomy</div>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-sm bg-white"></span><span class="text-[11px] text-slate-300">T1 Space Stations</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-sat-t1" class="loading-spinner"></div><input type="checkbox" id="layer-sat-t1" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-sky-300"></span><span class="text-[11px] text-slate-300">T2 Satellites</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-sat-t2" class="loading-spinner"></div><input type="checkbox" id="layer-sat-t2" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full border border-sky-400"></span><span class="text-[11px] text-slate-300">Orbital Trajectories</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-orbits" class="loading-spinner"></div><input type="checkbox" id="layer-orbits" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-cyan-500/50"></span><span class="text-[11px] text-slate-400">T3 Megaconstellation Swarm</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-swarm" class="loading-spinner"></div><input type="checkbox" id="layer-swarm" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-0 h-0 border-l-[4px] border-r-[4px] border-b-[8px] border-l-transparent border-r-transparent border-b-rose-500"></span><span class="text-[11px] text-rose-300">T4 Tracked Space Debris</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-debris" class="loading-spinner"></div><input type="checkbox" id="layer-debris" class="saas-checkbox layer-toggle"></div>
+            </label>
+
+            <!-- Environment & Demographics (3) -->
+            <div class="bg-slate-900 px-2 py-1 border-b border-slate-800/50 text-[9px] font-bold text-slate-500 uppercase">Environment & Demographics</div>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="material-icons-outlined text-[12px] text-rose-500">warning</span><span class="text-[11px] text-slate-300">USGS Seismic / Crises</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-crisis" class="loading-spinner"></div><input type="checkbox" id="layer-crisis" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="material-icons-outlined text-[12px] text-slate-400">cloud</span><span class="text-[11px] text-slate-300">Atmospheric Weather</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-weather" class="loading-spinner"></div><input type="checkbox" id="layer-weather" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="material-icons-outlined text-[12px] text-orange-400">groups</span><span class="text-[11px] text-slate-300">Population Density</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-pop" class="loading-spinner"></div><input type="checkbox" id="layer-pop" class="saas-checkbox layer-toggle"></div>
+            </label>
+
+            <!-- Telemetry & Streams (3) -->
+            <div class="bg-slate-900 px-2 py-1 border-b border-slate-800/50 text-[9px] font-bold text-slate-500 uppercase">Telemetry & Streams</div>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_5px_rgba(34,211,238,0.5)]"></span><span class="text-[11px] text-slate-300">Data Streams</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-stream-data" class="loading-spinner"></div><input type="checkbox" id="layer-stream-data" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer border-b border-slate-800/50 transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_5px_rgba(168,85,247,0.5)]"></span><span class="text-[11px] text-slate-300">Inference Streams</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-stream-inf" class="loading-spinner"></div><input type="checkbox" id="layer-stream-inf" class="saas-checkbox layer-toggle"></div>
+            </label>
+            <label class="layer-item flex items-center justify-between p-2 hover:bg-slate-800 cursor-pointer transition-colors">
+              <div class="flex items-center space-x-2"><span class="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_5px_rgba(250,204,21,0.5)]"></span><span class="text-[11px] text-slate-300">Financial Streams</span></div>
+              <div class="flex items-center space-x-2"><div id="spin-stream-fin" class="loading-spinner"></div><input type="checkbox" id="layer-stream-fin" class="saas-checkbox layer-toggle"></div>
+            </label>
+
+            <!-- Granularity / LOD Controls -->
+            <div class="bg-slate-900 px-2 py-1.5 border-t border-slate-800/50 flex justify-between items-center">
+               <span class="text-[9px] font-bold text-slate-500 uppercase">Granularity (LOD)</span>
+               <div class="flex space-x-2">
+                 <label class="flex items-center space-x-1 cursor-pointer" title="Tier 1: Hyperscale / Apex Nodes"><input type="checkbox" id="tier-1-toggle" checked class="saas-checkbox !w-3 !h-3"><span class="text-[8px] text-slate-400">T1</span></label>
+                 <label class="flex items-center space-x-1 cursor-pointer" title="Tier 2: Regional Hubs"><input type="checkbox" id="tier-2-toggle" class="saas-checkbox !w-3 !h-3"><span class="text-[8px] text-slate-400">T2</span></label>
+                 <label class="flex items-center space-x-1 cursor-pointer" title="Tier 3: Edge Nodes & Swarms"><input type="checkbox" id="tier-3-toggle" class="saas-checkbox !w-3 !h-3"><span class="text-[8px] text-slate-400">T3</span></label>
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Log Feed -->
+      <div class="flex flex-col shrink-0 border-t border-slate-800 bg-slate-950 min-h-[150px] max-h-[30vh]">
+        <div class="px-4 py-2 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+          <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-1">
+            <span class="material-icons-outlined text-[12px]">terminal</span><span>System Log</span>
+          </span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_5px_rgba(16,185,129,0.8)]"></span>
+        </div>
+        <div id="telemetry-feed" class="flex-1 overflow-y-auto p-3 space-y-1 font-mono text-[9px] flex flex-col-reverse break-words whitespace-normal text-slate-500">
+          <div><span class="text-emerald-500">[SYS]</span> A.T.L.A.S. Engine Initialized. Ready for opt-in layer fetching.</div>
+        </div>
+      </div>
+    </aside>
+
+    <main id="canvas-container" class="flex-1 relative bg-black outline-none cursor-crosshair min-w-[300px]"></main>
+
+    <aside id="inspector-panel" class="absolute right-0 top-0 bottom-0 w-[360px] border-l border-slate-800 bg-slate-900/95 backdrop-blur-md z-20 hidden flex-col shadow-[-10px_0_15px_-3px_rgba(0,0,0,0.5)]">
+      <div class="p-4 border-b border-slate-800 flex items-start justify-between bg-slate-950">
+        <div class="pr-2">
+          <div id="inspect-category" class="text-[9px] font-mono tracking-widest uppercase text-cyan-400 font-bold mb-1 flex items-center space-x-1">
+            <span class="material-icons-outlined text-[10px]">category</span><span>CATEGORY</span>
+          </div>
+          <h2 id="inspect-title" class="text-sm font-semibold text-white leading-tight break-words">Entity Name</h2>
+          <div id="inspect-subtitle" class="text-[10px] text-slate-400 font-mono mt-0.5 break-words">Details</div>
+        </div>
+        <button id="btn-close-inspect" class="text-slate-500 hover:text-white transition-colors p-1 rounded hover:bg-slate-800 shrink-0">
+          <span class="material-icons-outlined text-sm">close</span>
+        </button>
+      </div>
+
+      <div class="flex border-b border-slate-800 bg-slate-950/80 text-[10px] font-mono shrink-0">
+        <button data-tab="telemetry" class="inspector-tab flex-1 py-2 text-center text-blue-400 border-b-2 border-blue-500 font-medium transition-colors">Telemetry</button>
+        <button data-tab="calculator" class="inspector-tab flex-1 py-2 text-center text-slate-400 hover:text-slate-200 transition-colors">RTT Calc</button>
+        <button data-tab="schematic" class="inspector-tab flex-1 py-2 text-center text-slate-400 hover:text-slate-200 transition-colors">Schematic</button>
+        <button data-tab="playbook" class="inspector-tab flex-1 py-2 text-center text-slate-400 hover:text-slate-200 transition-colors">Playbook</button>
+      </div>
+
+      <div class="p-4 flex-1 overflow-y-auto">
+        <div id="tab-content-telemetry" class="tab-pane space-y-1 font-mono text-[10px]">
+          <div class="flex justify-between py-2 border-b border-slate-800/50"><span class="text-slate-500 shrink-0 mr-2">Location/Orbit</span><span id="inspect-coords" class="text-slate-200 text-right truncate">--</span></div>
+          <div class="flex justify-between py-2 border-b border-slate-800/50"><span class="text-slate-500 shrink-0 mr-2">Alt/City</span><span id="inspect-alt" class="text-cyan-400 text-right truncate">--</span></div>
+          <div class="flex justify-between py-2 border-b border-slate-800/50"><span class="text-slate-500 shrink-0 mr-2">Key Metric</span><span id="inspect-speed" class="text-emerald-400 text-right font-bold truncate">--</span></div>
+          <div class="flex justify-between py-2 border-b border-slate-800/50"><span class="text-slate-500 shrink-0 mr-2">Operator</span><span id="inspect-operator" class="text-amber-400 text-right truncate">--</span></div>
+          <div class="mt-4">
+            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Registry Abstract</span>
+            <p id="inspect-desc" class="text-[11px] text-slate-300 leading-relaxed bg-slate-950 border border-slate-800 p-3 rounded shadow-inner break-words whitespace-normal">--</p>
+          </div>
+        </div>
+
+        <div id="tab-content-calculator" class="tab-pane hidden space-y-3 font-mono text-[10px]">
+          <div class="text-[11px] font-semibold text-white mb-1">Packet Round-Trip Time (RTT) Calculator</div>
+          <p class="text-slate-400 text-[10px] mb-3">Simulate fiber propagation delay and packet loss metrics from this node.</p>
+          <div class="space-y-2">
+            <div><label class="text-slate-500 block mb-1">Distance (approx. km)</label><input type="number" id="calc-distance" value="3850" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-cyan-400 outline-none"></div>
+            <div>
+              <label class="text-slate-500 block mb-1">Medium Refractive Index</label>
+              <select id="calc-medium" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-slate-300 outline-none">
+                <option value="1.468">Single-Mode Fiber (1.468)</option>
+                <option value="1.000">Satellite / Free Space (1.000)</option>
+              </select>
+            </div>
+            <button id="btn-run-calc" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors mt-2">Compute Link Metrics</button>
+          </div>
+          <div id="calc-results" class="mt-4 p-3 bg-slate-950 border border-slate-800 rounded space-y-1.5 hidden text-slate-300">
+            <div class="flex justify-between"><span>Prop. Velocity:</span> <span id="res-vel" class="text-cyan-400">--</span></div>
+            <div class="flex justify-between"><span>Calculated RTT:</span> <span id="res-rtt" class="text-emerald-400 font-bold">--</span></div>
+            <div class="flex justify-between"><span>Theoretical Bandwidth:</span> <span id="res-bw" class="text-yellow-400">--</span></div>
+          </div>
+        </div>
+
+        <div id="tab-content-schematic" class="tab-pane hidden space-y-3 text-[10px] font-mono">
+          <div class="text-[11px] font-semibold text-white mb-1">Hardware & Infrastructure Topology</div>
+          <div class="p-3 bg-slate-950 border border-slate-800 rounded flex flex-col items-center justify-center space-y-2">
+            <div class="w-full h-32 border border-slate-800 rounded flex items-center justify-center bg-slate-900/40 relative overflow-hidden">
+              <div class="absolute inset-0 flex items-center justify-center opacity-30"><div class="w-24 h-24 border border-blue-500 rounded-full animate-ping"></div></div>
+              <span id="schematic-label" class="text-cyan-400 font-bold z-10 text-center px-2 text-[10px] uppercase">Retrieving Architecture...</span>
+            </div>
+            <span class="text-[9px] text-slate-500 text-center">Standardized Rack / Orbital Topology</span>
+          </div>
+        </div>
+
+        <div id="tab-content-playbook" class="tab-pane hidden space-y-3 text-[10px] font-mono">
+          <div class="text-[11px] font-semibold text-white mb-1">Incident Triage Workflow</div>
+          <div class="space-y-2" id="playbook-steps">
+            <div class="p-2 bg-slate-950 border border-blue-500/50 rounded flex items-start space-x-2"><span class="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] font-bold shrink-0">1</span><div><span class="text-white font-bold">Verify Signal Origin:</span> Cross-reference local state tables.</div></div>
+            <div class="p-2 bg-slate-950 border border-slate-800 rounded flex items-start space-x-2"><span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[9px] font-bold shrink-0">2</span><div><span class="text-slate-300 font-bold">Isolate Anomaly:</span> Check redundant pathways for faults.</div></div>
+            <div class="p-2 bg-slate-950 border border-slate-800 rounded flex items-start space-x-2"><span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[9px] font-bold shrink-0">3</span><div><span class="text-slate-300 font-bold">Escalation:</span> Confirm status with operational command.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-slate-800 bg-slate-950 shrink-0">
+        <button id="btn-focus-object" class="w-full py-2.5 rounded bg-slate-800 hover:bg-blue-600 text-white font-medium text-[11px] flex items-center justify-center space-x-2 transition-all border border-slate-700 hover:border-blue-500 shadow-lg">
+          <span class="material-icons-outlined text-[14px]">my_location</span><span>Center Tracking Camera</span>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="h-10 shrink-0 border-t border-slate-800 bg-slate-950 flex items-center justify-between px-4 text-[10px] font-mono text-slate-500 z-30 relative">
+    <div class="flex items-center space-x-4">
+      <span class="flex items-center space-x-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-slate-300 hidden sm:inline">LOCAL GALAXY: ONLINE</span></span>
+      <span class="hidden sm:inline">|</span>
+      <div class="flex items-center space-x-2">
+        <span class="text-slate-400">TIMELINE:</span>
+        <input type="range" id="timeline-scrubber" min="0" max="100" value="100" class="w-32 h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-blue-500">
+        <span id="timeline-display" class="text-cyan-400 font-mono w-20">T-0 (LIVE)</span>
+      </div>
+      <span class="hidden sm:inline">|</span>
+      <div class="flex items-center space-x-2">
+        <span class="text-slate-400">SIM SPEED:</span>
+        <input type="range" id="slider-speed" min="0" max="5" step="0.1" value="0" class="w-20 h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-blue-500">
+        <span id="speed-val" class="text-amber-500 font-mono w-10">0.0x</span>
+      </div>
+    </div>
+    <div class="flex items-center space-x-4">
+      <span class="flex items-center space-x-1">
+        <span class="material-icons-outlined text-[12px]">gps_fixed</span>
+        <span class="hidden sm:inline">CURSOR: </span><span id="mouse-coords" class="text-blue-400">OFF-EARTH</span>
+      </span>
+    </div>
+  </footer>
+
+  <script>
+    // --- Application State & Governor ---
+    let targetFPS = 15;
+    let frameInterval = 1000 / targetFPS;
+    let lastFrameTime = 0;
+    let simSpeed = 0.0;
+    let globeStyle = 'satellite';
+    let loadedLayers = new Set();
+    let timelineOffset = 0;
+    let globalTime = 0;
+    let isLiveApiEnabled = false;
+    let liveIssInterval = null;
+    let isPaused = true;
+    let prevSimSpeed = 1.0;
+    const directFileMode = window.location.protocol === 'file:';
+    let textureProfilesAvailable = !directFileMode;
+    let textureFallbackPending = directFileMode;
+    let textureFallbackLogged = false;
+
+    // --- Three.js Globals ---
+    const container = document.getElementById('canvas-container');
+    let scene, camera, renderer, controls;
+    let earthMesh, cloudsMesh, atmosphereMesh;
+    let raycaster, mouse;
+    let selectedObject = null;
+    let isTracking = false;
+    let pointerAnchor = null;
+    let selectedCoordinate = null;
+    const EARTH_RADIUS = 5;
+
+    // --- Object Groups & Buffers ---
+    let layerGroups = {
+      'dc': new THREE.Group(),
+      'ai': new THREE.Group(),
+      'fin': new THREE.Group(),
+      'ixp': new THREE.Group(),
+      'ship': new THREE.Group(),
+      'air': new THREE.Group(),
+      'road': new THREE.Group(),
+      'sat-t1': new THREE.Group(),
+      'sat-t2': new THREE.Group(),
+      'orbits': new THREE.Group(),
+      'crisis': new THREE.Group(),
+      'pop': new THREE.Group(),
+      'stream-data': new THREE.Group(),
+      'stream-inf': new THREE.Group(),
+      'stream-fin': new THREE.Group(),
+      'external': new THREE.Group()
+    };
+
+    let swarmPoints = null;
+    let debrisMesh = null;
+    let earthWaterData = null; // Stored canvas pixel data for landmasking
+    const NUM_SWARM = 5000;
+    const NUM_DEBRIS = 3000;
+
+    function activateProceduralTextureFallback(reason) {
+      textureProfilesAvailable = false;
+      textureFallbackPending = true;
+      globeStyle = 'procedural';
+
+      if (earthMesh && earthMesh.material && earthMesh.material.uniforms) {
+        earthMesh.material.uniforms.u_mode.value = 0;
+      }
+
+      document.querySelectorAll('.btn-style').forEach(button => {
+        const active = button.getAttribute('data-style') === 'procedural';
+        button.className = active
+          ? 'btn-style py-1.5 rounded text-[11px] font-medium bg-blue-600 text-white border border-blue-500 transition-colors'
+          : 'btn-style py-1.5 rounded text-[11px] font-medium bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800 transition-colors';
+      });
+
+      if (directFileMode) {
+        const notice = document.getElementById('file-mode-notice');
+        const httpLink = document.getElementById('file-http-link');
+        if (notice) notice.classList.add('show');
+        if (httpLink) httpLink.href = `http://127.0.0.1:8780/${window.location.hash}`;
+      }
+
+      if (!textureFallbackLogged) {
+        const detail = reason || 'One or more globe textures could not be loaded.';
+        logEvent(`[TEX] ${detail} Procedural Earth active.`, 'text-amber-500');
+        textureFallbackLogged = true;
+      }
+    }
+
+    function serializeState() {
+      const state = {
+        fps: targetFPS,
+        mode: globeStyle,
+        speed: simSpeed,
+        layers: Array.from(document.querySelectorAll('.layer-toggle')).filter(cb => cb.checked).map(cb => cb.id.replace('layer-', '')),
+        cam: camera ? {
+          x: +camera.position.x.toFixed(3),
+          y: +camera.position.y.toFixed(3),
+          z: +camera.position.z.toFixed(3),
+          tx: +controls.target.x.toFixed(3),
+          ty: +controls.target.y.toFixed(3),
+          tz: +controls.target.z.toFixed(3)
+        } : null
+      };
+      window.location.hash = encodeURIComponent(JSON.stringify(state));
+    }
+
+    function deserializeState() {
+      if (!window.location.hash) return;
+      try {
+        const rawHash = decodeURIComponent(window.location.hash.substring(1));
+        if (rawHash.startsWith("feed=")) {
+            let feedData = JSON.parse(rawHash.substring(5));
+            if (feedData?.gzg === 'galaxy-message') {
+                const message = window.ATLAS_IO.validate(feedData);
+                if (message.type !== 'atlas.feed') {
+                    throw new TypeError(`Expected atlas.feed, received ${message.type}.`);
+                }
+                feedData = message.payload;
+            }
+            feedData = validateHashFeed(feedData);
+            if (Array.isArray(feedData.entities)) {
+                ingestExternalEntities(feedData.entities);
+            }
+            if (feedData.filter === 'detection_radius' && feedData.sensor_units) {
+                window.sensorUnits = feedData.sensor_units;
+                logEvent(`[SYS] Shadow Play FOW active. Sensors: ${window.sensorUnits.length}`, 'text-emerald-400 font-bold');
+                setInterval(updateFOW, 2000);
+                updateFOW();
+            }
+            return;
+        }
+        const state = JSON.parse(rawHash);
+        if (state.fps) setFPS(state.fps);
+        if (state.mode) {
+          const btn = document.querySelector(`button[data-style="${state.mode}"]`);
+          if (btn) btn.click();
+        }
+        if (typeof state.speed === 'number') {
+          simSpeed = state.speed;
+          const slider = document.getElementById('slider-speed');
+          if (slider) slider.value = simSpeed;
+          document.getElementById('speed-val').textContent = `${simSpeed.toFixed(1)}x`;
+        }
+        if (state.layers) {
+          state.layers.forEach(layer => {
+            const cb = document.getElementById(`layer-${layer}`);
+            if (cb) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+          });
+        }
+        if (state.cam && camera && controls) {
+          camera.position.set(state.cam.x, state.cam.y, state.cam.z);
+          controls.target.set(state.cam.tx, state.cam.ty, state.cam.tz);
+          controls.update();
+        }
+        logEvent('[SYS] Restored session state from URL Snapshot.', 'text-emerald-400');
+      } catch (e) { console.warn("Invalid URL Hash", e); }
+    }
+
+    function validateHashFeed(feedData) {
+      if (!feedData || typeof feedData !== 'object' || Array.isArray(feedData)) {
+        throw new TypeError('A.T.L.A.S. feed must be an object.');
+      }
+      if (!Array.isArray(feedData.entities) || feedData.entities.length > 2000) {
+        throw new RangeError('A.T.L.A.S. feed requires at most 2,000 entities.');
+      }
+
+      const boundedText = (value, fallback, max = 160) =>
+        String(value ?? fallback).replace(/[\u0000-\u001f\u007f]/g, '').slice(0, max);
+      const entities = feedData.entities.map((raw, index) => {
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+          throw new TypeError(`Feed entity ${index} must be an object.`);
+        }
+        const lat = Number(raw.lat);
+        const lon = Number(raw.lon ?? raw.lng);
+        if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
+          throw new RangeError(`Feed entity ${index} latitude is invalid.`);
+        }
+        if (!Number.isFinite(lon) || lon < -180 || lon > 180) {
+          throw new RangeError(`Feed entity ${index} longitude is invalid.`);
+        }
+        return {
+          ...raw,
+          id: boundedText(raw.id, `external-${index}`),
+          label: boundedText(raw.label, raw.id ?? `External ${index + 1}`),
+          layer: boundedText(raw.layer, 'External Feed', 80),
+          description: boundedText(raw.description, 'Imported strategic entity', 500),
+          lat,
+          lon,
+          alt: Math.max(0, Math.min(Number(raw.alt) || 0, 100000)),
+          color: /^#[0-9a-f]{6}$/i.test(String(raw.color ?? '')) ? raw.color : '#38bdf8',
+          owned: raw.owned === true,
+        };
+      });
+
+      const validated = { ...feedData, entities };
+      if (feedData.filter === 'detection_radius') {
+        if (!Array.isArray(feedData.sensor_units) || feedData.sensor_units.length > 100) {
+          throw new RangeError('Detection-radius feeds require at most 100 sensor units.');
+        }
+        validated.sensor_units = feedData.sensor_units.map((sensor, index) => {
+          const lat = Number(sensor?.lat);
+          const lon = Number(sensor?.lon);
+          const radius = Number(sensor?.radius_km);
+          if (!Number.isFinite(lat) || lat < -90 || lat > 90 ||
+              !Number.isFinite(lon) || lon < -180 || lon > 180 ||
+              !Number.isFinite(radius) || radius < 0 || radius > 20050) {
+            throw new RangeError(`Sensor unit ${index} is invalid.`);
+          }
+          return {
+            id: boundedText(sensor.id, `sensor-${index}`),
+            lat,
+            lon,
+            radius_km: radius,
+          };
+        });
+      }
+      return validated;
+    }
+
+    function updateFOW() {
+        if (!window.sensorUnits || window.sensorUnits.length === 0) return;
+        Object.values(layerGroups).forEach(group => {
+            if(!group.visible) return;
+            group.children.forEach(child => {
+                if(!child.userData || !child.userData.data || !Number.isFinite(Number(child.userData.data.lat))) return;
+                if(child.userData.data.owned === true) {
+                    child.visible = true;
+                    return;
+                }
+                let isVisible = false;
+                for (let sensor of window.sensorUnits) {
+                    const entityLon = Number(child.userData.data.lng ?? child.userData.data.lon);
+                    const dx = entityLon - Number(sensor.lon);
+                    const dy = Number(child.userData.data.lat) - Number(sensor.lat);
+                    const dist = Math.sqrt(dx*dx + dy*dy) * 111.0;
+                    if (dist <= Number(sensor.radius_km)) {
+                        isVisible = true;
+                        break;
+                    }
+                }
+                child.visible = isVisible;
+            });
+        });
+    }
+
+    // --- GLSL Shaders ---
+    const earthVertexShader = `
+      uniform int u_mode;
+      uniform sampler2D tElevation;
+      uniform sampler2D tSpecular;
+
+      varying vec2 vUv;
+      varying vec3 vPosition;
+      varying vec3 vNormal;
+      varying vec3 vWorldPosition;
+      varying float vElevation;
+
+      float hash(vec3 p) {
+          p = fract(p * 0.3183099 + .1);
+          p *= 17.0;
+          return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+      }
+      float noise(vec3 x) {
+          vec3 p = floor(x); vec3 f = fract(x);
+          f = f * f * (3.0 - 2.0 * f);
+          return mix(mix(mix(hash(p), hash(p + vec3(1,0,0)), f.x),
+                         mix(hash(p + vec3(0,1,0)), hash(p + vec3(1,1,0)), f.x), f.y),
+                     mix(mix(hash(p + vec3(0,0,1)), hash(p + vec3(1,0,1)), f.x),
+                         mix(hash(p + vec3(0,1,1)), hash(p + vec3(1,1,1)), f.x), f.y), f.z);
+      }
+      float fbm(vec3 p) {
+          float v = 0.0; float w = 0.5;
+          for(int i = 0; i < 4; i++) { v += w * noise(p); p *= 2.0; w *= 0.5; }
+          return v;
+      }
+
+      void main() {
+        vUv = uv;
+        vNormal = normalize(normalMatrix * normal);
+
+        float landElev = texture2D(tElevation, uv).r;
+        float isWater = texture2D(tSpecular, uv).r;
+
+        float displacement = 0.0;
+        float elev = 0.0;
+        vec3 p3 = normalize(position);
+
+        if (isWater > 0.5) {
+            // Ocean Bathymetry: Seamless 3D noise for sweeping trenches and ridges
+            float bathymetry = fbm(p3 * 5.0) * 0.6 + fbm(p3 * 15.0) * 0.3 + fbm(p3 * 40.0) * 0.1;
+            bathymetry = smoothstep(0.1, 0.9, bathymetry);
+            displacement = -0.006 - (bathymetry * 0.05);
+            elev = -bathymetry;
+        } else {
+            displacement = pow(landElev, 0.8) * 0.15;
+            elev = landElev;
+        }
+
+        vElevation = elev;
+        vec3 newPos = position + normalize(position) * displacement;
+        vPosition = newPos;
+        vWorldPosition = (modelMatrix * vec4(newPos, 1.0)).xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+      }
+    `;
+
+    const earthFragmentShader = `
+      uniform int u_mode; uniform vec3 u_lightDir; uniform float u_time;
+      uniform sampler2D tDiffuse; uniform sampler2D tSpecular; uniform sampler2D tNight;
+      varying vec2 vUv; varying vec3 vPosition; varying vec3 vNormal; varying vec3 vWorldPosition;
+      varying float vElevation;
+
+      float hash(vec3 p) { p = fract(p * 0.3183099 + .1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+      float noise(vec3 x) {
+        vec3 p = floor(x); vec3 f = fract(x); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(mix(hash(p), hash(p + vec3(1,0,0)), f.x), mix(hash(p + vec3(0,1,0)), hash(p + vec3(1,1,0)), f.x), f.y),
+                   mix(mix(hash(p + vec3(0,0,1)), hash(p + vec3(1,0,1)), f.x), mix(hash(p + vec3(0,1,1)), hash(p + vec3(1,1,1)), f.x), f.y), f.z);
+      }
+      float fbm(vec3 p) { float f = 0.0; float w = 0.5; for(int i = 0; i < 5; i++) { f += w * noise(p); p *= 2.0; w *= 0.5; } return f; }
+
+      void main() {
+        vec3 p = normalize(vPosition);
+        float n1 = fbm(p * 3.5);
+        float absLat = abs(p.y);
+
+        float proceduralLandMask = smoothstep(0.48, 0.55, fbm(p * 2.5 + vec3(0.0, p.y * 2.0, 0.0)));
+
+        vec3 color = vec3(0.0);
+        vec3 normalLight = normalize(u_lightDir);
+        vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+        float diffuse = max(dot(normalize(vNormal), normalLight), 0.0);
+        float lighting = diffuse * 0.85 + 0.15;
+
+        vec3 texDay = texture2D(tDiffuse, vUv).rgb;
+        float specMask = texture2D(tSpecular, vUv).r;
+        float geoLuma = dot(texDay, vec3(0.299, 0.587, 0.114));
+
+        if (u_mode == 3) { // SATELLITE
+            vec3 texNight = texture2D(tNight, vUv).rgb;
+            vec3 dayColor = texDay * lighting;
+            float nightIntensity = smoothstep(0.2, -0.2, dot(normalize(vNormal), normalLight));
+            vec3 nightColor = texNight * vec3(1.2, 1.0, 0.8) * nightIntensity * 2.0;
+            vec3 halfVector = normalize(normalLight + viewDir);
+            float spec = pow(max(dot(normalize(vNormal), halfVector), 0.0), 32.0) * specMask * diffuse;
+            dayColor += vec3(0.5, 0.7, 1.0) * spec * 0.6;
+            color = dayColor + nightColor;
+
+        } else if (u_mode == 0) { // PROCEDURAL
+            vec3 ocean = vec3(0.05, 0.15, 0.3);
+            vec3 land = mix(vec3(0.1, 0.3, 0.15), vec3(0.4, 0.35, 0.2), smoothstep(0.5, 0.8, n1));
+            color = mix(ocean, land, proceduralLandMask) * lighting;
+
+        } else if (u_mode == 1) { // POWER GRIDS
+            vec3 texNight = texture2D(tNight, vUv).rgb;
+            color = mix(vec3(0.02, 0.02, 0.04), vec3(0.0, 0.0, 0.01), specMask);
+            color += texNight * vec3(1.0, 0.8, 0.3) * 1.5;
+            vec3 topoColor = mix(vec3(0.08, 0.12, 0.2), vec3(0.02, 0.04, 0.1), specMask);
+            color += topoColor * pow(geoLuma, 1.2) * lighting * 1.5;
+
+        } else if (u_mode == 2) { // CYBERTECH
+            color = mix(vec3(0.01, 0.03, 0.06), vec3(0.0, 0.01, 0.03), specMask);
+            float edge = smoothstep(0.1, 0.3, specMask) - smoothstep(0.3, 0.5, specMask);
+            color += vec3(0.0, 0.8, 1.0) * edge * 1.5;
+            vec3 topoColor = mix(vec3(0.0, 0.4, 0.8), vec3(0.0, 0.15, 0.4), specMask);
+            color += topoColor * pow(geoLuma, 1.5) * 2.0 * lighting;
+            float grid = smoothstep(0.98, 1.0, sin(vUv.x * 200.0)) + smoothstep(0.98, 1.0, sin(vUv.y * 100.0));
+            color += vec3(0.0, 0.5, 1.0) * grid * 0.2 * (geoLuma + 0.2);
+
+        } else if (u_mode == 4) { // THERMAL
+            float heat = fbm(p * 8.0 + u_time*0.1);
+            float altitudeHeat = 1.0 - geoLuma;
+            float totalHeat = heat * 0.3 + altitudeHeat * 0.6 + smoothstep(0.6, 0.0, absLat) * 0.3;
+            vec3 c1 = vec3(0.1, 0.0, 0.2); vec3 c2 = vec3(0.0, 0.3, 0.8); vec3 c3 = vec3(0.8, 0.8, 0.0); vec3 c4 = vec3(1.0, 0.0, 0.0); vec3 c5 = vec3(1.0, 1.0, 1.0);
+            if(totalHeat < 0.25) color = mix(c1, c2, totalHeat / 0.25);
+            else if(totalHeat < 0.5) color = mix(c2, c3, (totalHeat - 0.25) / 0.25);
+            else if(totalHeat < 0.75) color = mix(c3, c4, (totalHeat - 0.5) / 0.25);
+            else color = mix(c4, c5, (totalHeat - 0.75) / 0.25);
+            color *= lighting * (0.4 + geoLuma * 0.8);
+
+        } else if (u_mode == 5) { // INFRASTRUCTURE
+            color = mix(vec3(0.02, 0.05, 0.08), vec3(0.01, 0.02, 0.03), specMask);
+            float grid = smoothstep(0.98, 1.0, sin(vUv.x * 300.0)) + smoothstep(0.98, 1.0, sin(vUv.y * 150.0));
+            color += vec3(0.2, 0.6, 0.4) * grid * 0.2 * (geoLuma + 0.3);
+            vec3 topoColor = mix(vec3(0.3, 0.6, 0.5), vec3(0.05, 0.2, 0.25), specMask);
+            color += topoColor * pow(geoLuma, 1.8) * 2.0 * lighting;
+
+        } else if (u_mode == 6) { // FINANCIAL
+            color = mix(vec3(0.02, 0.05, 0.02), vec3(0.01, 0.02, 0.01), specMask);
+            float grid = smoothstep(0.98, 1.0, sin((vUv.x+vUv.y)*200.0)) + smoothstep(0.98, 1.0, sin((vUv.x-vUv.y)*200.0));
+            color += vec3(0.8, 0.7, 0.1) * grid * 0.15 * (geoLuma + 0.3);
+            vec3 topoColor = mix(vec3(0.6, 0.8, 0.2), vec3(0.1, 0.3, 0.1), specMask);
+            color += topoColor * pow(geoLuma, 1.5) * 1.8 * lighting;
+
+        } else if (u_mode == 7) { // ELEVATION (True Topographic & Bathymetric Wireframe)
+            vec3 bgColor = vec3(0.01, 0.015, 0.025);
+            vec3 deepOcean = vec3(0.01, 0.08, 0.35);
+            vec3 midOcean = vec3(0.04, 0.25, 0.65);
+            vec3 shallowWater = vec3(0.10, 0.50, 0.85);
+            vec3 coast = vec3(0.7, 0.6, 0.2);
+            vec3 lowland = vec3(0.1, 0.45, 0.15);
+            vec3 highland = vec3(0.55, 0.35, 0.15);
+            vec3 peak = vec3(0.95, 0.95, 0.95);
+
+            vec3 wireCol = vec3(0.0);
+            float absElev = abs(vElevation);
+
+            if (specMask > 0.5) {
+                float depth = clamp(absElev, 0.0, 1.0);
+                if (depth < 0.35) wireCol = mix(shallowWater, midOcean, depth / 0.35);
+                else wireCol = mix(midOcean, deepOcean, (depth - 0.35) / 0.65);
+                wireCol += vec3(0.0, 0.4, 0.6) * smoothstep(0.2, 0.0, depth);
+            } else {
+                float h = clamp(vElevation, 0.0, 1.0);
+                if (h < 0.03) wireCol = mix(coast, lowland, h / 0.03);
+                else if (h < 0.20) wireCol = mix(lowland, highland, (h - 0.03) / 0.17);
+                else wireCol = mix(highland, peak, (h - 0.20) / 0.80);
+            }
+            wireCol = mix(wireCol, texDay * 1.5, 0.35);
+
+            vec2 gridUV = vUv * vec2(720.0, 360.0);
+            vec2 fw = max(fwidth(gridUV), vec2(0.0001));
+            vec2 grid = abs(fract(gridUV - 0.5) - 0.5) / fw;
+            float line = min(grid.x, grid.y);
+            float wireframe = 1.0 - min(line, 1.0);
+
+            vec2 contourUV = vUv * vec2(90.0, 45.0);
+            vec2 contourFw = max(fwidth(contourUV), vec2(0.0001));
+            vec2 contourGrid = abs(fract(contourUV - 0.5) - 0.5) / contourFw;
+            float contourLine = min(contourGrid.x, contourGrid.y);
+            float contour = 1.0 - min(contourLine, 1.0);
+
+            color = bgColor;
+            color += wireCol * wireframe * (0.7 + absElev * 1.5);
+            color += wireCol * contour * 0.5;
+            color *= lighting * (0.9 + absElev * 0.8);
+        }
+
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `;
+
+    // --- STREAMING_CHUNK: Scene Setup & Initialization ---
+    function initThreeScene() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+      camera.position.set(0, 10, 22);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true; controls.dampingFactor = 0.05;
+      controls.minDistance = 5.2; controls.maxDistance = 60;
+      controls.addEventListener('start', () => { isTracking = false; });
+
+      const texLoader = new THREE.TextureLoader();
+      texLoader.crossOrigin = "Anonymous";
+      let texturesReady = 0;
+      const solidTexture = (r, g, b, a = 255) => {
+        const texture = new THREE.DataTexture(
+          new Uint8Array([r, g, b, a]), 1, 1, THREE.RGBAFormat
+        );
+        texture.needsUpdate = true;
+        return texture;
+      };
+      const onTexError = (name) => {
+        textureFallbackPending = true;
+        activateProceduralTextureFallback(`${name} failed.`);
+      };
+      let tDiffuse, tSpecular, tNight, tElevation;
+      if (directFileMode) {
+        tDiffuse = solidTexture(20, 70, 110);
+        tSpecular = solidTexture(0, 0, 0);
+        tNight = solidTexture(0, 0, 0);
+        tElevation = solidTexture(0, 0, 0);
+      } else {
+        tDiffuse = texLoader.load('vendor/textures/earth-blue-marble.jpg', () => { texturesReady++; }, undefined, () => onTexError('Day map'));
+        tSpecular = texLoader.load('vendor/textures/earth-water.png', () => { texturesReady++; }, undefined, () => onTexError('Specular map'));
+        tNight = texLoader.load('vendor/textures/earth-night.jpg', () => { texturesReady++; }, undefined, () => onTexError('Night-lights map'));
+        tElevation = texLoader.load('vendor/textures/earth-topology.png', () => { texturesReady++; }, undefined, () => onTexError('Elevation map'));
+      }
+
+      // Hidden Canvas for Landmask Sampling (Population strictly bound to land)
+      if (!directFileMode) {
+        const waterImg = new Image();
+        waterImg.crossOrigin = "Anonymous";
+        waterImg.src = 'vendor/textures/earth-water.png';
+        waterImg.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 1024; canvas.height = 512;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(waterImg, 0, 0, 1024, 512);
+          earthWaterData = ctx.getImageData(0, 0, 1024, 512).data;
+        };
+      }
+
+      const earthMat = new THREE.ShaderMaterial({
+        vertexShader: earthVertexShader, fragmentShader: earthFragmentShader,
+        uniforms: {
+          u_mode: { value: textureProfilesAvailable ? 3 : 0 }, u_time: { value: 0 },
+          u_lightDir: { value: new THREE.Vector3(1, 0.5, 1).normalize() },
+          tDiffuse: { value: tDiffuse },
+          tSpecular: { value: tSpecular },
+          tNight: { value: tNight },
+          tElevation: { value: tElevation }
+        }
+      });
+      earthMesh = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS, 192, 192), earthMat);
+      scene.add(earthMesh);
+      if (textureFallbackPending) {
+        activateProceduralTextureFallback(
+          directFileMode
+            ? 'Browser texture security is active in file:// mode.'
+            : 'One or more globe textures could not be loaded.'
+        );
+      }
+
+      // Clouds Mesh
+      const cloudMat = new THREE.ShaderMaterial({
+        uniforms: { u_time: { value: 0 } },
+        vertexShader: `
+          varying vec3 vPosition;
+          void main() { vPosition = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+        `,
+        fragmentShader: `
+          uniform float u_time;
+          varying vec3 vPosition;
+          float hash(vec3 p) { p = fract(p * 0.3183099 + .1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+          float noise(vec3 x) {
+            vec3 p = floor(x); vec3 f = fract(x); f = f * f * (3.0 - 2.0 * f);
+            return mix(mix(mix(hash(p), hash(p + vec3(1,0,0)), f.x), mix(hash(p + vec3(0,1,0)), hash(p + vec3(1,1,0)), f.x), f.y),
+                       mix(mix(hash(p + vec3(0,0,1)), hash(p + vec3(1,0,1)), f.x), mix(hash(p + vec3(0,1,1)), hash(p + vec3(1,1,1)), f.x), f.y), f.z);
+          }
+          float fbm(vec3 p) { float f = 0.0; float w = 0.5; for(int i = 0; i < 4; i++) { f += w * noise(p); p *= 2.0; w *= 0.5; } return f; }
+          void main() {
+            vec3 p = normalize(vPosition);
+            float timeAngle = u_time * 0.05;
+            vec3 rotatedP = vec3(p.x * cos(timeAngle) - p.z * sin(timeAngle), p.y, p.x * sin(timeAngle) + p.z * cos(timeAngle));
+            float c = fbm(rotatedP * 4.0);
+            float alpha = smoothstep(0.4, 0.7, c);
+            gl_FragColor = vec4(1.0, 1.0, 1.0, alpha * 0.7);
+          }
+        `,
+        transparent: true, depthWrite: false, blending: THREE.NormalBlending
+      });
+      cloudsMesh = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS + 0.1, 64, 64), cloudMat);
+      cloudsMesh.visible = false;
+      scene.add(cloudsMesh);
+
+      // Atmosphere Glow
+      const atmosMat = new THREE.ShaderMaterial({
+        vertexShader: `
+          varying vec3 vNormal;
+          void main() { vNormal = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+        `,
+        fragmentShader: `
+          varying vec3 vNormal;
+          void main() {
+            float intensity = pow(0.6 - dot(vNormal, vec3(0, 0, 1.0)), 3.0);
+            gl_FragColor = vec4(0.3, 0.6, 1.0, 1.0) * intensity;
+          }
+        `,
+        blending: THREE.AdditiveBlending, side: THREE.BackSide, transparent: true, depthWrite: false
+      });
+      atmosphereMesh = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS + 0.25, 64, 64), atmosMat);
+      scene.add(atmosphereMesh);
+
+      const surfaceKeys = ['dc', 'ai', 'fin', 'ixp', 'ship', 'air', 'road', 'crisis', 'pop', 'stream-data', 'stream-inf', 'stream-fin', 'external'];
+      const orbitalKeys = ['sat-t1', 'sat-t2', 'orbits'];
+      surfaceKeys.forEach(k => { layerGroups[k].visible = false; earthMesh.add(layerGroups[k]); });
+      orbitalKeys.forEach(k => { layerGroups[k].visible = false; scene.add(layerGroups[k]); });
+
+      // Starfield
+      const starGeo = new THREE.BufferGeometry();
+      const posArray = new Float32Array(3000 * 3);
+      for(let i=0; i<9000; i++) posArray[i] = (Math.random() - 0.5) * 400;
+      starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+      scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.5, color: 0xffffff, transparent: true, opacity: 0.6 })));
+
+      raycaster = new THREE.Raycaster(); mouse = new THREE.Vector2();
+      renderer.domElement.addEventListener('pointerdown', event => {
+        pointerAnchor = { x: event.clientX, y: event.clientY };
+      });
+      renderer.domElement.addEventListener('pointerup', event => {
+        if(event.button !== 0 || !pointerAnchor) return;
+        const moved = Math.hypot(event.clientX-pointerAnchor.x,event.clientY-pointerAnchor.y);
+        pointerAnchor = null;
+        if(moved <= 6) onPointerClick(event);
+      });
+      renderer.domElement.addEventListener('pointermove', onPointerMove);
+      renderer.domElement.addEventListener('contextmenu', event => {
+        event.preventDefault();
+        onPointerClick(event);
+      });
+
+      const resizeObserver = new ResizeObserver(() => {
+        if(!container.clientWidth) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+      resizeObserver.observe(container);
+    }
+
+    function latLngToVector3(lat, lng, radius) {
+      const phi = (90 - lat) * (Math.PI / 180); const theta = (lng + 180) * (Math.PI / 180);
+      return new THREE.Vector3(-(radius * Math.sin(phi) * Math.cos(theta)), radius * Math.cos(phi), radius * Math.sin(phi) * Math.sin(theta));
+    }
+
+    function ingestExternalEntities(entities) {
+      const group = layerGroups.external;
+      group.clear();
+      entities.forEach((raw, index) => {
+        const lat = Number(raw.lat);
+        const lng = Number(raw.lon ?? raw.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+        const color = new THREE.Color(raw.color || '#38bdf8');
+        const marker = new THREE.Group();
+        const altitude = Math.max(0, Number(raw.alt || 0));
+        marker.position.copy(latLngToVector3(lat, lng, EARTH_RADIUS + 0.35 + Math.min(altitude / 2000, 0.75)));
+        marker.lookAt(0, 0, 0);
+        const mesh = new THREE.Mesh(
+          new THREE.ConeGeometry(0.07, 0.22, 6),
+          new THREE.MeshBasicMaterial({color, depthTest:false})
+        );
+        mesh.rotation.x = Math.PI / 2;
+        mesh.position.z = 0.11;
+        marker.add(mesh);
+        marker.userData = {
+          type:'external',
+          data:{
+            id:String(raw.id || `external-${index}`),
+            name:String(raw.label || raw.id || `External ${index + 1}`),
+            cat:String(raw.layer || 'External Feed'),
+            desc:String(raw.description || 'Public URL feed entity'),
+            lat,
+            lng,
+            owned:raw.owned === true
+          }
+        };
+        group.add(marker);
+      });
+      group.visible = true;
+      logEvent(`[FEED] Loaded ${group.children.length} external entities.`, 'text-cyan-400 font-bold');
+    }
+
+    function logEvent(msg, colClass = 'text-slate-400') {
+      const feed = document.getElementById('telemetry-feed');
+      const time = new Date().toLocaleTimeString('en-US',{hour12:false});
+      const el = document.createElement('div');
+      el.className = `feed-item ${colClass} pb-1`;
+      const timestamp = document.createElement('span');
+      timestamp.className = 'text-slate-600 mr-1';
+      timestamp.textContent = `[${time}]`;
+      el.append(timestamp, document.createTextNode(` ${String(msg)}`));
+      feed.prepend(el);
+      if(feed.children.length > 30) feed.removeChild(feed.lastChild);
+    }
+
+    function createArc(p1, p2, color, opacity) {
+        const v1 = latLngToVector3(p1.lat, p1.lng, EARTH_RADIUS + 0.35);
+        const v2 = latLngToVector3(p2.lat, p2.lng, EARTH_RADIUS + 0.35);
+        const mid = v1.clone().add(v2).multiplyScalar(0.5).normalize().multiplyScalar(EARTH_RADIUS + 0.5);
+        const curve = new THREE.QuadraticBezierCurve3(v1, mid, v2);
+        const line = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(curve.getPoints(24)),
+            new THREE.LineDashedMaterial({ color: color, transparent: true, opacity: opacity, dashSize: 0.1, gapSize: 0.2, depthWrite: false, depthTest: false })
+        );
+        line.computeLineDistances();
+        return line;
+    }
+
+    async function ingestDataCenters() {
+      logEvent('Fetching Global DC topology & Edge nodes...', 'text-amber-400');
+      await new Promise(r => setTimeout(r, 600));
+
+      const t1Data = [
+        { id: "dc-aws-e1", name: "AWS us-east-1", tier: 1, cat: "Hyperscale", lat: 39.0, lng: -77.4, desc: "Primary Northern Virginia hub." },
+        { id: "dc-aws-w2", name: "AWS us-west-2", tier: 1, cat: "Hyperscale", lat: 45.5, lng: -122.6, desc: "Oregon region." },
+        { id: "dc-aws-eu", name: "AWS eu-west-1", tier: 1, cat: "Hyperscale", lat: 53.3, lng: -6.2, desc: "EU Core (Ireland)." },
+        { id: "dc-gcp-asia", name: "GCP asia-east1", tier: 1, cat: "Hyperscale", lat: 35.6, lng: 139.7, desc: "Tokyo region." },
+        { id: "dc-azure-eu", name: "Azure West Europe", tier: 1, cat: "Hyperscale", lat: 52.3, lng: 4.9, desc: "Amsterdam primary." }
+      ];
+
+      t1Data.forEach(d => {
+        const marker = new THREE.Group();
+        marker.position.copy(latLngToVector3(d.lat, d.lng, EARTH_RADIUS + 0.35));
+        marker.lookAt(0,0,0);
+        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.2, 8), new THREE.MeshBasicMaterial({ color: 0xf59e0b }));
+        mesh.rotation.x = Math.PI / 2; mesh.position.z = 0.1;
+        marker.add(mesh);
+        marker.userData = { type: 'datacenter', data: d };
+        layerGroups['dc'].add(marker);
+      });
+
+      const numEdge = 2000;
+      const edgeGeo = new THREE.BufferGeometry();
+      const edgePos = new Float32Array(numEdge * 3);
+      for(let i=0; i<numEdge; i++) {
+        const v = latLngToVector3((Math.random() - 0.5) * 120, (Math.random() - 0.5) * 360, EARTH_RADIUS + 0.35);
+        edgePos[i*3] = v.x; edgePos[i*3+1] = v.y; edgePos[i*3+2] = v.z;
+      }
+      edgeGeo.setAttribute('position', new THREE.BufferAttribute(edgePos, 3));
+      const edgePoints = new THREE.Points(edgeGeo, new THREE.PointsMaterial({ color: 0xfcd34d, size: 0.03, transparent: true, opacity: 0.6, depthTest: false }));
+      edgePoints.userData = { data: { tier: 3, cat: 'Edge Node' } };
+      layerGroups['dc'].add(edgePoints);
+    }
+
+    async function ingestAI() {
+        logEvent('Mapping Volumetric AI/HPC Clusters...', 'text-fuchsia-400');
+        await new Promise(r => setTimeout(r, 400));
+        const data = [
+            { id: "ai-xai", name: "xAI Colossus", tier: 1, cat: "Supercluster", lat: 35.1, lng: -90.0, desc: "Memphis GPU cluster.", val: "1.8 EFLOPS" },
+            { id: "ai-frontier", name: "ORNL Frontier", tier: 1, cat: "Supercomputer", lat: 35.9, lng: -84.3, desc: "Exascale compute node.", val: "1.2 EFLOPS" }
+        ];
+        data.forEach(d => {
+            const marker = new THREE.Group();
+            marker.position.copy(latLngToVector3(d.lat, d.lng, EARTH_RADIUS + 0.35));
+            marker.lookAt(0,0,0);
+            const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.5, 8), new THREE.MeshBasicMaterial({ color: 0xe879f9, transparent:true, opacity:0.8, depthWrite:false }));
+            pillar.rotation.x = Math.PI / 2; pillar.position.z = 0.25;
+            const ring = new THREE.Mesh(new THREE.RingGeometry(0.06, 0.15, 16), new THREE.MeshBasicMaterial({ color: 0xc084fc, side: THREE.DoubleSide }));
+            ring.position.z = 0.04;
+            marker.add(pillar); marker.add(ring);
+            marker.userData = { type: 'ai', data: d };
+            layerGroups['ai'].add(marker);
+        });
+    }
+
+    async function ingestFinancial() {
+        logEvent('Connecting to Exchange routing tables...', 'text-yellow-400');
+        await new Promise(r => setTimeout(r, 500));
+        const data = [
+            { id: "fin-nyse", name: "NYSE Carteret", tier: 1, cat: "Matching Engine", lat: 40.58, lng: -74.23, desc: "US Equity Core.", val: "$250B/Day" },
+            { id: "fin-lse", name: "LSE LD4", tier: 1, cat: "Matching Engine", lat: 51.51, lng: -0.59, desc: "EU Equity Core.", val: "$150B/Day" }
+        ];
+        data.forEach(d => {
+            const marker = new THREE.Group();
+            marker.position.copy(latLngToVector3(d.lat, d.lng, EARTH_RADIUS + 0.35));
+            marker.lookAt(0,0,0);
+            const mesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.06), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
+            mesh.position.z = 0.1;
+            const pulse = new THREE.Mesh(new THREE.RingGeometry(0.08, 0.12, 16), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent:true, opacity:0.8 }));
+            pulse.position.z = 0.05; marker.userData.pulse = pulse;
+            marker.add(mesh); marker.add(pulse);
+            marker.userData.type = 'fin'; marker.userData.data = d;
+            layerGroups['fin'].add(marker);
+        });
+        layerGroups['fin'].add(createArc(data[0], data[1], 0xfacc15, 0.8));
+    }
+
+    async function ingestIXP() {
+        logEvent('Tracing Backbone Fiber & IXPs...', 'text-emerald-400');
+        await new Promise(r => setTimeout(r, 400));
+        const data = [
+            { id: "ixp-decix", name: "DE-CIX Frankfurt", tier: 1, cat: "IXP", lat: 50.11, lng: 8.68, desc: "EU peering point.", val: "14.5 Tbps" },
+            { id: "ixp-ash", name: "Equinix Ashburn", tier: 1, cat: "IXP", lat: 39.04, lng: -77.48, desc: "US East peering.", val: "18.0 Tbps" }
+        ];
+        data.forEach(d => {
+            const marker = new THREE.Group();
+            marker.position.copy(latLngToVector3(d.lat, d.lng, EARTH_RADIUS + 0.35));
+            marker.lookAt(0,0,0);
+            const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.1, 8), new THREE.MeshBasicMaterial({ color: 0x34d399 }));
+            mesh.rotation.x = Math.PI / 2; mesh.position.z = 0.05;
+            marker.add(mesh);
+            marker.userData = { type: 'ixp', data: d };
+            layerGroups['ixp'].add(marker);
+        });
+        layerGroups['ixp'].add(createArc(data[0], data[1], 0x34d399, 0.6));
+    }
+
+    async function ingestMobility(type) {
+        logEvent(`Simulating global ${type} networks...`, 'text-blue-400');
+        await new Promise(r => setTimeout(r, 300));
+
+        let routes = [];
+        if (type === 'ship') {
+            const ports = [{lat:31.2, lng:121.5}, {lat:1.2, lng:103.8}, {lat:51.9, lng:4.0}, {lat:33.7, lng:-118.2}, {lat:40.7, lng:-74.0}, {lat:9.1, lng:-79.6}, {lat:30.9, lng:32.3}, {lat:-33.9, lng:151.2}, {lat:-33.9, lng:18.4}];
+            for(let i=0; i<ports.length; i++) {
+                for(let j=i+1; j<ports.length; j++) {
+                    if(Math.random() > 0.4) routes.push([ports[i], ports[j]]);
+                }
+            }
+        } else if (type === 'air') {
+            const hubs = [{lat:40.6, lng:-73.7}, {lat:51.4, lng:-0.4}, {lat:25.2, lng:55.3}, {lat:35.5, lng:139.7}, {lat:50.0, lng:8.5}, {lat:33.9, lng:-118.4}, {lat:22.3, lng:113.9}, {lat:41.8, lng:12.2}, {lat:-23.5, lng:-46.6}];
+            for(let i=0; i<hubs.length; i++) {
+                for(let j=i+1; j<hubs.length; j++) {
+                    if(Math.random() > 0.3) routes.push([hubs[i], hubs[j]]);
+                }
+            }
+        } else if (type === 'road') {
+            const cities = [{lat:40.7, lng:-74.0}, {lat:41.8, lng:-87.6}, {lat:34.0, lng:-118.2}, {lat:29.7, lng:-95.3}, {lat:48.8, lng:2.3}, {lat:52.5, lng:13.4}, {lat:41.9, lng:12.5}, {lat:39.9, lng:116.4}, {lat:31.2, lng:121.5}, {lat:22.5, lng:114.0}];
+            for(let i=0; i<cities.length; i++) {
+                for(let j=i+1; j<cities.length; j++) {
+                    const dLat = cities[i].lat - cities[j].lat; const dLng = cities[i].lng - cities[j].lng;
+                    const dist = Math.sqrt(dLat*dLat + dLng*dLng);
+                    if(dist < 60 && Math.random() > 0.2) routes.push([cities[i], cities[j]]);
+                }
+            }
+        }
+
+        const color = type === 'ship' ? 0x3b82f6 : type === 'air' ? 0xffffff : 0xf97316;
+        routes.forEach(r => {
+            const line = createArc(r[0], r[1], color, type === 'air' ? 0.3 : 0.6);
+            line.userData = { type: type, data: { name: `Active ${type} Route`, cat: "Logistics", desc: "Simulated transit corridor." } };
+            layerGroups[type].add(line);
+        });
+        logEvent(`Mapped ${routes.length} active ${type} corridors.`, 'text-blue-300');
+    }
+
+    async function ingestDataStreams() {
+        logEvent('Initializing Data Stream telemetry...', 'text-cyan-400');
+        await new Promise(r => setTimeout(r, 300));
+        const nodes = [{lat:39.0, lng:-77.4}, {lat:53.3, lng:-6.2}, {lat:35.6, lng:139.7}, {lat:45.5, lng:-122.6}, {lat:52.3, lng:4.9}];
+        nodes.forEach((n1, i) => {
+            nodes.forEach((n2, j) => {
+                if(i !== j && Math.random() > 0.3) {
+                    const line = createArc(n1, n2, 0x22d3ee, 0.7);
+                    line.userData = { type: 'stream-data', data: { name: `DC Backbone Link`, cat: "Telemetry", desc: "Active hyperscale data transfer." } };
+                    layerGroups['stream-data'].add(line);
+                }
+            });
+        });
+    }
+
+    async function ingestInferenceStreams() {
+        logEvent('Tracing Inference API calls to edge...', 'text-purple-400');
+        await new Promise(r => setTimeout(r, 300));
+        const cores = [{lat:35.1, lng:-90.0}, {lat:35.9, lng:-84.3}];
+        cores.forEach(core => {
+            for(let i=0; i<15; i++) {
+                const edge = {lat: (Math.random()-0.5)*120, lng: (Math.random()-0.5)*360};
+                const line = createArc(core, edge, 0xa855f7, 0.5);
+                line.userData = { type: 'stream-inf', data: { name: `AI Inference Stream`, cat: "Compute", desc: "Token generation sent to edge node." } };
+                layerGroups['stream-inf'].add(line);
+            }
+        });
+    }
+
+    async function ingestFinancialStreams() {
+        logEvent('Tracking high-frequency algorithmic streams...', 'text-yellow-400');
+        await new Promise(r => setTimeout(r, 300));
+        const hubs = [{lat:40.58, lng:-74.23}, {lat:51.51, lng:-0.59}, {lat:35.68, lng:139.69}, {lat:22.28, lng:114.15}];
+        hubs.forEach((h1, i) => {
+            hubs.forEach((h2, j) => {
+                if(i !== j) {
+                    const line = createArc(h1, h2, 0xfacc15, 0.8);
+                    line.userData = { type: 'stream-fin', data: { name: `HFT Dark Pool`, cat: "Financial", desc: "High-frequency arbitrage stream." } };
+                    layerGroups['stream-fin'].add(line);
+                }
+            });
+        });
+    }
+
+    async function updateLiveISS() {
+      if (!isLiveApiEnabled || !layerGroups['sat-t1'].visible) return;
+      try {
+        const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        const d = { id: "sat-iss", name: "ISS (LIVE)", tier: 1, cat: "Station", alt: data.altitude, lat: data.latitude, lng: data.longitude, val: `${data.velocity.toFixed(0)} km/h`, desc: `Live tracking. Visibility: ${data.visibility}` };
+
+        let sat = layerGroups['sat-t1'].children.find(c => c.userData && c.userData.isLive);
+        if (!sat) {
+          sat = new THREE.Group();
+          sat.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.3), new THREE.MeshBasicMaterial({color: 0xffffff})));
+          sat.add(new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.02, 0.1), new THREE.MeshBasicMaterial({color: 0x0284c7})));
+          sat.userData = { type: 'sat', data: d, isLive: true };
+          layerGroups['sat-t1'].add(sat);
+        } else {
+          sat.userData.data = d;
+        }
+        sat.position.copy(latLngToVector3(d.lat, d.lng, EARTH_RADIUS + 0.5 + (d.alt/2000)));
+        sat.lookAt(0,0,0);
+
+        if (!sat.userData.track) {
+          sat.userData.track = [];
+          const trackGeo = new THREE.BufferGeometry();
+          const trackMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.55, depthWrite: false });
+          sat.userData.trackLine = new THREE.Line(trackGeo, trackMat);
+          layerGroups['sat-t1'].add(sat.userData.trackLine);
+        }
+        const track = sat.userData.track;
+        const groundPos = latLngToVector3(d.lat, d.lng, EARTH_RADIUS + 0.35);
+        track.push(groundPos);
+        if (track.length > 40) track.shift();
+        if (track.length > 1) {
+          sat.userData.trackLine.geometry.setFromPoints(track);
+          sat.userData.trackLine.geometry.attributes.position.needsUpdate = true;
+        }
+
+        if (selectedObject === sat) {
+          document.getElementById('inspect-coords').textContent = `${d.lat.toFixed(2)}°, ${d.lng.toFixed(2)}°`;
+          document.getElementById('inspect-alt').textContent = (typeof d.alt === 'number' ? d.alt.toFixed(1) : d.alt) + ' km';
+          document.getElementById('inspect-speed').textContent = d.val;
+        }
+      } catch (err) {}
+    }
+
+    async function ingestSpaceStationsT1() {
+        layerGroups['sat-t1'].clear();
+        if (liveIssInterval) { clearInterval(liveIssInterval); liveIssInterval = null; }
+
+        if (isLiveApiEnabled) {
+            logEvent('Fetching LIVE ISS telemetry...', 'text-cyan-400');
+            try {
+                await updateLiveISS();
+                logEvent(`Locked onto LIVE ISS. Continuous 15s refresh enabled.`, 'text-cyan-300 font-bold');
+                liveIssInterval = setInterval(updateLiveISS, 15000);
+                return;
+            } catch (err) {
+                logEvent(`ISS Uplink Failed: ${err.message}. Falling back...`, 'text-amber-500');
+            }
+        }
+
+        logEvent('Loading T1 Space Stations...', 'text-cyan-400');
+        await new Promise(r => setTimeout(r, 300));
+        const stations = [
+            { id: "sat-iss", name: "ISS", tier: 1, cat: "Station", alt: 420, inc: 51.6, raan: 100 },
+            { id: "sat-css", name: "Tiangong", tier: 1, cat: "Station", alt: 390, inc: 41.5, raan: 200 }
+        ];
+        stations.forEach(d => {
+            const sat = new THREE.Group();
+            sat.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.3), new THREE.MeshBasicMaterial({color: 0xffffff})));
+            sat.add(new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.02, 0.1), new THREE.MeshBasicMaterial({color: 0x0284c7})));
+            sat.userData = { type: 'sat', data: d, angle: 0, speed: 0.5, r: EARTH_RADIUS + 0.5 + (d.alt/2000), inc: d.inc, raan: d.raan };
+            layerGroups['sat-t1'].add(sat);
+        });
+    }
+
+    async function ingestSpaceStationsT2() {
+        layerGroups['sat-t2'].clear();
+        logEvent('Loading T2 Satellites...', 'text-sky-400');
+        await new Promise(r => setTimeout(r, 350));
+        const sats = [
+            { id: "sat-hubble", name: "Hubble", tier: 2, cat: "Observatory", alt: 540, inc: 28.5, raan: 50 },
+            { id: "sat-jwst", name: "JWST", tier: 2, cat: "Observatory", alt: 1500, inc: 0.0, raan: 0 },
+            { id: "sat-terra", name: "Terra", tier: 2, cat: "Earth Obs", alt: 705, inc: 98.2, raan: 120 }
+        ];
+        sats.forEach(d => {
+            const sat = new THREE.Group();
+            sat.add(new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.2), new THREE.MeshBasicMaterial({color: 0x7dd3fc})));
+            sat.add(new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.015, 0.08), new THREE.MeshBasicMaterial({color: 0x38bdf8})));
+            sat.userData = { type: 'sat', data: d, angle: Math.random()*Math.PI*2, speed: 0.4 + Math.random()*0.2, r: EARTH_RADIUS + 0.5 + (d.alt/2000), inc: d.inc, raan: d.raan };
+            layerGroups['sat-t2'].add(sat);
+        });
+    }
+
+    async function ingestTrajectories() {
+        logEvent('Calculating orbital trajectories...', 'text-sky-400');
+        await new Promise(r => setTimeout(r, 300));
+        const stations = [
+            { alt: 420, inc: 51.6, raan: 100 },
+            { alt: 390, inc: 41.5, raan: 200 },
+            { alt: 535, inc: 28.5, raan: 50 }
+        ];
+        for (let i = 0; i < 3; i++) stations.push({ alt: 1200 + i * 200, inc: 85 + i, raan: i * 45 });
+
+        stations.forEach(d => {
+            const r = EARTH_RADIUS + 0.5 + (d.alt/2000);
+            const orbitCurve = new THREE.EllipseCurve(0, 0, r, r, 0, 2 * Math.PI, false, 0);
+            const pts = orbitCurve.getPoints(128).map(p => new THREE.Vector3(p.x, 0, p.y));
+            const orbitGeo = new THREE.BufferGeometry().setFromPoints(pts);
+            orbitGeo.rotateX(THREE.MathUtils.degToRad(d.inc));
+            orbitGeo.rotateY(THREE.MathUtils.degToRad(d.raan));
+            const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.15, depthWrite: false, depthTest: false }));
+            orbitLine.userData = { type: 'orbits', data: { name: "Orbital Track", cat: "Trajectory", desc: "Predicted path." } };
+            layerGroups['orbits'].add(orbitLine);
+        });
+    }
+
+    async function ingestSwarm() {
+        logEvent('Constructing T3 Megaconstellation buffers...', 'text-cyan-500');
+        await new Promise(r => setTimeout(r, 400));
+        const geo = new THREE.BufferGeometry();
+        const pos = new Float32Array(NUM_SWARM * 3);
+        const udata = [];
+        for(let i=0; i<NUM_SWARM; i++) {
+            udata.push({ angle: Math.random()*Math.PI*2, speed: 0.6+Math.random()*0.1, r: EARTH_RADIUS+0.6, inc: 53+Math.random(), raan: Math.random()*360 });
+        }
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        swarmPoints = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x22d3ee, size: 0.02, transparent: true, opacity: 0.4, depthWrite: false, depthTest: false }));
+        swarmPoints.userData = { swarmData: udata, data: { tier: 3, cat: 'Megaconstellation Node' } };
+        scene.add(swarmPoints);
+    }
+
+    async function ingestDebris() {
+        logEvent('Fetching USSPACECOM T4 Debris Catalog...', 'text-rose-400');
+        await new Promise(r => setTimeout(r, 600));
+        const geo = new THREE.TetrahedronGeometry(0.015);
+        const mat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
+        debrisMesh = new THREE.InstancedMesh(geo, mat, NUM_DEBRIS);
+        const dummy = new THREE.Object3D();
+        const udata = [];
+        for(let i=0; i<NUM_DEBRIS; i++) {
+            udata.push({
+                angle: Math.random()*Math.PI*2, speed: 0.4+Math.random()*0.3, r: EARTH_RADIUS+0.8+Math.random()*1.5,
+                inc: Math.random()*180, raan: Math.random()*360,
+                rotX: Math.random()*0.1, rotY: Math.random()*0.1
+            });
+            debrisMesh.setMatrixAt(i, dummy.matrix);
+        }
+        debrisMesh.userData = { swarmData: udata, dummy: dummy };
+        scene.add(debrisMesh);
+    }
+
+    async function ingestCrisis() {
+        layerGroups['crisis'].clear();
+        if (isLiveApiEnabled) {
+            logEvent('Fetching LIVE USGS Seismic GeoJSON...', 'text-rose-500');
+            try {
+                const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson');
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+                let count = 0;
+                data.features.forEach(f => {
+                    const coords = f.geometry.coordinates;
+                    const mag = f.properties.mag;
+                    const d = { id: f.id, name: f.properties.place, tier: 1, cat: "Earthquake", lat: coords[1], lng: coords[0], desc: `Magnitude ${mag} detected.`, val: `M${mag}` };
+                    const marker = new THREE.Group();
+                    marker.position.copy(latLngToVector3(d.lat, d.lng, EARTH_RADIUS + 0.35));
+                    marker.lookAt(0,0,0);
+                    const ring = new THREE.Mesh(new THREE.RingGeometry(0.05 + (mag*0.01), 0.1 + (mag*0.02), 32), new THREE.MeshBasicMaterial({ color: 0xf43f5e, side: THREE.DoubleSide, transparent: true, opacity: 0.8 }));
+                    ring.position.z = 0.02; marker.add(ring);
+                    marker.userData = { type: 'crisis', data: d };
+                    layerGroups['crisis'].add(marker);
+                    count++;
+                });
+                logEvent(`Mapped ${count} LIVE seismic anomalies >M4.5.`, 'text-rose-400 font-bold');
+                return;
+            } catch (err) {
+                logEvent(`USGS Uplink Failed: ${err.message}. Falling back...`, 'text-amber-500');
+            }
+        }
+
+        logEvent('Connecting to USGS Simulated Endpoints...', 'text-rose-500');
+        await new Promise(r => setTimeout(r, 300));
+        const d = { id: "crs-1", name: "Seismic Anomaly", tier: 1, cat: "Earthquake", lat: 35.0, lng: 139.0, desc: "M6.2 Detection off coast.", val: "High" };
+        const marker = new THREE.Group();
+        marker.position.copy(latLngToVector3(d.lat, d.lng, EARTH_RADIUS + 0.35));
+        marker.lookAt(0,0,0);
+        const ring = new THREE.Mesh(new THREE.RingGeometry(0.1, 0.4, 32), new THREE.MeshBasicMaterial({ color: 0xf43f5e, side: THREE.DoubleSide, transparent: true, opacity: 0.8 }));
+        ring.position.z = 0.02; marker.add(ring);
+        marker.userData = { type: 'crisis', data: d };
+        layerGroups['crisis'].add(marker);
+        logEvent(`ALERT: ${d.name} detected (35.0N, 139.0E)`, 'text-rose-500 font-bold');
+    }
+
+    async function ingestPopulation() {
+        logEvent('Loading Global Population Density maps (land-masked)...', 'text-orange-400');
+        await new Promise(r => setTimeout(r, 400));
+
+        if (!earthWaterData) {
+            logEvent('[ERR] Landmask unavailable. Aborting population map.', 'text-rose-500');
+            return;
+        }
+
+        const numPoints = 15000;
+        const geo = new THREE.BufferGeometry();
+        const pos = new Float32Array(numPoints * 3);
+        const colors = new Float32Array(numPoints * 3);
+        const colorHigh = new THREE.Color(0xffaa00);
+        const colorMid  = new THREE.Color(0xff6600);
+        const colorLow  = new THREE.Color(0xcc3300);
+        let added = 0;
+        let attempts = 0;
+
+        while (added < numPoints && attempts < numPoints * 10) {
+            attempts++;
+            const lat = (Math.random() - 0.5) * 140;
+            const lng = (Math.random() - 0.5) * 360;
+
+            const u = (lng + 180) / 360;
+            const v = (90 - lat) / 180;
+            const px = Math.floor(u * 1023);
+            const py = Math.floor(v * 511);
+            const idx = (py * 1024 + px) * 4;
+            const isWater = earthWaterData[idx] > 128;
+
+            if (isWater) continue; // Strict rejection of ocean spawning
+
+            const popBias = 1.0 - Math.abs(lat) / 90;
+            if (Math.random() > (0.1 + popBias * 0.4)) continue;
+
+            const vec = latLngToVector3(lat, lng, EARTH_RADIUS + 0.35);
+            pos[added*3] = vec.x; pos[added*3+1] = vec.y; pos[added*3+2] = vec.z;
+
+            const dens = Math.random();
+            const c = dens > 0.75 ? colorHigh : (dens > 0.45 ? colorMid : colorLow);
+            colors[added*3] = c.r; colors[added*3+1] = c.g; colors[added*3+2] = c.b;
+            added++;
+        }
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        const points = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.018, vertexColors: true, transparent: true, opacity: 0.75, depthWrite: false, depthTest: false }));
+        points.userData = { type: 'population', data: { name: "Population Center", cat: "Demographics", desc: "High density land area (ocean rejected)." } };
+        layerGroups['pop'].add(points);
+        logEvent(`Population density: ${added} strictly land-masked nodes loaded.`, 'text-orange-300');
+    }
+
+    function updateSwarmPositions(pointsObj, delta) {
+        if(!pointsObj || !pointsObj.visible) return;
+        const data = pointsObj.userData.swarmData;
+        const pos = pointsObj.geometry.attributes.position.array;
+        for(let i=0; i<data.length; i++) {
+            const u = data[i];
+            u.angle += u.speed * delta * simSpeed * 0.5;
+            const p = new THREE.Vector3(u.r * Math.cos(u.angle), 0, u.r * Math.sin(u.angle));
+            p.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(u.inc));
+            p.applyAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(u.raan));
+            pos[i*3] = p.x; pos[i*3+1] = p.y; pos[i*3+2] = p.z;
+        }
+        pointsObj.geometry.attributes.position.needsUpdate = true;
+    }
+
+    function updateDebrisPositions(instMesh, delta) {
+        if(!instMesh || !instMesh.visible) return;
+        const data = instMesh.userData.swarmData;
+        const dummy = instMesh.userData.dummy;
+        for(let i=0; i<data.length; i++) {
+            const u = data[i];
+            u.angle += u.speed * delta * simSpeed * 0.5;
+            const p = new THREE.Vector3(u.r * Math.cos(u.angle), 0, u.r * Math.sin(u.angle));
+            p.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(u.inc));
+            p.applyAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(u.raan));
+            dummy.position.copy(p);
+            dummy.rotation.x += u.rotX * simSpeed;
+            dummy.rotation.y += u.rotY * simSpeed;
+            dummy.updateMatrix();
+            instMesh.setMatrixAt(i, dummy.matrix);
+        }
+        instMesh.instanceMatrix.needsUpdate = true;
+    }
+
+    function animate(time) {
+      requestAnimationFrame(animate);
+
+      const elapsed = time - lastFrameTime;
+      if (elapsed < frameInterval) return;
+      lastFrameTime = time - (elapsed % frameInterval);
+
+      const delta = 0.016;
+      globalTime += delta * simSpeed;
+
+      if (earthMesh) {
+          earthMesh.material.uniforms.u_time.value = globalTime;
+          earthMesh.rotation.y = (globalTime * 0.05) - (timelineOffset * 0.01);
+      }
+      if (cloudsMesh && cloudsMesh.visible) {
+          cloudsMesh.material.uniforms.u_time.value = globalTime;
+          cloudsMesh.rotation.y = earthMesh.rotation.y;
+      }
+
+      ['sat-t1', 'sat-t2'].forEach(key => {
+        if(!layerGroups[key] || !layerGroups[key].visible) return;
+        layerGroups[key].children.forEach(sat => {
+          const u = sat.userData;
+          if (u.isLive) return;
+          u.angle += u.speed * delta * simSpeed;
+          const p = new THREE.Vector3(u.r * Math.cos(u.angle), 0, u.r * Math.sin(u.angle));
+          p.applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(u.inc));
+          p.applyAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(u.raan));
+          sat.position.copy(p); sat.lookAt(0,0,0);
+        });
+      });
+
+      updateSwarmPositions(swarmPoints, delta);
+      updateDebrisPositions(debrisMesh, delta);
+
+      [layerGroups['ixp'], layerGroups['fin'], layerGroups['ship'], layerGroups['air'], layerGroups['road'], layerGroups['stream-data'], layerGroups['stream-inf'], layerGroups['stream-fin']].forEach(g => {
+          if(!g.visible) return;
+          g.children.forEach(c => {
+              if(c.isLine && c.material.dashOffset !== undefined) c.material.dashOffset -= 1.5 * delta * simSpeed;
+          });
+      });
+
+      if(layerGroups['fin'].visible) {
+          const t = globalTime;
+          layerGroups['fin'].children.forEach(c => {
+              if(c.userData.pulse) {
+                  const s = 1 + ((Math.sin(t*3) + 1)/2)*0.5;
+                  c.userData.pulse.scale.set(s,s,1);
+                  c.userData.pulse.material.opacity = 1 - ((Math.sin(t*3)+1)/2);
+              }
+          });
+      }
+      if(layerGroups['crisis'].visible) {
+          layerGroups['crisis'].children.forEach(c => c.children[0].rotation.z += 1.5 * delta * simSpeed);
+      }
+
+      if (isTracking && selectedObject) {
+        const targetPos = new THREE.Vector3();
+        selectedObject.getWorldPosition(targetPos);
+        targetPos.normalize().multiplyScalar(14);
+        camera.position.lerp(targetPos, 0.05);
+        const targetLook = new THREE.Vector3();
+        selectedObject.getWorldPosition(targetLook);
+        controls.target.lerp(targetLook, 0.05);
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function earthPointToCoordinates(point) {
+        const p = point.clone().normalize();
+        const lat = Math.asin(p.y) * (180 / Math.PI);
+        let lng = Math.atan2(p.z, p.x) * (180 / Math.PI);
+        lng = lng - (earthMesh.rotation.y * (180 / Math.PI));
+        lng = ((lng % 360) + 540) % 360 - 180;
+        return {lat,lng};
+    }
+
+    function updatePointerRay(event) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+    }
+
+    function publishSelection(payload) {
+        if (!window.ATLAS_IO) {
+          throw new Error('A.T.L.A.S. galaxy I/O adapter is unavailable.');
+        }
+        return window.ATLAS_IO.publishSelection(payload);
+    }
+
+    function onPointerMove(event) {
+        updatePointerRay(event);
+        const intersects = raycaster.intersectObject(earthMesh);
+        const coordEl = document.getElementById('mouse-coords');
+        if (intersects.length > 0) {
+            const {lat,lng} = earthPointToCoordinates(intersects[0].point);
+            coordEl.textContent = `${Math.abs(lat).toFixed(2)}°${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lng).toFixed(2)}°${lng >= 0 ? 'E' : 'W'}`;
+            coordEl.className = "text-emerald-400";
+        } else {
+            coordEl.textContent = "OFF-EARTH";
+            coordEl.className = "text-blue-400";
+        }
+    }
+
+    function onPointerClick(event) {
+      event.preventDefault();
+      updatePointerRay(event);
+      const targets = [];
+      Object.values(layerGroups).forEach(g => { if(g.visible) g.children.forEach(c => { if(c.type === 'Group' || c.isLine) targets.push(c); }); });
+      raycaster.params.Line.threshold = 0.1;
+
+      const intersects = raycaster.intersectObjects(targets, true);
+      if (intersects.length > 0) {
+        let obj = intersects[0].object;
+        while (obj.parent && !obj.userData.type) obj = obj.parent;
+        if (obj.userData && obj.userData.type) {
+          inspectObject(obj);
+          return;
+        }
+      }
+      const earthHits = raycaster.intersectObject(earthMesh);
+      if(earthHits.length > 0) {
+        inspectCoordinate(earthPointToCoordinates(earthHits[0].point));
+      }
+    }
+
+    function inspectCoordinate(coord) {
+      selectedObject = null;
+      selectedCoordinate = coord;
+      isTracking = false;
+      const northSouth = coord.lat >= 0 ? 'N' : 'S';
+      const eastWest = coord.lng >= 0 ? 'E' : 'W';
+      const coordinateName = `${Math.abs(coord.lat).toFixed(2)}°${northSouth}, ${Math.abs(coord.lng).toFixed(2)}°${eastWest}`;
+      document.getElementById('inspector-panel').classList.remove('hidden');
+      document.getElementById('inspector-panel').classList.add('flex');
+      document.getElementById('inspect-category').textContent = 'COORDINATE TARGET';
+      document.getElementById('inspect-title').textContent = coordinateName;
+      document.getElementById('inspect-subtitle').textContent = 'User-designated insertion point';
+      document.getElementById('inspect-coords').textContent = coordinateName;
+      document.getElementById('inspect-alt').textContent = 'Surface';
+      document.getElementById('inspect-speed').textContent = 'Awaiting mission';
+      document.getElementById('inspect-operator').textContent = 'Commander';
+      document.getElementById('inspect-desc').textContent = 'Selected map coordinates are eligible for reconnaissance deployment.';
+      document.getElementById('schematic-label').textContent = 'Coordinate reconnaissance';
+      publishSelection({deployable:true,type:'coordinate',name:coordinateName,lat:coord.lat,lng:coord.lng});
+      logEvent(`Selected deployment coordinates ${coordinateName}.`, 'text-cyan-300 font-bold');
+    }
+
+    function inspectObject(obj) {
+      selectedObject = obj;
+      selectedCoordinate = null;
+      const type = obj.userData.type || 'SYS';
+      const data = obj.userData.data || { name: 'Unknown Entity' };
+
+      document.getElementById('inspector-panel').classList.remove('hidden');
+      document.getElementById('inspector-panel').classList.add('flex');
+
+      document.getElementById('inspect-category').textContent = String(type).toUpperCase() + ` (T${data.tier || 3})`;
+      document.getElementById('inspect-title').textContent = data.name || 'Entity';
+      document.getElementById('inspect-subtitle').textContent = data.cat || "Entity";
+      document.getElementById('inspect-coords').textContent = data.lat !== undefined ? `${data.lat.toFixed(2)}°, ${data.lng.toFixed(2)}°` : `Orbital`;
+      document.getElementById('inspect-alt').textContent = data.alt || data.city || "--";
+      document.getElementById('inspect-speed').textContent = data.val || "--";
+      document.getElementById('inspect-operator').textContent = data.operator || "Public";
+      document.getElementById('inspect-desc').textContent = data.desc || "Active Telemetry...";
+      document.getElementById('schematic-label').textContent = `${data.name} Architecture`;
+
+      const deployable = type === 'crisis' || type === 'external' || data.deployable === true;
+      publishSelection({
+        deployable,
+        type,
+        name:data.name||'Selected A.T.L.A.S. Event',
+        lat:data.lat,
+        lng:data.lng,
+        city:data.city,
+        category:data.cat,
+        description:data.desc
+      });
+      logEvent(`Inspected ${data.name}.`, 'text-white');
+    }
+
+    function setFPS(fps) {
+      targetFPS = fps === 'MAX' ? 120 : parseInt(fps);
+      frameInterval = 1000 / targetFPS;
+      document.getElementById('fps-display').textContent = fps === 'MAX' ? 'UNLOCKED' : `${fps} FPS`;
+      document.querySelectorAll('.fps-btn').forEach(b => {
+        if(b.getAttribute('data-fps') == fps) b.className = 'fps-btn flex-1 py-1 text-[10px] font-mono bg-slate-800 text-white rounded shadow transition-colors';
+        else b.className = 'fps-btn flex-1 py-1 text-[10px] font-mono text-slate-500 hover:text-white rounded transition-colors';
+      });
+      serializeState();
+    }
+
+    async function toggleLayerHandler(id, groupObj, loadFunc) {
+      const isChecked = document.getElementById(id).checked;
+      const spin = document.getElementById(id.replace('layer-', 'spin-'));
+
+      if (isChecked) {
+        if (!loadedLayers.has(id)) {
+          if(spin) { spin.style.display = 'block'; document.getElementById(id).style.display = 'none'; }
+          if(loadFunc) await loadFunc();
+          loadedLayers.add(id);
+          if(spin) { spin.style.display = 'none'; document.getElementById(id).style.display = 'block'; }
+        }
+        let target = groupObj;
+        if (id === 'layer-swarm') target = swarmPoints;
+        if (id === 'layer-debris') target = debrisMesh;
+        if (id === 'layer-weather') target = cloudsMesh;
+        if (target) target.visible = true;
+      } else {
+        let target = groupObj;
+        if (id === 'layer-swarm') target = swarmPoints;
+        if (id === 'layer-debris') target = debrisMesh;
+        if (id === 'layer-weather') target = cloudsMesh;
+        if (target) target.visible = false;
+      }
+
+      let n = 0; let activeLayers = 0;
+      Object.values(layerGroups).forEach(g => { if(g.visible) n += g.children.length; });
+      if(swarmPoints && swarmPoints.visible) n += NUM_SWARM;
+      if(debrisMesh && debrisMesh.visible) n += NUM_DEBRIS;
+
+      document.querySelectorAll('.layer-toggle').forEach(cb => { if(cb.checked) activeLayers++; });
+
+      document.getElementById('stat-nodes').textContent = n;
+      document.getElementById('layer-count').textContent = `${activeLayers}/18`;
+
+      const setInd = (elId, active) => {
+        const el = document.getElementById(elId);
+        if (el) el.className = active ? 'w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse' : 'w-1.5 h-1.5 rounded-full bg-slate-800';
+      };
+      setInd('stat-nodes-indicator', n > 0);
+      document.getElementById('stat-flops').textContent = layerGroups['ai'].visible ? "~3.0 EFLOPS" : "OFFLINE";
+      setInd('stat-flops-indicator', layerGroups['ai'].visible);
+      document.getElementById('stat-ixp').textContent = layerGroups['ixp'].visible ? "~32.5 Tbps" : "OFFLINE";
+      setInd('stat-ixp-indicator', layerGroups['ixp'].visible);
+      document.getElementById('stat-fin').textContent = layerGroups['fin'].visible ? "~$400B/DAY" : "OFFLINE";
+      setInd('stat-fin-indicator', layerGroups['fin'].visible);
+
+      serializeState();
+    }
+
+    window.onload = () => {
+      initThreeScene();
+
+      document.querySelectorAll('.fps-btn').forEach(btn => btn.addEventListener('click', e => setFPS(e.target.getAttribute('data-fps'))));
+
+      document.querySelectorAll('.btn-style').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const requestedStyle = e.target.getAttribute('data-style');
+          if (!textureProfilesAvailable && requestedStyle !== 'procedural') {
+            activateProceduralTextureFallback(
+              directFileMode
+                ? 'Texture-backed display profiles require the local HTTP server.'
+                : 'Texture-backed display profiles are unavailable.'
+            );
+            serializeState();
+            return;
+          }
+          document.querySelectorAll('.btn-style').forEach(b => b.className = 'btn-style py-1.5 rounded text-[11px] font-medium bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800 transition-colors');
+          e.target.className = 'btn-style py-1.5 rounded text-[11px] font-medium bg-blue-600 text-white border border-blue-500 transition-colors';
+          globeStyle = requestedStyle;
+          const m = {'procedural':0, 'night':1, 'cyber':2, 'satellite':3, 'thermal':4, 'infra':5, 'financial':6, 'terrain':7};
+          earthMesh.material.uniforms.u_mode.value = m[globeStyle];
+          serializeState();
+        });
+      });
+
+      document.getElementById('layer-dc').addEventListener('change', () => toggleLayerHandler('layer-dc', layerGroups['dc'], ingestDataCenters));
+      document.getElementById('layer-ai').addEventListener('change', () => toggleLayerHandler('layer-ai', layerGroups['ai'], ingestAI));
+      document.getElementById('layer-fin').addEventListener('change', () => toggleLayerHandler('layer-fin', layerGroups['fin'], ingestFinancial));
+      document.getElementById('layer-ixp').addEventListener('change', () => toggleLayerHandler('layer-ixp', layerGroups['ixp'], ingestIXP));
+      document.getElementById('layer-ship').addEventListener('change', () => toggleLayerHandler('layer-ship', layerGroups['ship'], ()=>ingestMobility('ship')));
+      document.getElementById('layer-air').addEventListener('change', () => toggleLayerHandler('layer-air', layerGroups['air'], ()=>ingestMobility('air')));
+      document.getElementById('layer-road').addEventListener('change', () => toggleLayerHandler('layer-road', layerGroups['road'], ()=>ingestMobility('road')));
+      document.getElementById('layer-sat-t1').addEventListener('change', async () => {
+        if (!document.getElementById('layer-sat-t1').checked && liveIssInterval) {
+          clearInterval(liveIssInterval); liveIssInterval = null;
+        }
+        await toggleLayerHandler('layer-sat-t1', layerGroups['sat-t1'], ingestSpaceStationsT1);
+      });
+      document.getElementById('layer-sat-t2').addEventListener('change', () => toggleLayerHandler('layer-sat-t2', layerGroups['sat-t2'], ingestSpaceStationsT2));
+      document.getElementById('layer-orbits').addEventListener('change', () => toggleLayerHandler('layer-orbits', layerGroups['orbits'], ingestTrajectories));
+      document.getElementById('layer-swarm').addEventListener('change', () => toggleLayerHandler('layer-swarm', swarmPoints, ingestSwarm));
+      document.getElementById('layer-debris').addEventListener('change', () => toggleLayerHandler('layer-debris', debrisMesh, ingestDebris));
+      document.getElementById('layer-crisis').addEventListener('change', () => toggleLayerHandler('layer-crisis', layerGroups['crisis'], ingestCrisis));
+      document.getElementById('layer-weather').addEventListener('change', async () => {
+        if (document.getElementById('layer-weather').checked && isLiveApiEnabled) {
+          logEvent('Attempting live cloud / weather proxy...', 'text-slate-300');
+          try {
+            const proxy = 'https://corsproxy.io/?' + encodeURIComponent('https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&hourly=cloud_cover&forecast_days=1');
+            const res = await fetch(proxy);
+            if (res.ok) {
+              const data = await res.json();
+              const avgCloud = data.hourly && data.hourly.cloud_cover ? (data.hourly.cloud_cover.reduce((a,b)=>a+b,0)/data.hourly.cloud_cover.length) : 50;
+              logEvent(`Live weather sample ~${avgCloud.toFixed(0)}%. Clouds adjusted.`, 'text-emerald-400');
+              if (cloudsMesh && cloudsMesh.material.uniforms) {
+                cloudsMesh.material.opacity = Math.min(0.85, 0.4 + (avgCloud/100)*0.5);
+              }
+            }
+          } catch (err) {
+            logEvent(`Weather live uplink unavailable. Procedural clouds active.`, 'text-amber-500');
+          }
+        }
+        await toggleLayerHandler('layer-weather', cloudsMesh, null);
+      });
+      document.getElementById('layer-pop').addEventListener('change', () => toggleLayerHandler('layer-pop', layerGroups['pop'], ingestPopulation));
+      document.getElementById('layer-stream-data').addEventListener('change', () => toggleLayerHandler('layer-stream-data', layerGroups['stream-data'], ingestDataStreams));
+      document.getElementById('layer-stream-inf').addEventListener('change', () => toggleLayerHandler('layer-stream-inf', layerGroups['stream-inf'], ingestInferenceStreams));
+      document.getElementById('layer-stream-fin').addEventListener('change', () => toggleLayerHandler('layer-stream-fin', layerGroups['stream-fin'], ingestFinancialStreams));
+
+      document.getElementById('btn-select-all').addEventListener('click', () => document.querySelectorAll('.layer-toggle').forEach(cb => { if(!cb.checked) { cb.checked = true; cb.dispatchEvent(new Event('change')); }}));
+      document.getElementById('btn-select-none').addEventListener('click', () => document.querySelectorAll('.layer-toggle').forEach(cb => { if(cb.checked) { cb.checked = false; cb.dispatchEvent(new Event('change')); }}));
+
+      document.querySelectorAll('.inspector-tab').forEach(tab => {
+        tab.addEventListener('click', e => {
+          document.querySelectorAll('.inspector-tab').forEach(t => t.className = 'inspector-tab flex-1 py-2 text-center text-slate-400 hover:text-slate-200 transition-colors border-b-2 border-transparent');
+          e.target.className = 'inspector-tab flex-1 py-2 text-center text-blue-400 border-b-2 border-blue-500 font-medium transition-colors';
+          document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+          document.getElementById(`tab-content-${e.target.getAttribute('data-tab')}`).classList.remove('hidden');
+        });
+      });
+
+      document.getElementById('btn-close-inspect').addEventListener('click', () => {
+        document.getElementById('inspector-panel').classList.add('hidden');
+        document.getElementById('inspector-panel').classList.remove('flex');
+        isTracking = false;
+        selectedObject = null;
+        selectedCoordinate = null;
+        publishSelection({deployable:false});
+      });
+      document.getElementById('btn-focus-object').addEventListener('click', () => { if(selectedObject) isTracking = true; });
+
+      document.getElementById('btn-run-calc').addEventListener('click', () => {
+        const dist = parseFloat(document.getElementById('calc-distance').value) || 1000;
+        const n = parseFloat(document.getElementById('calc-medium').value) || 1.468;
+        const v = 299792 / n; const rtt = (dist * 2) / v * 1000;
+        document.getElementById('res-vel').textContent = `${v.toFixed(0)} km/s`;
+        document.getElementById('res-rtt').textContent = `${rtt.toFixed(2)} ms`;
+        document.getElementById('res-bw').textContent = `${(100/(rtt+1)).toFixed(1)} Gbps`;
+        document.getElementById('calc-results').classList.remove('hidden');
+      });
+
+      document.getElementById('slider-speed').addEventListener('input', e => {
+        const v = parseFloat(e.target.value);
+        if (v === 0) {
+          isPaused = true;
+          simSpeed = 0.0;
+          document.getElementById('speed-val').textContent = 'PAUSED';
+          document.getElementById('speed-val').className = 'text-amber-500 font-mono w-10';
+        } else {
+          isPaused = false;
+          simSpeed = v;
+          document.getElementById('speed-val').textContent = `${simSpeed.toFixed(1)}x`;
+          document.getElementById('speed-val').className = 'text-cyan-400 font-mono w-10';
+        }
+      });
+
+      document.getElementById('timeline-scrubber').addEventListener('input', e => {
+        const val = parseInt(e.target.value);
+        const display = document.getElementById('timeline-display');
+        if (val === 100) {
+          display.textContent = "T-0 (LIVE)";
+          display.className = "text-cyan-400 font-mono w-20";
+          timelineOffset = 0;
+          logEvent('[SYS] Syncing timeline to LIVE data feed.', 'text-emerald-400 font-bold');
+        } else {
+          const offset = (100 - val) * 15;
+          display.textContent = `T-${offset} min`;
+          display.className = "text-amber-500 font-mono w-20";
+          timelineOffset = offset;
+        }
+      });
+
+      document.getElementById('api-uplink-toggle').addEventListener('change', async e => {
+        isLiveApiEnabled = e.target.checked;
+        if(isLiveApiEnabled) {
+           logEvent('[SYS] Public Webhook Link ENABLED. Routing to live endpoints...', 'text-blue-400 font-bold');
+        } else {
+           logEvent('[SYS] Public Webhook Link DISABLED. Reverting to local sim.', 'text-amber-400');
+           if (liveIssInterval) { clearInterval(liveIssInterval); liveIssInterval = null; }
+        }
+
+        if (document.getElementById('layer-crisis').checked) {
+            document.getElementById('spin-crisis').style.display = 'block';
+            document.getElementById('layer-crisis').style.display = 'none';
+            await ingestCrisis();
+            document.getElementById('spin-crisis').style.display = 'none';
+            document.getElementById('layer-crisis').style.display = 'block';
+        }
+        if (document.getElementById('layer-sat-t1').checked) {
+            document.getElementById('spin-sat-t1').style.display = 'block';
+            document.getElementById('layer-sat-t1').style.display = 'none';
+            await ingestSpaceStationsT1();
+            document.getElementById('spin-sat-t1').style.display = 'none';
+            document.getElementById('layer-sat-t1').style.display = 'block';
+        }
+      });
+
+      const updateGranularity = () => {
+        const t1 = document.getElementById('tier-1-toggle').checked;
+        const t2 = document.getElementById('tier-2-toggle').checked;
+        const t3 = document.getElementById('tier-3-toggle').checked;
+
+        Object.values(layerGroups).forEach(g => {
+            g.children.forEach(child => {
+                if(child.userData && child.userData.data && child.userData.data.tier) {
+                   const tier = child.userData.data.tier;
+                   if(tier === 1) child.visible = t1;
+                   if(tier === 2) child.visible = t2;
+                   if(tier === 3) child.visible = t3;
+                }
+            });
+        });
+
+        if (swarmPoints) swarmPoints.visible = t3 && document.getElementById('layer-swarm').checked;
+        if (debrisMesh) debrisMesh.visible = document.getElementById('layer-debris').checked;
+        logEvent(`[SYS] LOD Updated: T1(${t1?'ON':'OFF'}) T2(${t2?'ON':'OFF'}) T3(${t3?'ON':'OFF'})`, 'text-slate-400');
+      };
+
+      document.getElementById('tier-1-toggle').addEventListener('change', updateGranularity);
+      document.getElementById('tier-2-toggle').addEventListener('change', updateGranularity);
+      document.getElementById('tier-3-toggle').addEventListener('change', updateGranularity);
+
+      document.getElementById('btn-snapshot').addEventListener('click', () => {
+        const tempInput = document.createElement('input');
+        tempInput.value = window.location.href;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+
+        const b = document.getElementById('btn-snapshot'); const o = b.innerHTML;
+        b.innerHTML = `<span class="material-icons-outlined text-[14px]">check</span><span>COPIED!</span>`;
+        setTimeout(() => b.innerHTML = o, 2000);
+      });
+
+      const searchBox = document.getElementById('search-box');
+      const searchResults = document.getElementById('search-results');
+      let searchMatches = [];
+
+      function collectSearchable() {
+        const items = [];
+        Object.values(layerGroups).forEach(g => {
+          if (!g.visible) return;
+          g.children.forEach(c => {
+            if (c.userData && c.userData.data && c.userData.data.name) {
+              items.push({ obj: c, name: c.userData.data.name, cat: c.userData.data.cat || c.userData.type || '' });
+            }
+          });
+        });
+        return items;
+      }
+
+      function flyToObject(obj) {
+        if (!obj) return;
+        selectedObject = obj;
+        isTracking = true;
+        inspectObject(obj);
+        logEvent(`Flying to ${obj.userData.data.name}`, 'text-cyan-300');
+      }
+
+      searchBox.addEventListener('input', () => {
+        const q = searchBox.value.trim().toLowerCase();
+        searchResults.innerHTML = '';
+        searchMatches = [];
+        if (q.length < 1) { searchResults.classList.add('hidden'); return; }
+        const all = collectSearchable();
+        searchMatches = all.filter(i => i.name.toLowerCase().includes(q) || i.cat.toLowerCase().includes(q)).slice(0, 12);
+        if (searchMatches.length === 0) {
+          searchResults.innerHTML = '<div class="px-3 py-2 text-slate-500">No matches</div>';
+        } else {
+          searchMatches.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'px-3 py-1.5 hover:bg-slate-800 cursor-pointer flex justify-between gap-2 border-b border-slate-800/50';
+            const name = document.createElement('span');
+            name.className = 'text-slate-200 truncate';
+            name.textContent = m.name;
+            const category = document.createElement('span');
+            category.className = 'text-slate-500 shrink-0';
+            category.textContent = m.cat;
+            div.append(name, category);
+            div.addEventListener('click', () => {
+              flyToObject(m.obj);
+              searchBox.value = m.name;
+              searchResults.classList.add('hidden');
+            });
+            searchResults.appendChild(div);
+          });
+        }
+        searchResults.classList.remove('hidden');
+      });
+
+      searchBox.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && searchMatches.length > 0) {
+          e.preventDefault();
+          flyToObject(searchMatches[0].obj);
+          searchResults.classList.add('hidden');
+        }
+        if (e.key === 'Escape') {
+          searchResults.classList.add('hidden');
+          searchBox.blur();
+        }
+      });
+
+      document.addEventListener('click', e => {
+        if (!searchBox.contains(e.target) && !searchResults.contains(e.target)) {
+          searchResults.classList.add('hidden');
+        }
+      });
+
+      window.addEventListener('keydown', e => {
+        if (e.code !== 'Space') return;
+        const tag = (e.target.tagName || '').toUpperCase();
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target.isContentEditable) return;
+        e.preventDefault();
+        e.stopPropagation();
+        isPaused = !isPaused;
+        if (isPaused) {
+          prevSimSpeed = (simSpeed > 0 ? simSpeed : prevSimSpeed) || 1.0;
+          simSpeed = 0;
+          document.getElementById('slider-speed').value = 0;
+          document.getElementById('speed-val').textContent = 'PAUSED';
+          document.getElementById('speed-val').className = 'text-amber-500 font-mono w-10';
+          logEvent('[SYS] Simulation PAUSED (Space)', 'text-amber-400 font-bold');
+        } else {
+          simSpeed = prevSimSpeed || 1.0;
+          document.getElementById('slider-speed').value = simSpeed;
+          document.getElementById('speed-val').textContent = `${simSpeed.toFixed(1)}x`;
+          document.getElementById('speed-val').className = 'text-cyan-400 font-mono w-10';
+          logEvent('[SYS] Simulation RESUMED', 'text-emerald-400 font-bold');
+        }
+      });
+
+      const hasSerializedState = Boolean(window.location.hash);
+      deserializeState();
+      if (!hasSerializedState) {
+        ['layer-dc', 'layer-ixp', 'layer-crisis'].forEach(id => {
+          const checkbox = document.getElementById(id);
+          if (checkbox && !checkbox.checked) {
+            checkbox.checked = true;
+            checkbox.dispatchEvent(new Event('change'));
+          }
+        });
+      }
+      requestAnimationFrame(animate);
+
+      setInterval(() => {
+          if(Math.random() > 0.3) return;
+          const active = [];
+          Object.values(layerGroups).forEach(g => { if(g.visible) active.push(...g.children); });
+          if(active.length === 0) return;
+          const obj = active[Math.floor(Math.random() * active.length)].userData;
+          if(!obj || !obj.data) return;
+          const cat = obj.data.cat || (obj.type ? String(obj.type).toUpperCase() : 'SYS');
+          const name = obj.data.name || 'Unknown Node';
+          logEvent(`[${cat}] ${name} nominal.`, 'text-cyan-400');
+      }, 3000);
+    };
+  </script>
+</body>
+</html>

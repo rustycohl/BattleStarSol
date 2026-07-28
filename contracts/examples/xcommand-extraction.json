@@ -1,0 +1,42 @@
+{
+  "gzg": "galaxy-message",
+  "version": "1.0",
+  "id": "xcommand:84021:1785240123456",
+  "type": "xcommand.extraction",
+  "source": {
+    "galaxy": "xCommand",
+    "version": "0.1.1-prealpha.1",
+    "instance": "godot-web"
+  },
+  "target": {
+    "galaxy": "BattleStarSol",
+    "capability": "strategic.receive-extraction"
+  },
+  "created_at": "2026-07-28T12:02:03Z",
+  "correlation_id": "battlestar:84021:1",
+  "payload": {
+    "schema": "gzg.xcommand.extraction/1.0",
+    "extraction": {
+      "type": "extraction",
+      "payload_contract_version": "1.0",
+      "generator_version": 1,
+      "rules_version": "alpha-1",
+      "sector": "Proving Ground",
+      "seed": 84021,
+      "outcome": "SUCCESS",
+      "survivors": 3,
+      "gains": {
+        "neural": 4,
+        "capital": 900,
+        "loot": []
+      },
+      "note": "evac",
+      "replay": {
+        "actions": [],
+        "events": []
+      },
+      "ts": 1785240123456,
+      "extraction_id": "xcommand:84021:1785240123456"
+    }
+  }
+}

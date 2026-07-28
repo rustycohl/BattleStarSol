@@ -1,0 +1,9 @@
+{
+  "name": "A.T.L.A.S. Strategic Galaxy",
+  "short_name": "A.T.L.A.S.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "description": "Standalone browser-local strategic globe and deployment selector."
+}

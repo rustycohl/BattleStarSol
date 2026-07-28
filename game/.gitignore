@@ -1,0 +1,8 @@
+.godot/
+godot-profile/
+.godot-test/
+.godot-test/
+# The release Web runtime is intentionally committed so the GitHub Page is a
+# complete standalone product. Local import/editor caches remain ignored.
+*.tmp
+*.log

@@ -1,8 +1,16 @@
 BattleStarSol
 Copyright (c) 2026 Rusty Cohl and contributors
 
-The source implementation is licensed under MIT.
+The software implementation is licensed under MIT.
+Documentation and original design writing are published under CC BY 4.0.
 
-Battle/Star.SOL names, marks, fiction, characters, and themed presentation are
-not granted under that software license. No open-source license grants
-trademark rights.
+The restored modular source also carried the attribution
+"Dustin / NeuralCulture & Contributors"; it is preserved here as recovery
+provenance without narrowing the repository license.
+
+Third-party engine/runtime components, Three.js, fonts, textures, and other
+carried assets remain subject to their own notices and terms. See
+docs/PROVENANCE.md before making a production asset claim.
+
+Battle/Star.SOL and related product names and marks are not granted as
+trademarks by either license. No endorsement is implied.

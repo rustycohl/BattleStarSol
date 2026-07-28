@@ -1,0 +1,45 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
+[application]
+
+config/name="Battle/Star.SOL Pre-Alpha"
+config/version="0.1.1-prealpha.1"
+run/main_scene="res://Bootstrap.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[autoload]
+
+ActionRouter="*res://scripts/ActionRouter.gd"
+ActionEconomy="*res://scripts/ActionEconomy.gd"
+PayloadBridge="*res://scripts/PayloadBridge.gd"
+GameConfig="*res://scripts/GameConfig.gd"
+GameState="*res://scripts/GameState.gd"
+Pathfinder="*res://scripts/Pathfinder.gd"
+AIBehavior="*res://scripts/AIBehavior.gd"
+Economy="*res://scripts/Economy.gd"
+Narrative="*res://scripts/Narrative.gd"
+ItemDB="*res://scripts/ItemDB.gd"
+AudioSystem="*res://scripts/AudioSystem.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+#PreferfewerGPUedgecasesonintegratedAMDduringpre-alpha.lights_and_shadows/directional_shadow/size=1024

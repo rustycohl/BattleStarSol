@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Battle/Star.SOL playable pre-alpha: strategic A.T.L.A.S. selection into a real Godot tactical extraction mission.">
+  <meta name="theme-color" content="#020617">
+  <title>Battle/Star.SOL // Strategic Command</title>
+  <style>
+    :root{--cyan:#38bdf8;--mag:#e879f9;--green:#22c55e;--amber:#fbbf24;--ink:#e2e8f0;--dim:#94a3b8;--panel:rgba(3,8,20,.94);--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:#000;color:var(--ink);font-family:var(--mono);overflow:hidden}
+    #atlas{position:fixed;inset:0;width:100%;height:100%;border:0}
+    #chrome{position:fixed;inset:0;z-index:5;pointer-events:none}
+    .interactive{pointer-events:auto}
+    .status{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;padding:7px 12px;border:1px solid rgba(56,189,248,.35);border-radius:999px;background:var(--panel);font-size:10px;letter-spacing:.08em;box-shadow:0 8px 28px #0008}
+    .status b{color:var(--green)} .status span{color:var(--dim)}
+    #console{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);width:min(980px,calc(100% - 28px));display:grid;grid-template-columns:minmax(170px,1.2fr) repeat(3,minmax(86px,.5fr)) minmax(290px,1.7fr);gap:12px;align-items:center;padding:13px 15px;border:1px solid rgba(56,189,248,.38);border-radius:14px;background:linear-gradient(180deg,rgba(7,15,29,.98),rgba(2,7,17,.98));box-shadow:0 16px 45px #000c}
+    .identity label,.metric .key{display:block;color:var(--dim);font-size:8px;letter-spacing:.12em;margin-bottom:4px}
+    .identity input{width:100%;border:0;border-bottom:1px solid #29405d;background:transparent;color:#fff;font:700 13px var(--mono);padding:3px 0;outline:none}
+    .metric{border-left:1px solid #223249;padding-left:12px}.metric .value{color:#fff;font-size:13px}.metric.neural .value{color:var(--mag)}.metric.capital .value{color:var(--green)}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    button{border:1px solid #2b4565;border-radius:8px;background:linear-gradient(180deg,#102b43,#07192a);color:#eef8ff;font:700 10px var(--mono);letter-spacing:.06em;padding:10px 11px;cursor:pointer}
+    button:hover{border-color:var(--cyan);box-shadow:0 0 16px #38bdf844}button.primary{border-color:#22c55e88;background:linear-gradient(180deg,#103b31,#08251e)}button[hidden]{display:none}
+    #history{position:absolute;right:14px;top:54px;width:min(330px,calc(100% - 28px));padding:10px 12px;border:1px solid #263952;border-radius:9px;background:var(--panel);font-size:10px;line-height:1.55}
+    #history strong{color:var(--cyan)}#history p{margin:3px 0;color:var(--dim)}
+    #toast{position:absolute;left:50%;bottom:158px;transform:translateX(-50%) translateY(8px);width:min(620px,calc(100% - 28px));padding:13px 16px;border:1px solid #38bdf866;border-radius:10px;background:var(--panel);opacity:0;transition:.2s;font-size:11px;line-height:1.5}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}#toast b{display:block;color:var(--cyan);margin-bottom:4px}
+    @media(max-width:800px){#console{grid-template-columns:1fr 1fr;bottom:10px}.identity,.actions{grid-column:1/-1}#history{display:none}.status{white-space:nowrap;max-width:calc(100% - 20px);overflow:hidden}.metric{padding-left:8px}#toast{bottom:210px}}
+  </style>
+  <script src="bridge.js" defer></script>
+</head>
+<body>
+  <iframe id="atlas" src="atlas/index.html" title="Embedded A.T.L.A.S. strategic galaxy" allow="fullscreen"></iframe>
+  <div id="chrome">
+    <div class="status"><b>PLAYABLE PRE-ALPHA</b><span>REAL GODOT 4.7.1 TACTICAL · BASE-10 AP</span></div>
+    <section id="history" class="interactive" aria-live="polite">
+      <strong>LOCAL CAMPAIGN VAULT</strong>
+      <p id="history-line">No completed missions in this browser.</p>
+    </section>
+    <div id="toast" role="status" aria-live="polite"><b id="toast-title"></b><span id="toast-body"></span></div>
+    <section id="console" class="interactive" aria-label="Battle Star strategic console">
+      <div class="identity">
+        <label for="callsign">COMMANDER CALLSIGN</label>
+        <input id="callsign" maxlength="40" autocomplete="off">
+      </div>
+      <div class="metric neural"><span class="key">NEURAL</span><span class="value" id="neural">0</span></div>
+      <div class="metric capital"><span class="key">CAPITAL</span><span class="value" id="capital">$0</span></div>
+      <div class="metric"><span class="key">MISSIONS</span><span class="value" id="missions">0</span></div>
+      <div class="actions">
+        <button id="quick" class="primary">▶ QUICK DEPLOY: PROVING GROUND</button>
+        <button id="deploy" hidden>⚔ DEPLOY TO A.T.L.A.S. TARGET</button>
+      </div>
+    </section>
+  </div>
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const bridge = window.BSS_BRIDGE;
+      const atlas = document.getElementById("atlas");
+      const deployButton = document.getElementById("deploy");
+      const callsign = document.getElementById("callsign");
+      let profile = bridge.loadProfile();
+      let selectedMessage = null;
+      let lastSelectionId = "";
+      let toastTimer = 0;
+
+      const showToast = (title, body) => {
+        document.getElementById("toast-title").textContent = title;
+        document.getElementById("toast-body").textContent = body;
+        document.getElementById("toast").classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => document.getElementById("toast").classList.remove("show"), 5000);
+      };
+
+      const renderProfile = () => {
+        callsign.value = profile.callsign;
+        document.getElementById("neural").textContent = profile.resources.neural.toLocaleString();
+        document.getElementById("capital").textContent = `$${profile.resources.capital.toLocaleString()}`;
+        document.getElementById("missions").textContent = profile.missions.length.toLocaleString();
+        const last = profile.missions.at(-1);
+        document.getElementById("history-line").textContent = last
+          ? `${last.outcome} · ${last.sector} · ${last.survivors} survivors · seed ${last.seed}`
+          : "No completed missions in this browser.";
+      };
+
+      const acceptExtraction = (data) => {
+        let normalized;
+        try { normalized = bridge.normalizeExtraction(data); } catch (error) {
+          console.warn("[BattleStarSol] Rejected extraction.", error);
+          return;
+        }
+        if (!normalized) return;
+        const applied = bridge.applyExtraction(profile, normalized);
+        profile = bridge.saveProfile(applied.profile);
+        renderProfile();
+        if (applied.changed) {
+          const result = normalized.extraction;
+          const gains = result.gains || {};
+          showToast(
+            `EXTRACTION // ${String(result.outcome || "UNKNOWN")}`,
+            `${Number(result.survivors || 0)} survivors · NEURAL +${Number(gains.neural || 0)} · Capital +$${Number(gains.capital || 0).toLocaleString()}`,
+          );
+        }
+      };
+
+      try {
+        const storedExtraction = localStorage.getItem(bridge.EXTRACTION_KEY);
+        if (storedExtraction) acceptExtraction(JSON.parse(storedExtraction));
+      } catch (error) {
+        console.warn("[BattleStarSol] Could not restore extraction.", error);
+      }
+
+      callsign.addEventListener("change", () => {
+        profile.callsign = callsign.value.trim() || "VANGUARD-1";
+        profile = bridge.saveProfile(profile);
+        renderProfile();
+      });
+
+      if (location.hash) atlas.src = `atlas/index.html${location.hash}`;
+
+      window.addEventListener("message", (event) => {
+        if (event.source === atlas.contentWindow) {
+          if (location.protocol !== "file:" && event.origin !== location.origin) return;
+          let candidate;
+          try { candidate = bridge.normalizeAtlasSelection(event.data); } catch (error) {
+            console.warn("[BattleStarSol] Rejected A.T.L.A.S. selection.", error);
+            return;
+          }
+          if (!candidate || candidate.id === lastSelectionId) return;
+          lastSelectionId = candidate.id;
+          selectedMessage = candidate.payload.deployable ? candidate : null;
+          deployButton.hidden = !selectedMessage;
+          if (selectedMessage) {
+            const label = String(selectedMessage.payload.selection?.name || "selected target");
+            deployButton.textContent = `⚔ DEPLOY: ${label.slice(0, 40)}`;
+            showToast("A.T.L.A.S. TARGET ACQUIRED", `${label} is ready for tactical insertion.`);
+          }
+          return;
+        }
+        acceptExtraction(event.data);
+      });
+
+      const launch = (selection) => {
+        profile.callsign = callsign.value.trim() || "VANGUARD-1";
+        profile.deployment_count += 1;
+        profile = bridge.saveProfile(profile);
+        let atlasState = "#";
+        try { atlasState = atlas.contentWindow.location.hash || "#"; } catch {}
+        const message = bridge.createDeployMessage(selection, {
+          ...profile,
+          deployment_count: profile.deployment_count - 1,
+        }, { atlas_state: atlasState });
+        localStorage.setItem(bridge.DEPLOY_KEY, JSON.stringify(message));
+        localStorage.setItem("bss_deploy_payload", JSON.stringify(message.payload.deploy));
+        const url = `battlestar.html?p=${encodeURIComponent(bridge.toBase64Utf8(JSON.stringify(message)))}`;
+        showToast("TACTICAL DEPLOYMENT", `Opening real Godot mission seed ${message.payload.deploy.seed}.`);
+        location.assign(url);
+      };
+
+      document.getElementById("quick").addEventListener("click", () => launch(null));
+      deployButton.addEventListener("click", () => {
+        if (selectedMessage) launch(selectedMessage);
+      });
+      renderProfile();
+    });
+  </script>
+</body>
+</html>

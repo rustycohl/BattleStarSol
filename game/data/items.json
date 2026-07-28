@@ -1,0 +1,279 @@
+{
+  "rock": {
+    "name": "Rock",
+    "tier": 0,
+    "category": "melee",
+    "dmg": 4,
+    "range": 6,
+    "cost": 3,
+    "skills": [
+      "primitive"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 0
+  },
+  "club": {
+    "name": "Club",
+    "tier": 0,
+    "category": "melee",
+    "dmg": 6,
+    "range": 3,
+    "cost": 4,
+    "skills": [
+      "primitive"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 0
+  },
+  "spear": {
+    "name": "Spear",
+    "tier": 0,
+    "category": "melee",
+    "dmg": 7,
+    "range": 5,
+    "cost": 4,
+    "skills": [
+      "primitive"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 0
+  },
+  "t1_pistol": {
+    "name": "Compact Tactical Pistol",
+    "tier": 1,
+    "category": "ranged",
+    "dmg": 4,
+    "range": 6,
+    "cost": 2,
+    "skills": [
+      "ballistic",
+      "pistol"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 1
+  },
+  "t1_rifle": {
+    "name": "Standard Infantry Rifle",
+    "tier": 1,
+    "category": "ranged",
+    "dmg": 6,
+    "range": 10,
+    "cost": 4,
+    "skills": [
+      "ballistic",
+      "rifle"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 1
+  },
+  "t1_shotgun": {
+    "name": "Close-Quarter Combat Shotgun",
+    "tier": 1,
+    "category": "ranged",
+    "dmg": 9,
+    "range": 4,
+    "cost": 4,
+    "skills": [
+      "ballistic",
+      "shotgun"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 1
+  },
+  "t1_sniper": {
+    "name": "Bolt-Action Precision Rifle",
+    "tier": 1,
+    "category": "ranged",
+    "dmg": 12,
+    "range": 18,
+    "cost": 7,
+    "skills": [
+      "ballistic",
+      "sniper"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 2
+  },
+  "t2_laser_pistol": {
+    "name": "Focus-Beam Laser Pistol",
+    "tier": 2,
+    "category": "ranged",
+    "dmg": 6,
+    "range": 7,
+    "cost": 2,
+    "skills": [
+      "laser",
+      "pistol"
+    ],
+    "damage_type": "thermal",
+    "armor_pierce": 2
+  },
+  "t2_laser_rifle": {
+    "name": "Sustained-Beam Laser Rifle",
+    "tier": 2,
+    "category": "ranged",
+    "dmg": 8,
+    "range": 12,
+    "cost": 4,
+    "skills": [
+      "laser",
+      "rifle"
+    ],
+    "damage_type": "thermal",
+    "armor_pierce": 2
+  },
+  "t3_mag_rifle": {
+    "name": "Shard-Firing Magnetic Rifle",
+    "tier": 3,
+    "category": "ranged",
+    "dmg": 11,
+    "range": 14,
+    "cost": 4,
+    "penetrates_cover": true,
+    "skills": [
+      "magnetic",
+      "rifle"
+    ],
+    "damage_type": "rail",
+    "armor_pierce": 5
+  },
+  "t4_plasma_rifle": {
+    "name": "Heavy Plasma Rifle",
+    "tier": 4,
+    "category": "ranged",
+    "dmg": 15,
+    "range": 15,
+    "cost": 5,
+    "skills": [
+      "plasma",
+      "rifle"
+    ],
+    "damage_type": "thermal",
+    "armor_pierce": 6
+  },
+  "t5_beam_rifle": {
+    "name": "Focused Vector Beam Rifle",
+    "tier": 5,
+    "category": "ranged",
+    "dmg": 20,
+    "range": 18,
+    "cost": 5,
+    "penetrates_cover": true,
+    "skills": [
+      "beam",
+      "rifle"
+    ],
+    "damage_type": "rail",
+    "armor_pierce": 10
+  },
+  "bow": {
+    "name": "Unstrung Bow",
+    "tier": 0,
+    "category": "melee",
+    "dmg": 2,
+    "range": 1,
+    "cost": 3,
+    "skills": [
+      "primitive"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 0
+  },
+  "string": {
+    "name": "Bow String",
+    "tier": 0,
+    "category": "melee",
+    "dmg": 1,
+    "range": 1,
+    "cost": 1,
+    "skills": [
+      "primitive"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 0
+  },
+  "stringedbow": {
+    "name": "Stringed Bow",
+    "tier": 0,
+    "category": "ranged",
+    "dmg": 8,
+    "range": 8,
+    "cost": 5,
+    "skills": [
+      "primitive"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 0
+  },
+  "arrow": {
+    "name": "Arrow",
+    "tier": 0,
+    "category": "melee",
+    "dmg": 2,
+    "range": 1,
+    "cost": 3,
+    "skills": [
+      "primitive"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 0
+  },
+  "t2_laser_sniper": {
+    "name": "High-Focus Laser Sniper",
+    "tier": 2,
+    "category": "ranged",
+    "dmg": 12,
+    "range": 16,
+    "cost": 5,
+    "skills": [
+      "laser",
+      "sniper"
+    ],
+    "damage_type": "thermal",
+    "armor_pierce": 2
+  },
+  "t3_railgun": {
+    "name": "Precision Railgun",
+    "tier": 3,
+    "category": "ranged",
+    "dmg": 18,
+    "range": 22,
+    "cost": 7,
+    "penetrates_cover": true,
+    "skills": [
+      "magnetic",
+      "sniper"
+    ],
+    "damage_type": "rail",
+    "armor_pierce": 5
+  },
+  "t4_plasma_shotgun": {
+    "name": "Plasma Scatter-Cannon",
+    "tier": 4,
+    "category": "ranged",
+    "dmg": 22,
+    "range": 5,
+    "cost": 5,
+    "skills": [
+      "plasma",
+      "shotgun"
+    ],
+    "damage_type": "thermal",
+    "armor_pierce": 6
+  },
+  "t5_singularity": {
+    "name": "Miniature Singularity Launcher",
+    "tier": 5,
+    "category": "ranged",
+    "dmg": 35,
+    "range": 10,
+    "cost": 8,
+    "penetrates_cover": true,
+    "skills": [
+      "beam",
+      "heavy"
+    ],
+    "damage_type": "rail",
+    "armor_pierce": 10
+  }
+}

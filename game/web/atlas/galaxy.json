@@ -1,0 +1,41 @@
+{
+  "schema": "gzg.galaxy-manifest/1.0",
+  "flag": "DEDICATED_REPO_PAGE",
+  "galaxy": {
+    "id": "ATLAS",
+    "name": "A.T.L.A.S.",
+    "version": "0.1.0-alpha.2",
+    "status": "alpha",
+    "kind": "strategic-surface",
+    "standalone": true
+  },
+  "repository": {
+    "required": true,
+    "independent": true,
+    "full_name": "rustycohl/ATLAS"
+  },
+  "page": {
+    "required": true,
+    "url": "https://rustycohl.github.io/ATLAS/"
+  },
+  "runtime": {
+    "authority": "browser-local",
+    "external_boot_dependencies": [],
+    "server_required": false
+  },
+  "io": {
+    "envelope": "gzg.galaxy-message/1.0",
+    "emits": [
+      "gzg.atlas.selection/1.0"
+    ],
+    "accepts": [
+      "gzg.atlas.feed/1.0"
+    ],
+    "transports": [
+      "file-export",
+      "url-hash",
+      "postMessage",
+      "CustomEvent"
+    ]
+  }
+}

@@ -1,12 +1,16 @@
 {
-  "name": "battlestarsol",
-  "version": "0.1.0-alpha.1",
-  "description": "Battle/Star.SOL clean-tab themed launch surface.",
+  "name": "battlestar-sol",
+  "version": "0.1.1-prealpha.1",
+  "description": "Playable Battle/Star.SOL strategic-to-tactical Godot pre-alpha.",
   "private": true,
   "type": "module",
-  "scripts": {
-    "test": "node --test tests/site.test.mjs",
-    "check": "node --check site/app.mjs"
+  "engines": {
+    "node": ">=22"
   },
-  "license": "MIT"
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check game/web/bridge.js && node --check tools/serve.mjs"
+  },
+  "license": "SEE LICENSE IN LICENSE"
 }
