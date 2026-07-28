@@ -103,7 +103,28 @@ to four, and retained four after a forced reload with no replayed result toast.
 
 ### Public GitHub Pages observation
 
-Pending deployment.
+Commit `b91ceabc16db2b2bd11c30c5a3405f6f527938bc` passed GitHub Actions
+workflow run `30369846480`: verification completed in 5 seconds and deployment
+completed in 21 seconds. The published artifact digest was
+`sha256:29634a7539ce88d78012b0946d8c57d99c58e501c922420c88685f9274bd6841`.
+
+The corrective public smoke at
+`https://rustycohl.github.io/BattleStarSol/?release=b91ceab` verified:
+
+- the standalone strategic Page loaded embedded A.T.L.A.S.
+  `0.1.0-alpha.2` with 3/18 default layers and an empty public-origin vault;
+- Quick Deploy navigated in the same tab to a standard
+  `battlestar.deploy` payload;
+- the committed Godot 4.7.1 Web release rendered the real battlefield, three
+  squad units, hostile squads, tactical HUD, and a Commander with 10/10 AP;
+- Space/End Turn resolved the allied and hostile phases and returned control
+  at turn 2 with the Commander restored to 10/10 AP;
+- F8 extracted from inside the engine, returned to the saved A.T.L.A.S. hash,
+  and recorded a successful three-survivor mission; and
+- a forced network reload retained exactly one mission and did not replay the
+  extraction.
+
+Result: **public strategic-to-tactical-to-strategic loop passes.**
 
 ## Claim discipline
 
