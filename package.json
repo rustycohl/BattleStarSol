@@ -1,0 +1,12 @@
+{
+  "name": "battlestarsol",
+  "version": "0.1.0-alpha.1",
+  "description": "Battle/Star.SOL clean-tab themed launch surface.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/site.test.mjs",
+    "check": "node --check site/app.mjs"
+  },
+  "license": "MIT"
+}

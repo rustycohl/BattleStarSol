@@ -1,0 +1,17 @@
+{
+  "name": "Battle/Star.SOL Launch Surface",
+  "short_name": "BattleStarSol",
+  "description": "The clean launch surface for the first Ground Zero Games public alpha.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#05070b",
+  "theme_color": "#05070b",
+  "icons": [
+    {
+      "src": "./battlestar-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#05070b">
+    <meta
+      name="description"
+      content="Battle/Star.SOL — the clean launch surface for the first Ground Zero Games public alpha."
+    >
+    <link rel="icon" href="./battlestar-mark.svg" type="image/svg+xml">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Battle/Star.SOL // Launch Surface</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#launch">Skip to launch ports</a>
+    <div class="stars" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Battle Star SOL home">
+        <span class="brand__mark">B/S</span>
+        <span>
+          <b>BATTLE/STAR.SOL</b>
+          <small>GROUND ZERO GAMES</small>
+        </span>
+      </a>
+      <div class="clock" aria-label="Local system time">
+        <span id="local-date">LOCAL DATE</span>
+        <b id="local-time">--:--:--</b>
+      </div>
+      <span class="build">0.1.0-alpha.1</span>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__copy">
+          <p class="eyebrow">CLEAN TAB // NOTHING RUNS UNTIL YOU CHOOSE</p>
+          <h1 id="hero-title">
+            <span>BATTLE</span><i>/</i><span>STAR</span><b>.SOL</b>
+          </h1>
+          <p class="lead">
+            A quiet launch surface for tactical play and the rules beneath it.
+          </p>
+          <div class="truth-row" aria-label="Launch-page boundaries">
+            <span>NO ACCOUNT</span>
+            <span>NO GAME SERVER</span>
+            <span>NO TRACKING</span>
+          </div>
+        </div>
+
+        <div class="orbital" aria-label="Launch surface ready">
+          <div class="orbital__ring orbital__ring--outer"></div>
+          <div class="orbital__ring orbital__ring--middle"></div>
+          <div class="orbital__ring orbital__ring--inner"></div>
+          <div class="orbital__core">
+            <span>SOL</span>
+            <b>READY</b>
+          </div>
+          <i class="orbital__contact orbital__contact--one"></i>
+          <i class="orbital__contact orbital__contact--two"></i>
+          <i class="orbital__contact orbital__contact--three"></i>
+        </div>
+      </section>
+
+      <section class="launch" id="launch" aria-labelledby="launch-title">
+        <header class="launch__header">
+          <div>
+            <p class="eyebrow">INITIAL PUBLIC RELEASE // TWO PRODUCTS + ONE SRD</p>
+            <h2 id="launch-title">CHOOSE A PORT</h2>
+          </div>
+          <p>
+            These are the first audience-facing surfaces. Everything else stays
+            public for inspection, but serves the development network.
+          </p>
+        </header>
+
+        <div class="launch-grid">
+          <a
+            class="launch-card launch-card--tactical"
+            data-key="1"
+            href="https://rustycohl.github.io/X-Command/"
+          >
+            <span class="launch-card__key">01</span>
+            <span class="launch-card__type">PRODUCT DEMO</span>
+            <h3>X-COMMAND</h3>
+            <p>
+              Generate a deterministic tactical theatre, inspect its payload,
+              and replay the same seed.
+            </p>
+            <span class="launch-card__action">OPEN TACTICAL GENERATOR <b>↗</b></span>
+          </a>
+
+          <a
+            class="launch-card launch-card--rules"
+            data-key="2"
+            href="https://rustycohl.github.io/d10SRD/"
+          >
+            <span class="launch-card__key">02</span>
+            <span class="launch-card__type">RULES COMMONS</span>
+            <h3>d10SRD</h3>
+            <p>
+              Read the scaled d10 core, Base-10 action bridge, and executable
+              conformance proof.
+            </p>
+            <span class="launch-card__action">OPEN SYSTEM REFERENCE <b>↗</b></span>
+          </a>
+        </div>
+
+        <aside class="dev-port">
+          <div>
+            <span class="dev-port__state"><i></i> DEVELOPMENT NETWORK LIVE</span>
+            <strong>GZG:NOW</strong>
+            <p>
+              The integration lab and independent protocol ports remain open
+              for public inspection and backend testing.
+            </p>
+          </div>
+          <a data-key="3" href="https://rustycohl.github.io/GZG-NOW/">
+            INSPECT THE LAB <span>↗</span>
+          </a>
+        </aside>
+      </section>
+
+      <section class="signal" aria-label="Current publication state">
+        <span>THEMED LAUNCH PAGE</span>
+        <b aria-hidden="true"></b>
+        <span>STATIC / OFFLINE-CAPABLE</span>
+        <b aria-hidden="true"></b>
+        <span>PUBLIC ALPHA</span>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        <strong>BATTLE/STAR.SOL</strong> is the themed launch surface.
+        The tactical engine and rules carry their own licenses.
+      </p>
+      <p class="keys">KEYS <kbd>1</kbd> TACTICAL <kbd>2</kbd> SRD <kbd>3</kbd> LAB</p>
+    </footer>
+
+    <script type="module" src="./app.mjs"></script>
+  </body>
+</html>
