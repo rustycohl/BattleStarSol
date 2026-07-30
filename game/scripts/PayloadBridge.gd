@@ -237,6 +237,25 @@ func import_payload(src_path: String) -> Dictionary:
 	f.close()
 	return d if typeof(d) == TYPE_DICTIONARY else {}
 
+func import_character(src_path: String) -> bool:
+	var d = import_payload(src_path)
+	if d.get("schema") == "gzg.oracle.character/0.1":
+		if not _payload.has("characters"): _payload["characters"] = []
+		_payload["characters"].append(d)
+		print("[PayloadBridge] Imported ORACLE Character: ", d.get("callsign", "Unknown"))
+		return true
+	print("[PayloadBridge] Invalid character payload at ", src_path)
+	return false
+
+func import_deck(src_path: String) -> bool:
+	var d = import_payload(src_path)
+	if d.get("schema") == "gzg.dealer.deck/0.1":
+		_payload["deck"] = d.get("cards", [])
+		print("[PayloadBridge] Imported DEALER Deck with ", _payload["deck"].size(), " cards")
+		return true
+	print("[PayloadBridge] Invalid deck payload at ", src_path)
+	return false
+
 
 # --- Optional HTTP relay mode ---
 func configure(atlas_url: String, taclayer_url: String) -> void:

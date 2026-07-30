@@ -152,6 +152,15 @@ func _build_launcher_ui() -> void:
 	btn_dev.pressed.connect(_quick_deploy)
 	vbox.add_child(btn_dev)
 
+	var btn_standoff = Button.new()
+	btn_standoff.text = "STANDOFF (COVER/FLANK SIMULATION)"
+	btn_standoff.custom_minimum_size = Vector2(400, 32)
+	var sbs = StyleBoxFlat.new()
+	sbs.bg_color = Color(0.3, 0.2, 0.1)
+	btn_standoff.add_theme_stylebox_override("normal", sbs)
+	btn_standoff.pressed.connect(_standoff_deploy)
+	vbox.add_child(btn_standoff)
+
 	var btn_tutorial = Button.new()
 	btn_tutorial.text = "PROVING GROUND (TUTORIAL SIMULATION)"
 	btn_tutorial.custom_minimum_size = Vector2(400, 32)
@@ -239,6 +248,20 @@ func _tutorial_deploy() -> void:
 			"Complete a basic attack",
 			"End turn and observe the phases",
 			"Extract to strategy"
+		],
+		"resources": {"neural": 0, "capital": 0}
+	})
+	get_tree().change_scene_to_file("res://Main.tscn")
+
+func _standoff_deploy() -> void:
+	PayloadBridge.set_payload({
+		"type": "deploy",
+		"sector": "Standoff",
+		"faction": GameState.commander_faction if GameState.commander_faction != "" else "HAD",
+		"seed": 888888,
+		"squad": [{"name": "Agent-1", "cls": "Scout"}],
+		"objectives": [
+			"Observe AI flanking or taking cover."
 		],
 		"resources": {"neural": 0, "capital": 0}
 	})

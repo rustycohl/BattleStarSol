@@ -154,6 +154,35 @@ static func spawn_into(main: Node, player_faction: int, payload: Dictionary) -> 
 		instructor.is_commander = false
 		instructor.is_squad_bot = false
 		instructor.player_controlled = false
+	elif sector == "Standoff":
+		var fac := (player_faction + 1) % 3
+		var lane_y := 3
+		var target_cell := Vector2i(7, lane_y)
+		var ranger_cell := Vector2i(1, lane_y)
+		var cover_cell := Vector2i(3, lane_y + 1)
+		
+		# Move player to target cell
+		if main.units.size() > 0:
+			var p = main.units[0]
+			p.cell = target_cell
+			if p.node:
+				p.node.position = main._cell_to_world(target_cell)
+		
+		var ranger = main._make_unit(fac, ranger_cell)
+		ranger.name = "AI Ranger"
+		ranger.skills = (skills[fac] as Array).duplicate()
+		ranger.hp = Config.UNIT_HP
+		ranger.max_hp = Config.UNIT_HP
+		ranger.ap = Config.MAX_AP
+		ranger.max_ap = Config.MAX_AP
+		ranger.is_commander = false
+		ranger.is_squad_bot = false
+		ranger.player_controlled = false
+		
+		# Inject cover
+		if main.cells.has(cover_cell):
+			main.cells[cover_cell] = {"type": Config.COVER, "z": 3}
+			World.spawn_tile(main.tiles_root, cover_cell, Config.COVER, 3, 888888)
 	else:
 		for fac in [Config.FACTION_HAD, Config.FACTION_SYND, Config.FACTION_TIME]:
 			if fac == player_faction:

@@ -174,6 +174,8 @@ func _ready() -> void:
 	var brief = Narrative.generate_mission_brief() if Narrative else "Squad inserted."
 	if sector == "Proving Ground":
 		brief = "GUIDED PROVING GROUND ACTIVE: follow the objective panel. F8 is always available for extraction."
+	elif sector == "Standoff":
+		brief = "STANDOFF SIMULATION: End turn to observe AI cover and flank behavior."
 	else:
 		brief = "%s | Pilot: Commander. Agents are autonomous until Remotes (God Mode)." % brief
 

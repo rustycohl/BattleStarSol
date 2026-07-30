@@ -51,7 +51,9 @@ static func normalize_deploy(raw: Dictionary) -> Dictionary:
 		"atlas_state": source.get("atlas_state", {}),
 		"map": source.get("map", {}).duplicate(true) if source.get("map", {}) is Dictionary else {},
 		"cell_size": float(source.get("cell_size", 2.0)),
-		"macro_grid": bool(source.get("macro_grid", false))
+		"macro_grid": bool(source.get("macro_grid", false)),
+		"characters": source.get("characters", []).duplicate(true) if source.get("characters", []) is Array else [],
+		"deck": source.get("deck", []).duplicate(true) if source.get("deck", []) is Array else []
 	}
 	if not galaxy_message_id.is_empty():
 		normalized["galaxy_message_id"] = galaxy_message_id

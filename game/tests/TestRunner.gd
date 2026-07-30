@@ -20,6 +20,7 @@ func _init() -> void:
 
 func _run() -> void:
 	_test_seeded_generation()
+	_test_d10_conformance()
 	_test_payload_contract()
 	_test_faction_vocabulary()
 	_test_action_economy()
@@ -74,6 +75,27 @@ func _test_seeded_generation() -> void:
 			_expect(int(first.get(cell, {}).get("z", -1)) == 0, "faction spawn was generated on elevated terrain")
 			_expect(not spawn_seen.has(cell), "faction spawn positions overlap")
 			spawn_seen[cell] = true
+
+func _test_d10_conformance() -> void:
+	_expect(Config.MAX_AP == 10, "d10SRD Conformance: Base-10 AP rule broken")
+	_expect(Config.UNIT_HP == 10, "d10SRD Conformance: Base-10 HP rule broken")
+	_expect(Config.MOVE_COST == 1, "d10SRD Conformance: Move cost broken")
+	_expect(Config.SPRINT_MOVE_COST == 1, "d10SRD Conformance: Sprint cost broken")
+	_expect(Config.CROUCH_MOVE_COST == 2, "d10SRD Conformance: Crouch cost broken")
+	_expect(Config.PRONE_MOVE_COST == 3, "d10SRD Conformance: Prone cost broken")
+	_expect(Config.MELEE_COST == 4, "d10SRD Conformance: Melee cost broken")
+	_expect(Config.BLOCK_COST == 2, "d10SRD Conformance: Block cost broken")
+	_expect(Config.BLOCK_REDUCTION == 3, "d10SRD Conformance: Block reduction broken")
+	_expect(Config.EQUIP_COST == 1, "d10SRD Conformance: Equip cost broken")
+	_expect(Config.TAKE_COVER_COST == 1, "d10SRD Conformance: Take cover cost broken")
+	_expect(Config.LEAVE_COVER_COST == 1, "d10SRD Conformance: Leave cover cost broken")
+	_expect(Config.DODGE_COST == 1, "d10SRD Conformance: Dodge cost broken")
+	
+	_expect(Config.FIST_DMG == 4, "d10SRD Conformance: Fist dmg broken")
+	_expect(Config.ROCK_1H_DMG == 5, "d10SRD Conformance: Rock dmg broken")
+	_expect(Config.SPEAR_SWEEP_DMG == 6 or Config.THROW.get("spear", {}).get("dmg", 0) == 7, "d10SRD Conformance: Spear dmg broken")
+	_expect(Config.CLUB_SWEEP_DMG == 5 or Config.THROW.get("club", {}).get("dmg", 0) == 4, "d10SRD Conformance: Club dmg broken")
+	_expect(Config.BOW_DMG == 9, "d10SRD Conformance: Bow dmg broken")
 
 func _test_payload_contract() -> void:
 	var legacy := {
