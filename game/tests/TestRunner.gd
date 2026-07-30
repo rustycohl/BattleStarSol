@@ -14,6 +14,10 @@ const Tactics = preload("res://scripts/AITactics.gd")
 const Tutorial = preload("res://scripts/TutorialDirector.gd")
 
 var failures: Array[String] = []
+var checks := 0
+
+## Assertion floor. Raise this when tests are added; never lower it to make a run pass.
+const MIN_CHECKS := 1427
 
 func _init() -> void:
 	call_deferred("_run")
@@ -23,6 +27,7 @@ func _run() -> void:
 	_test_d10_conformance()
 	_test_balance_baseline()
 	_test_damage_appearance()
+	_test_tier_shedding_and_conservation()
 	_test_payload_contract()
 	_test_faction_vocabulary()
 	_test_action_economy()
@@ -34,15 +39,30 @@ func _run() -> void:
 	await _test_specials_stay_visible_in_god_mode()
 	await _test_multi_round_cycle()
 	await _test_strategic_scene()
+	if checks < MIN_CHECKS:
+		failures.append(
+			"only %d assertions ran, expected at least %d -- a test aborted before reaching its assertions (look for an engine error above)" % [checks, MIN_CHECKS]
+		)
 	if failures.is_empty():
-		print("PASS: Battle/Star.SOL headless tests")
+		print("PASS: Battle/Star.SOL headless tests, %d checks" % checks)
 		quit(0)
 	else:
 		for failure in failures:
 			push_error("FAIL: " + failure)
 		quit(1)
 
+## Every assertion is counted. A test that dies mid-way -- a runtime error abandons the rest
+## of its function and returns control to the runner -- used to leave the suite reporting PASS
+## with every later assertion silently unexecuted. Observed live on 2026-07-30: a wrong
+## argument order printed `SCRIPT ERROR: Invalid type in function 'damage_terrain'`, skipped
+## the rest of that test, and the suite still passed.
+##
+## GDScript gives the runner no way to detect that its callee aborted, so the tripwire is the
+## count: if fewer assertions run than the pinned floor, something did not finish. Same
+## pattern PlaytestRunner already prints. The floor is raised deliberately when tests are
+## added; it is not a target to be met by adding assertions elsewhere.
 func _expect(condition: bool, message: String) -> void:
+	checks += 1
 	if not condition:
 		failures.append(message)
 
@@ -291,6 +311,20 @@ func _test_scene_cover_is_material() -> void:
 			World.wear_of(main.cells.get(target_probe, {})) < 1.0,
 			"damaging a cell did not reduce its material"
 		)
+		# Conservation of matter, end to end: the tiers that came down must be on the ground as
+		# debris, in the existing debris system rather than a second pile of rubble somewhere.
+		var shed := int(main.cells.get(target_probe, {}).get("tiers_lost", 0))
+		if shed > 0:
+			_expect(
+				main.debris.has(target_probe),
+				"%d tier(s) came down and left no debris -- destruction deleted matter" % shed
+			)
+			_expect(
+				int(main.debris.get(target_probe, {}).get("rock", 0)) >= shed,
+				"debris on the cell (%d rock) does not account for the %d tier(s) that fell" % [
+					int(main.debris.get(target_probe, {}).get("rock", 0)), shed
+				]
+			)
 
 	main.free()
 
@@ -505,6 +539,67 @@ func _test_damage_appearance() -> void:
 	_expect(
 		is_equal_approx(float(repeat_a["yaw_deg"]), float(repeat_b["yaw_deg"])),
 		"damage appearance is not repeatable for the same cell"
+	)
+
+## A column sheds height one tier at a time under gravity, and the matter it sheds is
+## accounted for rather than deleted.
+##
+## Down is -Y, so material rests on what is beneath it and nothing floats: a column occupies
+## tiers 1..z contiguously from the ground, and losing material shortens it from the top. Before
+## this, a six-high wall dropped to two-high the instant its integrity crossed a threshold, and
+## the four tiers in between simply stopped existing.
+func _test_tier_shedding_and_conservation() -> void:
+	for start_height in [3, 4, 5, 6]:
+		var cell := World.material_cell(Config.COVER, start_height)
+		_expect(
+			int(cell.get("tiers", -1)) == start_height,
+			"a generated column does not record the tier count it started at"
+		)
+		_expect(
+			Ballistics.supported_tiers(cell) == start_height,
+			"a pristine column of %d does not support its own height (supports %d)" % [start_height, Ballistics.supported_tiers(cell)]
+		)
+		var recovered := 0
+		var previous_z := int(cell["z"])
+		var hits := 0
+		while int(cell.get("z", 0)) > 0 and hits < 40:
+			hits += 1
+			cell = Ballistics.degrade_cell(cell, 12)
+			var z_now := int(cell.get("z", 0))
+			var lost := int(cell.get("tiers_lost", -1))
+			_expect(lost >= 0, "degrade_cell did not report tiers_lost")
+			_expect(z_now <= previous_z, "a column grew taller after taking damage")
+			_expect(
+				previous_z - z_now == lost,
+				"tiers_lost (%d) disagrees with the height actually shed (%d)" % [lost, previous_z - z_now]
+			)
+			# Twelve damage against a capacity of at least sixteen per tier can never take
+			# more than one tier, which is what makes the shed sequential rather than a snap.
+			_expect(lost <= 1, "a single small hit shed %d tiers at once" % lost)
+			recovered += lost
+			previous_z = z_now
+		_expect(hits < 40, "a column of %d never came down -- the last tier may be indestructible" % start_height)
+		# Conservation: every tier the column started with is accounted for.
+		_expect(
+			recovered == start_height,
+			"a column of %d shed %d tiers -- matter was created or destroyed" % [start_height, recovered]
+		)
+
+	# A large enough single event takes several tiers at once and must report all of them.
+	var blasted := Ballistics.degrade_cell(World.material_cell(Config.COVER, 6), 60)
+	_expect(int(blasted["tiers_lost"]) > 1, "a grenade-scale hit shed at most one tier")
+	_expect(
+		6 - int(blasted["z"]) == int(blasted["tiers_lost"]),
+		"a multi-tier collapse did not account for every tier it dropped"
+	)
+
+	# Capacity per tier must come from the height the column STARTED at. Deriving it from the
+	# current height would make each surviving tier cheaper to hold up as the column shrank,
+	# and the last tier would never fail.
+	var worn := Ballistics.degrade_cell(World.material_cell(Config.COVER, 6), 48)
+	_expect(
+		int(worn.get("tiers", -1)) == 6,
+		"the original tier count was lost as the column was worn down"
 	)
 
 func _load_json(res_path: String) -> Dictionary:

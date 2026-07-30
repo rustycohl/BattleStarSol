@@ -163,13 +163,54 @@ static func resolve_with_penetration(cell_data, penetration: int, power: int = 1
 ## Applies wear to a cell and returns its new state. A cell degrades through its
 ## own material classes rather than vanishing: hard cover becomes soft cover,
 ## soft cover becomes rubble, rubble becomes open ground.
+## How many tiers of material the remaining integrity can hold up.
+##
+## A column is a stack of tiers resting on the ground. Down is -Y, so material rests on what
+## is beneath it and nothing floats: a column always occupies tiers 1..z contiguously from the
+## ground up, and losing material shortens it from the top. That is the whole of the gravity
+## rule, and it is what makes shedding sequential — a six-high wall goes 6, 5, 4, 3 rather
+## than dropping to 2 the instant it crosses a threshold.
+##
+## Capacity per tier is the cell's *original* material spread over its *original* tier count.
+## Both are fixed at generation: `density` is what the material started as and never changes as
+## integrity falls, and `tiers` records the height it started at. Deriving capacity from the
+## current height instead would make each tier cheaper as the column shrank, so the last tier
+## would be indestructible.
+static func supported_tiers(cell_data) -> int:
+	if not (cell_data is Dictionary):
+		return 0
+	var data: Dictionary = cell_data
+	var started_tiers := int(data.get("tiers", int(data.get("z", 0))))
+	if started_tiers <= 0:
+		return 0
+	var started_density := int(data.get("density", 0))
+	if started_density <= 0:
+		# Pre-material cells imply their material from type, exactly as `density_of` does.
+		started_density = density_for_type(int(data.get("type", Config.FLOOR)), started_tiers)
+	if started_density <= 0:
+		return 0
+	var capacity := maxf(float(started_density) / float(started_tiers), 1.0)
+	return clampi(int(floor(float(density_of(data)) / capacity)), 0, started_tiers)
+
+## Applies wear to a cell and returns its new state. A cell degrades through its
+## own material classes rather than vanishing: hard cover becomes soft cover,
+## soft cover becomes rubble, rubble becomes open ground.
+##
+## Height now sheds tier by tier under gravity rather than snapping at a threshold, and the
+## result reports `tiers_lost` so the caller can account for the matter that came down. A tier
+## does not cease to exist when it fails — see `Main.damage_terrain`, which turns the loss into
+## debris on the ground through the existing debris system.
 static func degrade_cell(cell_data, damage: int) -> Dictionary:
 	if not (cell_data is Dictionary):
 		return {}
 	var data: Dictionary = (cell_data as Dictionary).duplicate(true)
+	var height := int(data.get("z", 0))
+	# Record the original tier count the first time a cell is worked on, so capacity per tier
+	# stays fixed for the rest of its life.
+	if not data.has("tiers"):
+		data["tiers"] = height
 	var integrity := maxi(density_of(data) - maxi(damage, 0), 0)
 	data["integrity"] = integrity
-	var height := int(data.get("z", 0))
 	if integrity < RUBBLE_FLOOR:
 		# Nothing is left standing, so there is no material left to take. Open
 		# ground carries no density, exactly as freshly generated floor does.
@@ -179,11 +220,16 @@ static func degrade_cell(cell_data, damage: int) -> Dictionary:
 		data["climbable"] = false
 		data["density"] = 0
 		data["integrity"] = 0
-	elif integrity < HARD_COVER_FLOOR:
-		data["type"] = Config.HALF_COVER
-		data["z"] = mini(maxi(height - 1, 1), 2)
-		data["material"] = "soft"
-		data["climbable"] = true
+	else:
+		# Gravity first: the column can only be as tall as its remaining material supports,
+		# and it never grows back.
+		data["z"] = mini(height, maxi(supported_tiers(data), 1))
+		if integrity < HARD_COVER_FLOOR:
+			data["type"] = Config.HALF_COVER
+			data["material"] = "soft"
+			data["climbable"] = true
+		data["climbable"] = int(data["z"]) > 0 and int(data["z"]) <= 2
+	data["tiers_lost"] = maxi(height - int(data.get("z", 0)), 0)
 	return data
 
 ## Armor on the same scale as terrain density and weapon penetration, so one

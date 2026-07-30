@@ -2089,6 +2089,14 @@ func damage_terrain(cell: Vector2i, damage: int, weapon: String = "", attacker =
 	cells[cell] = after
 	if GameState:
 		GameState.cells = cells
+	# Conservation of matter: a tier that fails does not cease to exist, it comes down. Each
+	# lost tier becomes debris on the cell through the existing debris system — the same
+	# rocks a unit can pick up and throw — rather than a second inventory of rubble. Without
+	# this, destruction quietly deleted material from the world and the simulation stopped
+	# holding water.
+	var tiers_lost := int(after.get("tiers_lost", 0))
+	if tiers_lost > 0:
+		_add_debris(cell, "rock", tiers_lost)
 	var cover_before := Ballistics.effective_cover_level(before)
 	var cover_after := Ballistics.effective_cover_level(after)
 	# Redraw whenever the tile should *look* different, not only when it crosses a height or

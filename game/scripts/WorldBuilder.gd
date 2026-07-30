@@ -121,6 +121,10 @@ static func material_cell(cell_type: int, height: int) -> Dictionary:
 		"density": density,
 		"integrity": density,
 		"material": material,
+		# The tier count the column started at. Fixed for the cell's life, so the material
+		# each tier needs to stay up stays fixed as the column is worn down. Without it,
+		# capacity per tier would fall with the height and the last tier would never fail.
+		"tiers": height,
 		"climbable": height > 0 and height <= 2
 	}
 
