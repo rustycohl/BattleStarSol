@@ -21,6 +21,7 @@ func _init() -> void:
 func _run() -> void:
 	_test_seeded_generation()
 	_test_d10_conformance()
+	_test_balance_baseline()
 	_test_payload_contract()
 	_test_faction_vocabulary()
 	_test_action_economy()
@@ -28,6 +29,7 @@ func _run() -> void:
 	_test_contextual_movement()
 	_test_web_contract()
 	await _test_main_scene()
+	await _test_scene_cover_is_material()
 	await _test_multi_round_cycle()
 	await _test_strategic_scene()
 	if failures.is_empty():
@@ -76,26 +78,207 @@ func _test_seeded_generation() -> void:
 			_expect(not spawn_seen.has(cell), "faction spawn positions overlap")
 			spawn_seen[cell] = true
 
+## Conformance against the d10SRD, read from the pinned rules authority rather than
+## from numbers retyped into this test.
+##
+## The earlier version of this test asserted eighteen literals under a "d10SRD
+## Conformance" label. Exactly one of them -- the AP maximum -- is a d10SRD rule. The
+## SRD says in as many words: "Do not divide health, damage, movement, range, time,
+## capacity, currency, ammunition, action counts, or unrelated economies unless a named
+## module explicitly says so." Weapon damage and movement costs are authored balance,
+## and pinning them under a conformance label would make a legitimate balance change
+## read as a rules violation. They now live in `_test_balance_baseline`.
+##
+## Conformance vectors 1-4 do not apply to this port because it implements no check
+## resolution at all. That claim is verified by absence, not asserted by comment: if a
+## forbidden check-resolution symbol ever appears in the configuration authority, this
+## test fails, because at that moment the not-applicable declarations stop being true.
 func _test_d10_conformance() -> void:
-	_expect(Config.MAX_AP == 10, "d10SRD Conformance: Base-10 AP rule broken")
-	_expect(Config.UNIT_HP == 10, "d10SRD Conformance: Base-10 HP rule broken")
-	_expect(Config.MOVE_COST == 1, "d10SRD Conformance: Move cost broken")
-	_expect(Config.SPRINT_MOVE_COST == 1, "d10SRD Conformance: Sprint cost broken")
-	_expect(Config.CROUCH_MOVE_COST == 2, "d10SRD Conformance: Crouch cost broken")
-	_expect(Config.PRONE_MOVE_COST == 3, "d10SRD Conformance: Prone cost broken")
-	_expect(Config.MELEE_COST == 4, "d10SRD Conformance: Melee cost broken")
-	_expect(Config.BLOCK_COST == 2, "d10SRD Conformance: Block cost broken")
-	_expect(Config.BLOCK_REDUCTION == 3, "d10SRD Conformance: Block reduction broken")
-	_expect(Config.EQUIP_COST == 1, "d10SRD Conformance: Equip cost broken")
-	_expect(Config.TAKE_COVER_COST == 1, "d10SRD Conformance: Take cover cost broken")
-	_expect(Config.LEAVE_COVER_COST == 1, "d10SRD Conformance: Leave cover cost broken")
-	_expect(Config.DODGE_COST == 1, "d10SRD Conformance: Dodge cost broken")
-	
-	_expect(Config.FIST_DMG == 4, "d10SRD Conformance: Fist dmg broken")
-	_expect(Config.ROCK_1H_DMG == 5, "d10SRD Conformance: Rock dmg broken")
-	_expect(Config.SPEAR_SWEEP_DMG == 6 or Config.THROW.get("spear", {}).get("dmg", 0) == 7, "d10SRD Conformance: Spear dmg broken")
-	_expect(Config.CLUB_SWEEP_DMG == 5 or Config.THROW.get("club", {}).get("dmg", 0) == 4, "d10SRD Conformance: Club dmg broken")
-	_expect(Config.BOW_DMG == 9, "d10SRD Conformance: Bow dmg broken")
+	var pin := _load_json("res://data/d10srd_conformance.json")
+	_expect(not pin.is_empty(), "d10SRD conformance: the pinned rules authority is missing or unreadable")
+	if pin.is_empty():
+		return
+
+	# The pin must identify which published rules it was taken from. A pin that has lost
+	# its identity cannot tell us whether the SRD has moved underneath us.
+	_expect(
+		String(pin.get("rules_id", "")) == "gzg.d10/0.1",
+		"d10SRD conformance: pinned rules_id is not gzg.d10/0.1 (got '%s') -- re-pin against the current SRD" % String(pin.get("rules_id", ""))
+	)
+	_expect(
+		String(pin.get("srd_version", "")) == "0.1.0-alpha.2",
+		"d10SRD conformance: pinned srd_version moved (got '%s') -- re-read the SRD Conformance section before accepting it" % String(pin.get("srd_version", ""))
+	)
+
+	var vectors: Array = pin.get("vectors", [])
+	_expect(vectors.size() == 6, "d10SRD conformance: expected the SRD's six conformance vectors, found %d" % vectors.size())
+
+	var applicable := 0
+	for entry in vectors:
+		if not (entry is Dictionary):
+			_expect(false, "d10SRD conformance: malformed vector entry")
+			continue
+		var vector: Dictionary = entry
+		if not bool(vector.get("applies_to_godot_port", false)):
+			continue
+		applicable += 1
+		# Vector 6 is a governance constraint on the SRD itself; the port cannot express
+		# it as a value, and the pin says so rather than pretending otherwise.
+		if not bool(vector.get("machine_checked", true)):
+			continue
+		var symbol := String(vector.get("godot_symbol", ""))
+		var expected := int(vector.get("expected", -1))
+		_expect(
+			_config_constant(symbol) == expected,
+			"d10SRD conformance vector %d (%s): %s is %d, the SRD requires %d" % [
+				int(vector.get("id", -1)),
+				String(vector.get("requirement", "")),
+				symbol,
+				_config_constant(symbol),
+				expected
+			]
+		)
+	_expect(applicable >= 1, "d10SRD conformance: the pin declares no vector applicable to this port, which cannot be right")
+
+	# Verify the not-applicable claims by absence. This is the part that keeps the pin
+	# honest over time: the moment this port grows a check resolver, the declarations
+	# above become false and this fails rather than passing quietly.
+	var constants := _config_constants()
+	for name in pin.get("forbidden_symbols", []):
+		_expect(
+			not constants.has(String(name)),
+			"d10SRD conformance: %s now exists in GameConfig, so vectors 1-4 are no longer not-applicable -- implement them against the SRD or re-pin" % String(name)
+		)
+
+## Authored balance numbers. These are deliberately NOT d10SRD conformance -- the SRD
+## forbids deriving them from d10 scaling. They are pinned here as a regression baseline
+## so an accidental change is caught, and changing one on purpose means changing it here
+## too, which is the intended friction.
+func _test_balance_baseline() -> void:
+	_expect(Config.UNIT_HP == 10, "balance baseline: UNIT_HP changed")
+	_expect(Config.MOVE_COST == 1, "balance baseline: MOVE_COST changed")
+	_expect(Config.SPRINT_MOVE_COST == 1, "balance baseline: SPRINT_MOVE_COST changed")
+	_expect(Config.CROUCH_MOVE_COST == 2, "balance baseline: CROUCH_MOVE_COST changed")
+	_expect(Config.PRONE_MOVE_COST == 3, "balance baseline: PRONE_MOVE_COST changed")
+	_expect(Config.MELEE_COST == 4, "balance baseline: MELEE_COST changed")
+	_expect(Config.BLOCK_COST == 2, "balance baseline: BLOCK_COST changed")
+	_expect(Config.BLOCK_REDUCTION == 3, "balance baseline: BLOCK_REDUCTION changed")
+	_expect(Config.EQUIP_COST == 1, "balance baseline: EQUIP_COST changed")
+	_expect(Config.TAKE_COVER_COST == 1, "balance baseline: TAKE_COVER_COST changed")
+	_expect(Config.LEAVE_COVER_COST == 1, "balance baseline: LEAVE_COVER_COST changed")
+	_expect(Config.DODGE_COST == 1, "balance baseline: DODGE_COST changed")
+	_expect(Config.FIST_DMG == 4, "balance baseline: FIST_DMG changed")
+	_expect(Config.ROCK_1H_DMG == 5, "balance baseline: ROCK_1H_DMG changed")
+	_expect(Config.BOW_DMG == 9, "balance baseline: BOW_DMG changed")
+	# The earlier form of these two was `a == x or b == y`, which passes when either half
+	# breaks. Both axes are asserted separately so a real regression cannot hide behind
+	# the other one still holding.
+	_expect(Config.SPEAR_SWEEP_DMG == 6, "balance baseline: SPEAR_SWEEP_DMG changed")
+	_expect(int(Config.THROW.get("spear", {}).get("dmg", 0)) == 7, "balance baseline: thrown spear damage changed")
+	_expect(Config.CLUB_SWEEP_DMG == 5, "balance baseline: CLUB_SWEEP_DMG changed")
+	_expect(int(Config.THROW.get("club", {}).get("dmg", 0)) == 4, "balance baseline: thrown club damage changed")
+
+## Every cover cell in a live scene must carry the material fields, because cover strength,
+## penetration, destruction, and the terrain ledger are all derived from them. A cell
+## authored as a bare `{"type", "z"}` dict still *scores* correctly -- `density_of` falls
+## back to the type's implied material -- so this class of special case cannot be caught by
+## checking behaviour. It has to be caught structurally, which is what this does.
+##
+## Written against the Standoff sector because that is where the regression was found, but
+## the assertion is general: it walks the whole grid and accepts no cover cell without
+## material.
+func _test_scene_cover_is_material() -> void:
+	var bridge := root.get_node_or_null("/root/PayloadBridge")
+	_expect(bridge != null, "PayloadBridge autoload is unavailable, cannot drive a sector")
+	if bridge == null:
+		return
+	bridge.set_payload({
+		"type": "deploy",
+		"sector": "Standoff",
+		"faction": "HAD",
+		"seed": 888888,
+		"squad": [{"name": "Agent-1", "cls": "Scout"}],
+		"objectives": ["Observe AI flanking or taking cover."],
+		"resources": {"neural": 0, "capital": 0}
+	})
+
+	var packed := load("res://Main.tscn") as PackedScene
+	_expect(packed != null, "Main.tscn did not load for the cover-material check")
+	if packed == null:
+		return
+	var main := packed.instantiate()
+	root.add_child(main)
+	await process_frame
+	await process_frame
+
+	if not main.has_method("_spawn_squads"):
+		_expect(false, "Main.gd did not load for the cover-material check")
+		main.free()
+		return
+
+	var cover_cells := 0
+	var authored := 0
+	var first_offender := ""
+	for cell in main.cells.keys():
+		var data = main.cells[cell]
+		if not (data is Dictionary):
+			continue
+		var kind := int((data as Dictionary).get("type", Config.FLOOR))
+		if kind != Config.COVER and kind != Config.HALF_COVER:
+			continue
+		cover_cells += 1
+		var d: Dictionary = data
+		if not (d.has("density") and d.has("integrity") and d.has("material")):
+			authored += 1
+			if first_offender.is_empty():
+				first_offender = "%s (type %d, z %d, keys %s)" % [
+					str(cell), kind, int(d.get("z", 0)), str(d.keys())
+				]
+	_expect(cover_cells > 0, "the Standoff sector produced no cover at all, so this check proved nothing")
+	_expect(
+		authored == 0,
+		"%d cover cell(s) were authored without material fields -- cover must come from WorldBuilder.material_cell(); first: %s" % [authored, first_offender]
+	)
+
+	# The injected standoff cover specifically: hard material at the density the shared
+	# model assigns a three-high column, so it is indistinguishable from generated cover.
+	var standoff_cover := Vector2i(3, 4)
+	if main.cells.has(standoff_cover):
+		var sc: Dictionary = main.cells[standoff_cover]
+		_expect(int(sc.get("type", -1)) == Config.COVER, "standoff lane cover is missing at %s" % standoff_cover)
+		_expect(String(sc.get("material", "")) == "hard", "standoff lane cover is not hard material")
+		_expect(
+			int(sc.get("density", 0)) == int(World.material_cell(Config.COVER, 3).get("density", -1)),
+			"standoff lane cover density diverges from the shared material model"
+		)
+
+	main.free()
+
+func _load_json(res_path: String) -> Dictionary:
+	if not FileAccess.file_exists(res_path):
+		return {}
+	var f := FileAccess.open(res_path, FileAccess.READ)
+	if f == null:
+		return {}
+	var text := f.get_as_text()
+	f.close()
+	var parsed = JSON.parse_string(text)
+	return parsed if parsed is Dictionary else {}
+
+func _config_constant(name: String) -> int:
+	# The pin names its target as "GameConfig.MAX_AP"; resolve the trailing symbol
+	# against the configuration authority rather than hardcoding the lookup.
+	var symbol := name.get_slice(".", name.get_slice_count(".") - 1)
+	var constants := _config_constants()
+	if not constants.has(symbol):
+		return -1
+	return int(constants[symbol])
+
+## `Config` is a preloaded script reference, so its constant map has to be read through a
+## `Script`-typed binding; calling the method on the class reference is a parse error.
+func _config_constants() -> Dictionary:
+	var config_script: Script = Config
+	return config_script.get_script_constant_map()
 
 func _test_payload_contract() -> void:
 	var legacy := {
