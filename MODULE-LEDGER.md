@@ -148,6 +148,44 @@ re-earned.
 
 - `evidence/M03-001-GOLDEN-AI-2026-07-29.md`
 
+## M07-001 - Public release 0.1.2-prealpha.4
+
+- Status: PUBLISHED and live
+- Authority: principal instruction, 2026-07-30 — push to public so playtesting can
+  begin from the public endpoints. Procedure: `.agents/09-GIT-AND-BACKUP.md`, written
+  before any Git operation.
+- Backups taken first, both retained:
+  - `BattleStarSol-prealpha-02-20260730T0555Z-pre-push.zip`, 561 files, 75,645,844
+    bytes, SHA-256 `16a37374d01d18af5ae8a9da6174ed9e904b647347d333c1dcc4c5248586e07f`;
+  - `BattleStarSol-prealpha-02-20260730T0625Z-release-0.1.2-prealpha.4.zip`, 578
+    files, 78,814,486 bytes, SHA-256
+    `30d2c46fae7d3f9c97ce670837f99fd8b802fc13a7724f7074abe6b658e0e93e`.
+- Method: the reconstruction is Git-free, so the remote was cloned and the tree
+  copied in. No history was rewritten and nothing was initialised over a live remote.
+- Base `55ecad27` to published `25ecf4e`, tags `v0.1.2-prealpha.1` through
+  `v0.1.2-prealpha.4`, following the repository's existing `v<version>` convention.
+- Defect caught before publishing: `.gitattributes` declares `eol=lf` and twelve
+  working files carried CRLF, so the manifest described bytes CI would never check
+  out. Normalised, re-exported, regenerated, and re-verified inside the clone.
+- Defects caught after publishing, by CI and by smoke-testing the public endpoint:
+  - a browser-discovery test asserted a hardcoded Windows path while the resolver
+    composes with `path.join`, so it passed on Windows and failed on Linux. The
+    first fix attempt did not apply and shipped as `prealpha.2`; `prealpha.3`
+    corrected it by asserting precedence instead of separators;
+  - the HUD grips used glyphs the bundled font lacks and rendered as placeholder
+    boxes. `prealpha.4` uses ASCII.
+- Live verification: CI green on `25ecf4e`; the public Page serves 297,500 bytes with
+  SHA-256 `3a05a870...`, matching the committed runtime; a public-endpoint smoke test
+  booted Godot, reported tutorial 1/7, showed the grenade in the dock, and moved
+  keyboard focus to Brace on the first Tab, with zero page errors.
+- `release.allow_apply` remains `false`. This publishes the product repository; it
+  does not promote through `promote-prealpha-02.ps1`.
+
+### Evidence
+
+- `evidence/M07-001-PUBLIC-RELEASE-2026-07-30.md`
+- `evidence/M03-006-BLAST-VERTICAL-ARMOR-2026-07-30.md`
+
 ## M06-001 - Local release candidate
 
 - Status: PASS. Local preparation only — no Git, no publication,

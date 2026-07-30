@@ -79,7 +79,15 @@ Current bounded state:
 - `release.allow_apply`: remains false;
 - committed public runtime and `game/MANIFEST.sha256`: regenerated locally by
   M06-001 under owner approval, and no longer the pre-M01 build;
-- Git and the public Page: unchanged. Nothing was committed, pushed, or published.
+- Git and the public Page: **published**. Release `0.1.2-prealpha.4` is live at
+  <https://rustycohl.github.io/BattleStarSol/>, CI green on `25ecf4e`, and the served
+  runtime hash matches the committed file. Two backup zips precede it and both are
+  retained;
+- M03-006 grenade, vertical cover, and armor penetration: PASS. A wall protects only
+  while it stands between shooter and target; armor resolves on the same 0-100
+  penetration scale as terrain; and the grenade is a thrown area blast that damages
+  units and terrain, with a visible detonation and scorched rubble. Every squad
+  member starts with one.
 
 **Release:** `0.1.2-prealpha.4`
 **Date:** 2026-07-30
