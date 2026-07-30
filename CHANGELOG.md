@@ -2,7 +2,7 @@
 
 ## Unreleased — 2026-07-30, second run
 
-Six commits on `7a8c04f`. Not published; `0.1.3-prealpha.1` remains the live release.
+Ten commits on `7a8c04f`. Not published; `0.1.3-prealpha.1` remains the live release.
 
 ### Added
 - **The d10SRD rules are distributed with this product** at `vendor/d10srd/`, carried with
@@ -21,6 +21,18 @@ Six commits on `7a8c04f`. Not published; `0.1.3-prealpha.1` remains the live rel
 - `tests/evidence-hygiene.test.mjs`, gating evidence promotion: no `.partial` run may be
   tracked, every promoted pack carries `SHA256SUMS`, no promoted pack carries
   `HARNESS-ERROR.json`.
+- **Destruction is visible in proportion to damage taken.** Appearance is derived from the
+  material a cell has left rather than from three discrete states: `WorldBuilder.wear_of`,
+  `damage_appearance`, and `tile_visual_signature` are pure and headlessly assertable. A wall
+  that has taken four rounds now looks like a wall that has taken four rounds.
+- **Height sheds tier by tier under gravity.** Down is -Y, material rests on what is beneath
+  it, and a column loses height from the top one tier at a time instead of snapping from
+  six-high to two-high at a threshold. `Ballistics.supported_tiers` derives capacity from the
+  material and tier count the column started with.
+- **Conservation of matter.** Every tier that comes down becomes debris through the existing
+  debris system — the same rocks a unit can pick up and throw. Measured: a six-high column
+  yields exactly six tiers of debris.
+- An assertion floor in `TestRunner`, and engine-error scanning in `game/tools/test.ps1`.
 
 ### Fixed
 - The Standoff sector injected cover as a bare `{"type", "z"}` dict, bypassing
@@ -34,6 +46,18 @@ Six commits on `7a8c04f`. Not published; `0.1.3-prealpha.1` remains the live rel
   order binds a stale runtime to new source and passes green.
 - Two assertions of the form `a == x or b == y`, which passed when either half broke, split
   so neither axis can hide behind the other.
+- **The Wall Run option was missing from dev mode.** `update_ui` set special visibility from
+  `dev_god_mode` and then overwrote its own answer, so Wall Run vanished whenever no wall
+  qualified — which is most of the time. Flip and Wall Jump were hidden by the same three
+  lines. Specials now ask `Main._special_enabled`, the authority the action router uses, and a
+  precondition may only grey a button out with a stated reason, never hide it.
+- **`Q` and `E` each drove two actions.** Lean and camera both claimed them, and nothing
+  consumes the event, so leaning in cover also dropped the camera. Lean moved to `[` and `]`.
+  `docs/CONTROLS.md` had recorded the collision as intended behaviour.
+- **A test that hit a runtime error left the suite reporting PASS** with every later assertion
+  silently unexecuted. Also `game/tools/test.ps1` had been unusable: PowerShell 5.1 turns a
+  native command's stderr into a terminating error, so the project-import step's harmless
+  warning aborted the script before any suite ran.
 
 ### Changed
 - Conformance and balance are now separate concerns with separate tests. Seventeen authored
@@ -42,6 +66,16 @@ Six commits on `7a8c04f`. Not published; `0.1.3-prealpha.1` remains the live rel
 - Conformance vectors 1–4 remain not applicable to this port — it implements no check
   resolution — but the claim is now verified by absence: a forbidden check-resolution symbol
   appearing in `GameConfig` fails the build, so the declaration cannot quietly become false.
+
+### Deliberate simplification — debris falls straight down
+- A tier that fails becomes debris **on the cell it fell from**. Nothing is thrown outward,
+  nothing topples into a neighbouring cell, and nothing above a destroyed tier is displaced
+  sideways. **This is a decision, not a defect.** The part a player reads is intact — boom means
+  things fall, and matter is conserved: a six-high column yields exactly six tiers of debris.
+  Classified B-tier, meaning a known simplification a player will not be troubled by, as against
+  A-tier which is anything breaking the simulation's logic or the player's trust. It will be
+  tackled later together with the ledger budget, because lateral displacement writes to cells
+  the damage event did not target and multiplies terrain events per blast.
 
 ### Known limit, unchanged
 - Terrain events can exhaust the reproduction ledger at roughly 18 worst-case grenades per

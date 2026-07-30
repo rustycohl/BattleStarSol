@@ -128,6 +128,14 @@ func push_extraction(result: Dictionary) -> bool:
 	if not result.has("gains"): result["gains"] = {"neural": 0, "capital": 0, "loot": []}
 	result["ts"] = Time.get_unix_time_from_system() * 1000.0
 	result["extraction_id"] = "xcommand:%d:%d" % [int(result["seed"]), int(result["ts"])]
+	# Option E from OBSERVATION-001: report the reproduction budget with the result, so a
+	# mission that spent its ledger says so in the extraction rather than only failing later
+	# when someone tries to bundle it.
+	var game_state = Engine.get_main_loop().root.get_node_or_null("GameState")
+	if game_state != null and game_state.has_method("ledger_budget"):
+		var budget: Dictionary = game_state.ledger_budget()
+		if not budget.is_empty():
+			result["repro_budget"] = budget
 	var extraction_message := _build_extraction_message(result)
 
 	print("[PayloadBridge] PUSHING EXTRACTION RESULT: ", result)

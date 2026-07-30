@@ -176,3 +176,80 @@ func replay_bundle() -> Dictionary:
 		"actions": action_records.duplicate(true),
 		"events": event_records.duplicate(true)
 	}
+
+## --- Reproduction ledger budget -------------------------------------------------------
+##
+## Option E from `evidence/OBSERVATION-001-LEDGER-CAPACITY-2026-07-30.md`. The ledger has a
+## hard ceiling and the worst property of that ceiling was its silence: a mission with heavy
+## terrain destruction would play correctly, extract correctly, and produce a reproduction
+## artifact that failed closed — with nobody told until afterwards.
+##
+## This does not raise the ceiling. It makes the ceiling visible while a player can still act.
+##
+## The caps are not retyped here. They live in `tools/repro-bundle.mjs`, which the runtime
+## cannot import, so `game/data/repro_budget.json` is their res://-readable view and
+## `tests/repro-budget.test.mjs` asserts the two agree.
+
+const REPRO_BUDGET_PATH := "res://data/repro_budget.json"
+var _repro_budget_cache: Dictionary = {}
+
+func repro_budget_limits() -> Dictionary:
+	if not _repro_budget_cache.is_empty():
+		return _repro_budget_cache
+	if not FileAccess.file_exists(REPRO_BUDGET_PATH):
+		return {}
+	var f := FileAccess.open(REPRO_BUDGET_PATH, FileAccess.READ)
+	if f == null:
+		return {}
+	var parsed = JSON.parse_string(f.get_as_text())
+	f.close()
+	if parsed is Dictionary:
+		_repro_budget_cache = parsed
+	return _repro_budget_cache
+
+## How much of the reproduction budget this mission has spent, and how close it is to the
+## cap that actually binds.
+##
+## Bytes are measured from the real serialised ledger rather than estimated per event, because
+## events are not uniform in size and an estimate would drift from the bundler it is meant to
+## predict. It is deliberately an approximation of the final artifact, not a duplicate of it:
+## the bundler remains the gate and still fails closed. This is a readout.
+func ledger_budget() -> Dictionary:
+	var limits := repro_budget_limits()
+	if limits.is_empty():
+		return {}
+	var max_events := int(limits.get("max_events", 0))
+	var max_bytes := int(limits.get("max_repro_bytes", 0))
+	var overhead := int(limits.get("baseline_overhead_bytes", 0))
+	var warn_at := float(limits.get("warn_at_fraction", 0.75))
+
+	var record_count := action_records.size() + event_records.size()
+	var ledger_bytes := JSON.stringify(replay_bundle()).length()
+	var byte_ceiling := maxi(max_bytes - overhead, 1)
+
+	var event_fraction := float(record_count) / float(maxi(max_events, 1))
+	var byte_fraction := float(ledger_bytes) / float(byte_ceiling)
+	# The binding cap is whichever is closer to full. Measured on this project it is bytes,
+	# but that is a measurement rather than a rule, so it is derived rather than assumed.
+	var fraction := maxf(event_fraction, byte_fraction)
+	var binding := "bytes" if byte_fraction >= event_fraction else "events"
+
+	var status := "ok"
+	if fraction >= 1.0:
+		status = "over"
+	elif fraction >= warn_at:
+		status = "warn"
+
+	return {
+		"records": record_count,
+		"max_events": max_events,
+		"ledger_bytes": ledger_bytes,
+		"byte_ceiling": byte_ceiling,
+		"event_fraction": event_fraction,
+		"byte_fraction": byte_fraction,
+		"fraction": clampf(fraction, 0.0, 99.0),
+		"remaining_fraction": clampf(1.0 - fraction, 0.0, 1.0),
+		"binding_cap": binding,
+		"status": status,
+		"warn_at_fraction": warn_at
+	}

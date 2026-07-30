@@ -17,7 +17,7 @@ var failures: Array[String] = []
 var checks := 0
 
 ## Assertion floor. Raise this when tests are added; never lower it to make a run pass.
-const MIN_CHECKS := 1427
+const MIN_CHECKS := 1441
 
 func _init() -> void:
 	call_deferred("_run")
@@ -28,6 +28,7 @@ func _run() -> void:
 	_test_balance_baseline()
 	_test_damage_appearance()
 	_test_tier_shedding_and_conservation()
+	_test_ledger_budget_readout()
 	_test_payload_contract()
 	_test_faction_vocabulary()
 	_test_action_economy()
@@ -601,6 +602,95 @@ func _test_tier_shedding_and_conservation() -> void:
 		int(worn.get("tiers", -1)) == 6,
 		"the original tier count was lost as the column was worn down"
 	)
+
+## The reproduction ledger's ceiling is visible while a mission is still running.
+##
+## Option E from `evidence/OBSERVATION-001-LEDGER-CAPACITY-2026-07-30.md`. The ceiling itself is
+## unchanged; what changes is that it stops being silent. A mission with heavy destruction used
+## to play correctly, extract correctly, and produce an artifact that failed closed, with nobody
+## told until afterwards.
+##
+## The readout is calibrated against the measured exhaustion point rather than a guess. The
+## first attempt used a guessed overhead and reported 88% at the moment the artifact was already
+## full — an optimistic readout on a feature whose whole purpose is honesty about a limit. These
+## assertions pin the calibration so that cannot come back.
+func _test_ledger_budget_readout() -> void:
+	var gs = root.get_node_or_null("/root/GameState")
+	_expect(gs != null, "GameState autoload is unavailable")
+	if gs == null:
+		return
+	var limits: Dictionary = gs.repro_budget_limits()
+	_expect(not limits.is_empty(), "the reproduction budget pin is missing or unreadable")
+	if limits.is_empty():
+		return
+
+	gs.reset_state()
+	var empty: Dictionary = gs.ledger_budget()
+	_expect(not empty.is_empty(), "ledger_budget reported nothing on a fresh mission")
+	_expect(String(empty.get("status", "")) == "ok", "a fresh mission is not reported as ok")
+	_expect(float(empty.get("fraction", 1.0)) < 0.01, "a fresh mission already claims budget spent")
+
+	# Terrain events are the load that actually exhausts this budget, so measure with those.
+	var readings := {}
+	for count in [300, 420, 462, 600]:
+		gs.reset_state()
+		for i in range(count):
+			gs.record_event("terrain_damaged", {
+				"cell": {"x": i % 20, "y": int(i / 20) % 20, "z": 3},
+				"weapon": "rifle",
+				"material_before": "hard",
+				"material_after": "soft",
+				"integrity_before": 96,
+				"integrity_after": 84,
+				"attacker": 1
+			})
+		readings[count] = gs.ledger_budget()
+
+	var mid: Dictionary = readings[300]
+	var near: Dictionary = readings[420]
+	var over: Dictionary = readings[600]
+
+	# Monotonic: more events can never report less budget spent.
+	_expect(
+		float(mid["fraction"]) < float(near["fraction"]) and float(near["fraction"]) < float(over["fraction"]),
+		"budget consumption is not monotonic in the number of events recorded"
+	)
+	# Bytes are the cap that binds on this project. Derived, not assumed — but if it ever stops
+	# being bytes, that is a measurement worth failing on rather than absorbing silently.
+	_expect(
+		String(near.get("binding_cap", "")) == "bytes",
+		"the binding cap is no longer bytes (%s) -- re-measure the budget before trusting the readout" % String(near.get("binding_cap", ""))
+	)
+	# OBSERVATION-001 measured the usable terrain budget at roughly 420 events. The readout must
+	# be warning by then and must not yet claim the artifact is lost.
+	_expect(String(near["status"]) == "warn", "at 420 terrain events the readout is '%s', not a warning" % String(near["status"]))
+	_expect(float(near["fraction"]) < 1.0, "the readout claims the artifact is already lost at 420 events")
+	# And a mission well past the measured ceiling must say so outright.
+	_expect(String(over["status"]) == "over", "at 600 terrain events the readout is '%s', not over" % String(over["status"]))
+	_expect(float(over["fraction"]) > 1.0, "600 terrain events does not exceed the budget")
+	# The warning has to leave usable runway, or it is a post-mortem rather than a warning.
+	_expect(
+		String(mid["status"]) == "ok",
+		"the readout is already warning at 300 events, which leaves too little room to act"
+	)
+
+	# THE CALIBRATION ITSELF. OBSERVATION-001 measured the byte cap exhausted at 462 terrain
+	# events, so that is where the readout must reach full. This is the assertion that has teeth:
+	# the surrounding status checks all pass with a badly calibrated overhead, which is exactly
+	# what happened -- a guessed 9000-byte overhead reported 88% at the point the artifact was
+	# already full, and every other assertion here still passed. An optimistic readout on a
+	# feature whose only purpose is honesty about a limit is worse than no readout.
+	var at_exhaustion: Dictionary = readings[462]
+	_expect(
+		float(at_exhaustion["fraction"]) >= 0.97,
+		"at the measured exhaustion point of 462 terrain events the readout claims only %.1f%% spent -- baseline_overhead_bytes is miscalibrated and the readout is optimistic" % (float(at_exhaustion["fraction"]) * 100.0)
+	)
+	_expect(
+		float(at_exhaustion["fraction"]) <= 1.15,
+		"at 462 terrain events the readout claims %.1f%% spent -- overhead is overstated and the readout is alarmist" % (float(at_exhaustion["fraction"]) * 100.0)
+	)
+
+	gs.reset_state()
 
 func _load_json(res_path: String) -> Dictionary:
 	if not FileAccess.file_exists(res_path):

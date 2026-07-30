@@ -1600,6 +1600,20 @@ func update_ui() -> void:
 		st_text += main.selected.stance.to_upper()
 		if main.selected.lean != "none":
 			st_text += " (LEAN %s)" % main.selected.lean.to_upper()
+		# Option E from OBSERVATION-001: the reproduction ledger has a hard ceiling and its worst
+		# property was silence. A mission with heavy destruction played, extracted, and produced an
+		# artifact that failed closed, with nobody told until afterwards. This does not raise the
+		# ceiling; it puts the ceiling where a player can see it while the mission can still be
+		# ended cleanly. Nothing is shown until the budget is actually worth mentioning.
+		var budget: Dictionary = GameState.ledger_budget() if GameState else {}
+		if not budget.is_empty() and String(budget.get("status", "ok")) != "ok":
+			var pct := int(round(float(budget["fraction"]) * 100.0))
+			if String(budget["status"]) == "over":
+				st_text += "  [REPLAY LEDGER FULL: %d%% of the %s cap -- this mission will not reproduce]" % [
+					pct, String(budget.get("binding_cap", "byte"))
+				]
+			else:
+				st_text += "  [REPLAY LEDGER %d%%]" % pct
 		hud_stance_label.text = st_text
 	else:
 		hud_name.text = "—"

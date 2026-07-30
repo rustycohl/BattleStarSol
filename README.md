@@ -43,6 +43,13 @@ an authenticated account or remote authority.
   agents on the player side;
 - Base-10 AP movement, stances, cover, LOS, typed combat, armor, inventory,
   salvage, flight, jump, wall, and developer mobility paths;
+- destructible terrain where a cell carries material, density, and integrity, so
+  cover is a consequence of what is standing rather than a flag on a tile;
+- damage that is visible in proportion to what it took: a wall darkens, roughens,
+  loses its glow, leans, and sheds height one tier at a time from the top under
+  gravity, and every tier that comes down becomes debris you can pick up and throw
+  — matter is conserved. **Debris falls straight down; nothing scatters sideways
+  yet. That is a deliberate simplification, recorded in `STATUS.md`.**
 - utility AI, multi-faction turn resolution, victory/defeat/EVAC, and replay
   records;
 - embedded standalone A.T.L.A.S. snapshot plus contextual and quick deployment;

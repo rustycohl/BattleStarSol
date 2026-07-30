@@ -1,0 +1,23 @@
+{
+  "schema": "gzg.battlestar.repro-budget/1.0",
+  "pinned_on": "2026-07-30",
+  "source": {
+    "authority": "tools/repro-bundle.mjs",
+    "constants": ["MAX_EVENTS", "MAX_REPRO_BYTES"],
+    "note": "The reproduction artifact's caps live in the Node bundler, which the Godot runtime cannot import. This file is the res://-readable view of them, not a second authority. tests/repro-budget.test.mjs asserts these values equal the exported constants, so the two cannot drift."
+  },
+  "max_events": 1024,
+  "max_repro_bytes": 128000,
+  "measured": {
+    "binding_cap": "bytes",
+    "terrain_events_to_exhaust_bytes": 462,
+    "usable_terrain_budget_after_baseline": 420,
+    "worst_case_grenades": 18,
+    "evidence": "evidence/OBSERVATION-001-LEDGER-CAPACITY-2026-07-30.md",
+    "note": "Measured rather than estimated. The event cap alone suggested roughly 40 grenades; the byte cap binds first and the real figure is about 18. Do not restate the event-cap number."
+  },
+  "warn_at_fraction": 0.75,
+  "warn_note": "Option E from OBSERVATION-001: the worst property of this limit is its silence. Warning at three quarters of the binding cap puts the information in front of the player while a mission can still be ended cleanly, rather than after the artifact has already failed closed.",
+  "baseline_overhead_bytes": 23000,
+  "baseline_note": "Everything the finished artifact carries beyond the replay bundle the runtime can measure: identity, manifest, SHA256SUMS, mechanical and artifact digests. Subtracted from the byte cap so the readout reaches 100% where the artifact actually fails. NOT guessed -- calibrated against the measured exhaustion point. A live ledger costs 227.3 bytes per terrain event, and OBSERVATION-001 measured the byte cap exhausted at 462 terrain events, so 128000 - (462 * 227.3) = 23136, pinned at 23000. The first attempt at this used a guessed 9000, which made the readout report 88% at the point the artifact was already full -- an optimistic readout on a feature whose entire purpose is honesty about a limit. Re-derive this the same way if the artifact envelope changes. Still an approximation: the bundler remains the gate and still fails closed."
+}

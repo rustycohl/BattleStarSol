@@ -54,6 +54,24 @@ commits here are **not** in that release.
   verbatim in `60faf3c`, credited to their author, so the corrections can be reverted
   independently of the feature.
 
+### Deliberate simplification: debris falls straight down
+
+**This is a decision, not a defect.** When a wall loses a tier of material, that tier becomes
+debris **on the cell it fell from**. Nothing is thrown outward, nothing topples into a
+neighbouring cell, and nothing above a destroyed tier is displaced sideways.
+
+It is acceptable because the part a player actually reads is intact: **boom means things fall**,
+and the matter is accounted for. A six-high column yields exactly six tiers of debris — the
+simulation is not lying about where material went, only about how far it scattered.
+
+Classified **B-tier**: a known simplification a player will not be troubled by, as against
+A-tier, which is anything that breaks the simulation's internal logic or the player's trust.
+
+**It will be tackled later, for reasons beyond appearance.** Lateral displacement means writing
+to cells the damage event did not target, which multiplies terrain events per blast — and the
+reproduction ledger is already the binding constraint at roughly 18 worst-case grenades per
+mission. Debris scatter and the ledger budget are the same piece of work.
+
 **Open, and named:**
 
 - This repository conforms to vendored d10SRD commit `c77005b`. If upstream publishes a rules
