@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2-prealpha.2 — 2026-07-30
+
+### Fixed
+- Continuous integration: the Windows browser-discovery test composed its expected
+  path from a Windows literal while the resolver uses `path.join`, so it passed on
+  Windows and failed on a Linux runner. It now composes the path the same way the
+  resolver does. No runtime change.
+
 ## 0.1.2-prealpha.1 — 2026-07-30
 
 Recovered work line from the SOL reconstruction, published together.
