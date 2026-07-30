@@ -127,7 +127,7 @@ func has_los(
 				not penetrates_cover
 				and c != ignored_cover
 				and cells.has(c)
-				and cells[c].get("type", 0) == GameConfig.COVER
+				and cells[c].get("type", GameConfig.FLOOR) == GameConfig.COVER
 			):
 				var cz: int = cells[c].get("z", 0)
 				if cz >= ray_h:
@@ -182,7 +182,7 @@ func line(
 			not penetrates_cover
 			and c != ignored_cover
 			and cells.has(c)
-			and cells[c].get("type", 0) == GameConfig.COVER
+			and cells[c].get("type", GameConfig.FLOOR) == GameConfig.COVER
 		):
 			var cz: int = cells[c].get("z", 0)
 			if cz >= az:

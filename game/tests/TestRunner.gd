@@ -17,7 +17,7 @@ var failures: Array[String] = []
 var checks := 0
 
 ## Assertion floor. Raise this when tests are added; never lower it to make a run pass.
-const MIN_CHECKS := 1441
+const MIN_CHECKS := 1472
 
 func _init() -> void:
 	call_deferred("_run")
@@ -29,6 +29,7 @@ func _run() -> void:
 	_test_damage_appearance()
 	_test_tier_shedding_and_conservation()
 	_test_ledger_budget_readout()
+	_test_cell_shape_authority()
 	_test_payload_contract()
 	_test_faction_vocabulary()
 	_test_action_economy()
@@ -258,6 +259,21 @@ func _test_scene_cover_is_material() -> void:
 					str(cell), kind, int(d.get("z", 0)), str(d.keys())
 				]
 	_expect(cover_cells > 0, "the Standoff sector produced no cover at all, so this check proved nothing")
+	# The whole live grid, not only its cover: any cell that entered the scene malformed is a
+	# parallel model in the making, and the compatibility defaults will hide it.
+	var malformed := 0
+	var first_malformed := ""
+	for cell in main.cells.keys():
+		var shape_problem := World.cell_shape_error(main.cells[cell])
+		if not shape_problem.is_empty():
+			malformed += 1
+			if first_malformed.is_empty():
+				first_malformed = "%s: %s" % [str(cell), shape_problem]
+	_expect(
+		malformed == 0,
+		"%d cell(s) in the live scene do not satisfy the cell shape; first %s" % [malformed, first_malformed]
+	)
+
 	_expect(
 		authored == 0,
 		"%d cover cell(s) were authored without material fields -- cover must come from WorldBuilder.material_cell(); first: %s" % [authored, first_offender]
@@ -691,6 +707,70 @@ func _test_ledger_budget_readout() -> void:
 	)
 
 	gs.reset_state()
+
+## Every cell the model ever holds has the shape the model expects — not only cover cells, and
+## not only in one scene.
+##
+## `_test_scene_cover_is_material` was the narrow version of this, written after the Standoff
+## sector built a cover cell by hand. This is the general form, and it exists because of what a
+## sweep of the registered authorities showed: 183 `get(key, default)` sites, of which the cell
+## and material keys account for 63. Almost every default is correct — a missing cell reading as
+## open ground is the conservative answer — so removing them would be wrong. What defaults cannot
+## do is notice that something entered the model malformed. Only a shape assertion can.
+func _test_cell_shape_authority() -> void:
+	# The producer's own output must satisfy the shape it defines.
+	for cell_type in [Config.FLOOR, Config.HALF_COVER, Config.COVER]:
+		for height in [0, 1, 2, 3, 6]:
+			var produced := World.material_cell(cell_type, height)
+			var problem := World.cell_shape_error(produced)
+			_expect(
+				problem.is_empty(),
+				"material_cell(%d, %d) does not satisfy its own cell shape: %s" % [cell_type, height, problem]
+			)
+
+	# And so must a cell that has been worked on, at every stage of its destruction.
+	var worked := World.material_cell(Config.COVER, 6)
+	for hit in range(1, 10):
+		worked = Ballistics.degrade_cell(worked, 12)
+		var degraded_problem := World.cell_shape_error(worked)
+		_expect(
+			degraded_problem.is_empty(),
+			"a cell degraded %d time(s) no longer satisfies the cell shape: %s" % [hit, degraded_problem]
+		)
+
+	# Malformed cells must be rejected, or the check is decoration.
+	_expect(not World.cell_shape_error({"type": Config.COVER, "z": 3}).is_empty(), "a hand-built cell was accepted")
+	_expect(not World.cell_shape_error("not a dict").is_empty(), "a non-Dictionary was accepted as a cell")
+	var bad_integrity := World.material_cell(Config.COVER, 3)
+	bad_integrity["integrity"] = int(bad_integrity["density"]) + 1
+	_expect(
+		not World.cell_shape_error(bad_integrity).is_empty(),
+		"a cell with more integrity than it started with was accepted"
+	)
+	var bad_height := World.material_cell(Config.COVER, 3)
+	bad_height["z"] = int(bad_height["tiers"]) + 1
+	_expect(
+		not World.cell_shape_error(bad_height).is_empty(),
+		"a cell taller than the tiers it started with was accepted"
+	)
+	var stowaway := World.material_cell(Config.COVER, 3)
+	stowaway["painted_cover"] = true
+	_expect(
+		not World.cell_shape_error(stowaway).is_empty(),
+		"a cell carrying an unrecognised field was accepted -- that is how a parallel model starts"
+	)
+
+	# Then the whole generated world, which is what actually ships.
+	var generated := World.generate_cells(84021)
+	var bad := 0
+	var first := ""
+	for cell in generated.keys():
+		var generated_problem := World.cell_shape_error(generated[cell])
+		if not generated_problem.is_empty():
+			bad += 1
+			if first.is_empty():
+				first = "%s: %s" % [str(cell), generated_problem]
+	_expect(bad == 0, "%d generated cell(s) do not satisfy the cell shape; first %s" % [bad, first])
 
 func _load_json(res_path: String) -> Dictionary:
 	if not FileAccess.file_exists(res_path):

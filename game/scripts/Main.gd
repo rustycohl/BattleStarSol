@@ -2084,6 +2084,9 @@ func damage_terrain(cell: Vector2i, damage: int, weapon: String = "", attacker =
 		return {}
 	var after: Dictionary = Ballistics.degrade_cell(before, damage)
 	var integrity_after := Ballistics.density_of(after)
+	# The two defaults differ on purpose. A cell missing `type` entirely must compare unequal so
+	# the change is still recorded rather than silently dropped as a no-op; matching defaults
+	# would make "no type before" and "no type after" look identical.
 	if integrity_after == integrity_before and int(after.get("type", -1)) == int(before.get("type", -2)):
 		return {}
 	cells[cell] = after

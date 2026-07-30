@@ -202,6 +202,52 @@ static func cover_near_spawn(
 	)
 	return found
 
+## Every field a terrain cell must carry. `material_cell` is the only thing that should ever
+## produce one, and this is what "produced by the authority" looks like from the outside.
+##
+## This exists because of a defect that no behavioural test could have caught. The Standoff
+## sector built a cell by hand as `{"type": COVER, "z": 3}`, and it *behaved correctly* —
+## `Ballistics.density_of` falls back to the type's implied material for pre-material fixtures
+## and reached the identical density. The only symptom was that the terrain ledger recorded an
+## empty `material_before`, which the reproduction schema types loosely enough to validate. A
+## compatibility default absorbed a special case in silence.
+##
+## Every `get(key, default)` in an authority is a place that can happen. The defaults are almost
+## all correct — a missing cell reading as open ground is the conservative answer — so the
+## remedy is not to remove them. It is to assert the *shape* of what enters the model, which is
+## what defaults cannot do.
+const CELL_FIELDS := ["type", "z", "density", "integrity", "material", "tiers", "climbable"]
+
+## Fields a cell may additionally carry once it has been worked on.
+const CELL_OPTIONAL_FIELDS := ["tiers_lost"]
+
+## "" when the cell has the shape the model expects, otherwise why not. Pure, so a headless
+## test can walk a whole grid with it.
+static func cell_shape_error(cell_data) -> String:
+	if not (cell_data is Dictionary):
+		return "not a Dictionary"
+	var data: Dictionary = cell_data
+	var missing: Array = []
+	for field in CELL_FIELDS:
+		if not data.has(field):
+			missing.append(field)
+	if not missing.is_empty():
+		return "missing %s (has %s)" % [str(missing), str(data.keys())]
+	var unknown: Array = []
+	for key in data.keys():
+		var name := String(key)
+		if not CELL_FIELDS.has(name) and not CELL_OPTIONAL_FIELDS.has(name):
+			unknown.append(name)
+	if not unknown.is_empty():
+		return "carries unrecognised field(s) %s" % str(unknown)
+	if int(data["density"]) < 0 or int(data["integrity"]) < 0:
+		return "negative material (density %d, integrity %d)" % [int(data["density"]), int(data["integrity"])]
+	if int(data["integrity"]) > int(data["density"]):
+		return "integrity %d exceeds the density %d it started with" % [int(data["integrity"]), int(data["density"])]
+	if int(data["tiers"]) < int(data["z"]):
+		return "z %d exceeds the %d tiers it started with" % [int(data["z"]), int(data["tiers"])]
+	return ""
+
 ## Below this fraction of its original material, a cell has taken a hit worth showing.
 ## Not zero: floating-point division on an undamaged cell must not register as wear.
 const WEAR_VISIBLE_AT := 0.995
