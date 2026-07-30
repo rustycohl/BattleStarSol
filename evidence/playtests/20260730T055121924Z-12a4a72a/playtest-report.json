@@ -1,0 +1,1349 @@
+{
+  "harness": "gzg.battlestar.autonomous-playtest/3.0",
+  "run_id": "20260730T055121924Z-12a4a72a",
+  "started_at": "2026-07-30T05:51:21.926Z",
+  "config": {
+    "base": "http://127.0.0.1:8781/",
+    "rounds": 8,
+    "require_m03": false,
+    "callsign": "AUTOPILOT",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "browser": {
+    "resolver_source": "PW_CHROMIUM",
+    "headed": false,
+    "version": "150.0.4078.105"
+  },
+  "identity": {
+    "run_id": "20260730T055121924Z-12a4a72a",
+    "deployment_message_id": "battlestar:1167583760:1",
+    "extraction_message_id": "xcommand:1167583760:1785390734787",
+    "extraction_id": "xcommand:1167583760:1785390734787",
+    "correlation_id": "battlestar:1167583760:1",
+    "seed": 1167583760,
+    "extracted_at": "2026-07-30 05:52:14Z"
+  },
+  "deployment": {
+    "gzg": "galaxy-message",
+    "version": "1.0",
+    "id": "battlestar:1167583760:1",
+    "type": "battlestar.deploy",
+    "source": {
+      "galaxy": "BattleStarSol",
+      "version": "0.1.1-prealpha.1",
+      "instance": "browser-local"
+    },
+    "target": {
+      "galaxy": "xCommand",
+      "capability": "tactical.deploy"
+    },
+    "created_at": "2026-07-30T05:51:28.116Z",
+    "payload": {
+      "schema": "gzg.battlestar.deploy/1.0",
+      "deploy": {
+        "type": "deploy",
+        "payload_contract_version": "1.0",
+        "generator_version": 1,
+        "rules_version": "alpha-1",
+        "sector": "Proving Ground",
+        "faction": "HAD // HEAVY ARMOR DIVISION",
+        "seed": 1167583760,
+        "atlas_state": "#%7B%22fps%22%3A15%2C%22mode%22%3A%22satellite%22%2C%22speed%22%3A0%2C%22layers%22%3A%5B%22dc%22%2C%22ixp%22%2C%22crisis%22%5D%2C%22cam%22%3A%7B%22x%22%3A0%2C%22y%22%3A10%2C%22z%22%3A22%2C%22tx%22%3A0%2C%22ty%22%3A0%2C%22tz%22%3A0%7D%7D",
+        "squad": [
+          {
+            "name": "AUTOPILOT",
+            "cls": "Heavy"
+          },
+          {
+            "name": "SCOUT-3",
+            "cls": "Recon"
+          },
+          {
+            "name": "MEDIC-2",
+            "cls": "Support"
+          }
+        ],
+        "objectives": [
+          "Select the Commander",
+          "Move and practice defense",
+          "Complete a basic attack",
+          "End turn and observe the phases",
+          "Extract to strategy"
+        ],
+        "map": {
+          "target": {
+            "type": "coordinate",
+            "name": "Proving Ground",
+            "latitude": 34.0522,
+            "longitude": -118.2437
+          }
+        },
+        "resources": {
+          "neural": 50,
+          "capital": 25000,
+          "alloys": 100
+        }
+      }
+    }
+  },
+  "steps": [
+    {
+      "name": "canonical development server responds",
+      "ok": true,
+      "detail": "http://127.0.0.1:8781/ marker=1",
+      "at": "2026-07-30T05:51:21.958Z"
+    },
+    {
+      "name": "served tactical package identified",
+      "ok": true,
+      "detail": "297804 bytes sha256:a7e8a31ddfee924952c30d712e5ddbbd5553d4fae3d1ef85bf5a35f27f0270c6",
+      "at": "2026-07-30T05:51:21.958Z"
+    },
+    {
+      "name": "strategic console loads",
+      "ok": true,
+      "detail": "Battle/Star.SOL // Strategic Command",
+      "at": "2026-07-30T05:51:25.300Z"
+    },
+    {
+      "name": "commander callsign accepted",
+      "ok": true,
+      "detail": "AUTOPILOT",
+      "at": "2026-07-30T05:51:27.299Z"
+    },
+    {
+      "name": "quick deploy control present",
+      "ok": true,
+      "detail": "▶ QUICK DEPLOY: PROVING GROUND",
+      "at": "2026-07-30T05:51:27.462Z"
+    },
+    {
+      "name": "same-tab launch to tactical launcher",
+      "ok": true,
+      "detail": "battlestar.html",
+      "at": "2026-07-30T05:51:28.282Z"
+    },
+    {
+      "name": "deployment brief populated",
+      "ok": true,
+      "detail": "seed=1167583760 sector=Proving Ground",
+      "at": "2026-07-30T05:51:30.613Z"
+    },
+    {
+      "name": "godot tactical runtime booted",
+      "ok": true,
+      "detail": "5.2s",
+      "at": "2026-07-30T05:51:36.961Z"
+    },
+    {
+      "name": "roster select advances the guided tutorial",
+      "ok": true,
+      "detail": "step=2/7 move",
+      "at": "2026-07-30T05:51:40.968Z"
+    },
+    {
+      "name": "a completed move advances to defense",
+      "ok": true,
+      "detail": "step=3/7 defense; choice=brace-plus-melee-adjacent-visible-hostile",
+      "at": "2026-07-30T05:51:44.134Z"
+    },
+    {
+      "name": "defensive posture advances",
+      "ok": true,
+      "detail": "step=5/7 attack",
+      "at": "2026-07-30T05:51:47.881Z"
+    },
+    {
+      "name": "cover step skipped in a lane without cover",
+      "ok": true,
+      "detail": "no adjacent cover published",
+      "at": "2026-07-30T05:51:49.183Z"
+    },
+    {
+      "name": "basic attack advances to end turn",
+      "ok": true,
+      "detail": "step=6/7 end_turn",
+      "at": "2026-07-30T05:51:51.291Z"
+    },
+    {
+      "name": "end turn advances to phase observation",
+      "ok": true,
+      "detail": "step=7/7 extract",
+      "at": "2026-07-30T05:51:56.927Z"
+    },
+    {
+      "name": "returned player turn exposes extraction",
+      "ok": true,
+      "detail": "step=7/7 extract",
+      "at": "2026-07-30T05:51:57.830Z"
+    },
+    {
+      "name": "turn cycle survives full run",
+      "ok": true,
+      "detail": "8 free rounds",
+      "at": "2026-07-30T05:52:44.652Z"
+    },
+    {
+      "name": "one full extraction message captured",
+      "ok": true,
+      "detail": "28282 bytes",
+      "at": "2026-07-30T05:52:50.165Z"
+    },
+    {
+      "name": "strategic console shows a completed mission",
+      "ok": true,
+      "detail": "SUCCESS · Proving Ground · 3 survivors · seed 1167583760",
+      "at": "2026-07-30T05:52:50.545Z"
+    },
+    {
+      "name": "mission count is idempotent under forced reload",
+      "ok": true,
+      "detail": "1 -> 1",
+      "at": "2026-07-30T05:52:53.337Z"
+    }
+  ],
+  "console_lines": [
+    "WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost",
+    "THREE.WebGLRenderer: Context Lost.",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "THREE.WebGLRenderer: Context Restored.",
+    "[.WebGL-0x4714001abe00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x4714001abe00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x4714001abe00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x4714001abe00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+    "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+    "OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL",
+    "Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.",
+    "[PayloadBridge] Payload updated: Proving Ground seed=1167583760",
+    "[PayloadBridge] Loaded payload from Web URL!",
+    "ItemDB: Loaded 21 items.",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":541,\"y\":72},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":576,\"y\":90},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":560,\"y\":81},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":257,\"action_dock_height\":132,\"action_dock_left\":257,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":277,\"tutorial_dock_clear\":true,\"tutorial_left\":277},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":539,\"y\":55}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":556,\"y\":63}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":573,\"y\":71}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":591,\"y\":80}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":524,\"y\":64}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":508,\"y\":73}},{\"ap\":10,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":524,\"y\":82}},{\"ap\":9,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":543,\"y\":92}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":552,\"y\":247},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":601,\"y\":279},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":581,\"y\":282},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":550,\"y\":215}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":573,\"y\":230}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":597,\"y\":245}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":622,\"y\":261}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":529,\"y\":231}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":248}},{\"ap\":10,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":530,\"y\":284}},{\"ap\":9,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":557,\"y\":303}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":308},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":610,\"y\":348},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":588,\"y\":356},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":553,\"y\":271}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":578,\"y\":288}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":306}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":326}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":290}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":311}},{\"ap\":10,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":532,\"y\":359}},{\"ap\":9,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":382}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":611,\"y\":351},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":589,\"y\":359},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":10,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":9,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":611,\"y\":351},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":589,\"y\":359},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":10,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":9,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":611,\"y\":351},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":589,\"y\":359},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":10,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":9,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":9,\"cell\":{\"x\":1,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":551,\"y\":316},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":581,\"y\":381},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":556,\"y\":392},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":525,\"y\":297}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":577,\"y\":335}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":605,\"y\":356}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":501,\"y\":318}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":526,\"y\":338}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":475,\"y\":340}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":9,\"cell\":{\"x\":1,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":557,\"y\":310},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":588,\"y\":374},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":563,\"y\":384},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":532,\"y\":292}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":584,\"y\":329}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":612,\"y\":350}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":507,\"y\":312}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":533,\"y\":332}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":482,\"y\":334}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":8,\"cell\":{\"x\":2,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":554,\"y\":310},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":557,\"y\":352},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":530,\"y\":361},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":505,\"y\":274}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":529,\"y\":292}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":581,\"y\":330}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":611,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":481,\"y\":294}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":505,\"y\":312}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":587,\"y\":358}},{\"ap\":4,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":455,\"y\":314}},{\"ap\":5,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":560,\"y\":385}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":564,\"y\":317},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":540,\"y\":339},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":513,\"y\":346},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":514,\"y\":280}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":538,\"y\":298}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":593,\"y\":320}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":623,\"y\":341}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":490,\"y\":300}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":568,\"y\":344}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":598,\"y\":366}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":541,\"y\":369}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":572,\"y\":393}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":564,\"y\":317},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":540,\"y\":339},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":513,\"y\":346},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":514,\"y\":280}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":538,\"y\":298}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":593,\"y\":320}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":623,\"y\":341}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":490,\"y\":300}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":568,\"y\":344}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":598,\"y\":366}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":541,\"y\":369}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":572,\"y\":393}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":555,\"y\":310},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":531,\"y\":332},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":503,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":506,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":530,\"y\":292}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":294}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":558,\"y\":336}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":588,\"y\":358}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":531,\"y\":361}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":561,\"y\":385}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":483,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":5,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":5,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":5,\"step\":\"attack\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":6,\"step\":\"end_turn\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":562,\"y\":306},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":538,\"y\":327},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":511,\"y\":333},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":537,\"y\":287}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"end_turn\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":554,\"y\":312},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":530,\"y\":334},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":502,\"y\":341},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":529,\"y\":294}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"end_turn\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":332},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":292}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"end_turn\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"end_turn\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":332},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"end_turn\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"end_turn\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"observe_phases\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":504,\"y\":339},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"observe_phases\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"observe_phases\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":1,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5},{\"adjacent\":false,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":587,\"y\":375},\"unit_id\":6}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"observe_phases\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":1,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"observe_phases\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":2,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"observe_phases\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":353}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":587,\"y\":375}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":457,\"y\":315}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":533,\"y\":377}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":400}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":9,\"cell\":{\"x\":2,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":547,\"y\":305},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":524,\"y\":370},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":499,\"y\":269}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":522,\"y\":287}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":573,\"y\":324}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":601,\"y\":344}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":474,\"y\":288}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":498,\"y\":307}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":549,\"y\":346}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":577,\"y\":367}},{\"ap\":4,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":449,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":473,\"y\":328}},{\"ap\":4,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":497,\"y\":348}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":552,\"y\":392}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":9,\"cell\":{\"x\":2,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":534,\"y\":378},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":583,\"y\":331}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":483,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":559,\"y\":353}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":587,\"y\":375}},{\"ap\":4,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":457,\"y\":315}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":4,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":507,\"y\":356}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":562,\"y\":401}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":8,\"cell\":{\"x\":1,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":555,\"y\":310},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":561,\"y\":400},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":530,\"y\":292}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":582,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":610,\"y\":350}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":506,\"y\":312}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":531,\"y\":332}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":586,\"y\":374}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":480,\"y\":334}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":506,\"y\":355}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":532,\"y\":377}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":8,\"cell\":{\"x\":1,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":562,\"y\":401},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":583,\"y\":331}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":587,\"y\":375}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":507,\"y\":356}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":534,\"y\":378}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":587,\"y\":375},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":553,\"y\":274}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":578,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":530,\"y\":293}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":610,\"y\":351}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":506,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":558,\"y\":353}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":506,\"y\":356}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":548,\"y\":318},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":603,\"y\":359},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":568,\"y\":261}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":593,\"y\":278}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":619,\"y\":296}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":647,\"y\":314}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":546,\"y\":280}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":571,\"y\":298}},{\"ap\":5,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":625,\"y\":336}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":522,\"y\":300}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":574,\"y\":338}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":523,\"y\":340}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":557,\"y\":310},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":612,\"y\":350},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":576,\"y\":254}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":601,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":627,\"y\":288}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":655,\"y\":306}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":272}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":580,\"y\":290}},{\"ap\":5,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":634,\"y\":327}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":532,\"y\":292}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":584,\"y\":329}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":533,\"y\":332}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":610,\"y\":351},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":272}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":654,\"y\":307}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":553,\"y\":274}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":578,\"y\":291}},{\"ap\":5,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":329}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":530,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":582,\"y\":331}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":531,\"y\":333}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":654,\"y\":307}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":5,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":332}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":654,\"y\":307}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":5,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":333}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":654,\"y\":307}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":587,\"y\":375}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":587,\"y\":375}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":559,\"y\":353}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":1,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":559,\"y\":353}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":2,\"actor\":{\"ap\":6,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":559,\"y\":353}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":559,\"y\":353}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":654,\"y\":307},\"team\":0,\"unit_id\":2},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":683,\"y\":326}},{\"ap\":2,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":714,\"y\":346}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":663,\"y\":348}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":694,\"y\":370}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":641,\"y\":372}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":557,\"y\":311},\"team\":0,\"unit_id\":2},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":612,\"y\":351}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":483,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":533,\"y\":332}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":560,\"y\":353}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":588,\"y\":375}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":482,\"y\":335}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":507,\"y\":355}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":534,\"y\":377}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":2},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":483,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":353}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":587,\"y\":375}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":533,\"y\":377}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":2},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":353}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":587,\"y\":375}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":533,\"y\":377}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":8,\"cell\":{\"x\":3,\"y\":3,\"z\":0},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":519,\"y\":344},\"team\":0,\"unit_id\":2},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":4,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":518,\"y\":266}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":542,\"y\":283}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":568,\"y\":301}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":594,\"y\":319}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":622,\"y\":339}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":519,\"y\":303}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":544,\"y\":322}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":571,\"y\":342}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":599,\"y\":363}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":470,\"y\":305}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":494,\"y\":324}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":3},\"screen\":{\"x\":546,\"y\":365}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":4,\"z\":0},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":509,\"y\":353},\"team\":0,\"unit_id\":2},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":533,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":558,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":585,\"y\":328}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":613,\"y\":348}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":485,\"y\":292}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":509,\"y\":311}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":535,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":3},\"screen\":{\"x\":561,\"y\":351}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":3},\"screen\":{\"x\":590,\"y\":372}},{\"ap\":6,\"cell\":{\"x\":1,\"y\":4},\"screen\":{\"x\":450,\"y\":277}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":4},\"screen\":{\"x\":484,\"y\":332}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":4},\"screen\":{\"x\":536,\"y\":375}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":6,\"cell\":{\"x\":3,\"y\":5,\"z\":1},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":515,\"y\":329},\"team\":0,\"unit_id\":2},\"attack_targets\":[],\"cover_faces\":[{\"cell\":{\"x\":4,\"y\":5},\"screen\":{\"x\":542,\"y\":314}}],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":5,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":516,\"y\":267}},{\"ap\":4,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":540,\"y\":285}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":565,\"y\":302}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":3},\"screen\":{\"x\":592,\"y\":321}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":3},\"screen\":{\"x\":620,\"y\":341}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":4},\"screen\":{\"x\":487,\"y\":249}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":4},\"screen\":{\"x\":517,\"y\":305}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":4},\"screen\":{\"x\":542,\"y\":324}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":4},\"screen\":{\"x\":569,\"y\":344}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":5},\"screen\":{\"x\":464,\"y\":289}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":5},\"screen\":{\"x\":489,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":6},\"screen\":{\"x\":436,\"y\":311}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":4,\"cell\":{\"x\":3,\"y\":6,\"z\":1},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":507,\"y\":337},\"team\":0,\"unit_id\":2},\"attack_targets\":[],\"cover_faces\":[{\"cell\":{\"x\":2,\"y\":6},\"screen\":{\"x\":463,\"y\":229}}],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":4,\"cell\":{\"x\":2,\"y\":4},\"screen\":{\"x\":533,\"y\":291}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":4},\"screen\":{\"x\":558,\"y\":309}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":4},\"screen\":{\"x\":585,\"y\":328}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":5},\"screen\":{\"x\":482,\"y\":275}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":5},\"screen\":{\"x\":507,\"y\":294}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":5},\"screen\":{\"x\":534,\"y\":313}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":6},\"screen\":{\"x\":455,\"y\":296}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":6},\"screen\":{\"x\":535,\"y\":359}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":7},\"screen\":{\"x\":446,\"y\":321}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":7},\"screen\":{\"x\":474,\"y\":344}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":7},\"screen\":{\"x\":507,\"y\":385}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":7},\"screen\":{\"x\":538,\"y\":425}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":3,\"cell\":{\"x\":4,\"y\":6,\"z\":1},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":566,\"y\":351},\"team\":0,\"unit_id\":2},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":6,\"y\":7},\"screen\":{\"x\":597,\"y\":434},\"unit_id\":6}],\"cover_faces\":[{\"cell\":{\"x\":5,\"y\":6},\"screen\":{\"x\":600,\"y\":321}},{\"cell\":{\"x\":4,\"y\":5},\"screen\":{\"x\":592,\"y\":295}}],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":2,\"y\":5},\"screen\":{\"x\":538,\"y\":292}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":5},\"screen\":{\"x\":563,\"y\":310}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":6},\"screen\":{\"x\":539,\"y\":331}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":7},\"screen\":{\"x\":513,\"y\":338}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":7},\"screen\":{\"x\":541,\"y\":375}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":7},\"screen\":{\"x\":569,\"y\":411}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":8},\"screen\":{\"x\":517,\"y\":413}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":2,\"cell\":{\"x\":4,\"y\":7,\"z\":1},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":566,\"y\":344},\"team\":0,\"unit_id\":2},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":6,\"y\":7},\"screen\":{\"x\":622,\"y\":402},\"unit_id\":6}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":3,\"y\":6},\"screen\":{\"x\":563,\"y\":302}},{\"ap\":1,\"cell\":{\"x\":4,\"y\":6},\"screen\":{\"x\":590,\"y\":321}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":7},\"screen\":{\"x\":538,\"y\":306}},{\"ap\":2,\"cell\":{\"x\":5,\"y\":7},\"screen\":{\"x\":593,\"y\":380}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":8},\"screen\":{\"x\":542,\"y\":382}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":4,\"y\":7,\"z\":1},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":522,\"y\":329},\"team\":0,\"unit_id\":2},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":6,\"y\":7},\"screen\":{\"x\":576,\"y\":386},\"unit_id\":6}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":4,\"y\":6},\"screen\":{\"x\":547,\"y\":308}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":4,\"y\":7,\"z\":1},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":567,\"y\":305},\"team\":0,\"unit_id\":2},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":6,\"y\":7},\"screen\":{\"x\":619,\"y\":359},\"unit_id\":6}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":4,\"y\":6},\"screen\":{\"x\":589,\"y\":285}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":4,\"y\":7,\"z\":1},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":553,\"y\":313},\"team\":0,\"unit_id\":2},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":6,\"y\":7},\"screen\":{\"x\":605,\"y\":368},\"unit_id\":6}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":4,\"y\":6},\"screen\":{\"x\":576,\"y\":292}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":4,\"y\":7,\"z\":1},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":557,\"y\":310},\"team\":0,\"unit_id\":2},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":6,\"y\":7},\"screen\":{\"x\":609,\"y\":365},\"unit_id\":6}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":4,\"y\":6},\"screen\":{\"x\":580,\"y\":290}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":4,\"y\":7,\"z\":1},\"is_commander\":false,\"name\":\"SCOUT-3 (Agent)\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":2},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":6,\"y\":7},\"screen\":{\"x\":608,\"y\":366},\"unit_id\":6}],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":4,\"y\":6},\"screen\":{\"x\":579,\"y\":291}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":587,\"y\":197},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":600,\"y\":159}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":620,\"y\":170}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":642,\"y\":182}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":664,\"y\":194}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":583,\"y\":172}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":604,\"y\":183}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":625,\"y\":196}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":648,\"y\":208}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":566,\"y\":185}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":608,\"y\":210}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":631,\"y\":223}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":568,\"y\":211}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":1,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":587,\"y\":197},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":600,\"y\":159}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":620,\"y\":170}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":642,\"y\":182}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":664,\"y\":194}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":583,\"y\":172}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":604,\"y\":183}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":625,\"y\":196}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":648,\"y\":208}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":566,\"y\":185}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":608,\"y\":210}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":631,\"y\":223}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":568,\"y\":211}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":1,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":587,\"y\":197},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":600,\"y\":159}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":621,\"y\":170}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":642,\"y\":182}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":664,\"y\":194}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":584,\"y\":172}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":604,\"y\":183}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":625,\"y\":196}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":648,\"y\":208}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":566,\"y\":185}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":608,\"y\":210}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":631,\"y\":223}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":569,\"y\":211}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":1,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":587,\"y\":197},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":600,\"y\":159}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":621,\"y\":170}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":642,\"y\":182}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":664,\"y\":194}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":583,\"y\":172}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":604,\"y\":183}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":625,\"y\":196}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":648,\"y\":208}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":566,\"y\":185}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":608,\"y\":210}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":631,\"y\":223}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":569,\"y\":211}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":2,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":587,\"y\":197},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":600,\"y\":159}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":621,\"y\":170}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":642,\"y\":182}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":664,\"y\":194}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":583,\"y\":172}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":604,\"y\":183}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":625,\"y\":196}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":648,\"y\":208}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":566,\"y\":185}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":608,\"y\":210}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":631,\"y\":223}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":569,\"y\":211}}],\"round\":3,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":587,\"y\":197},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":600,\"y\":159}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":621,\"y\":170}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":642,\"y\":182}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":664,\"y\":194}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":583,\"y\":172}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":604,\"y\":183}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":625,\"y\":196}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":648,\"y\":208}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":566,\"y\":185}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":608,\"y\":210}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":631,\"y\":223}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":569,\"y\":211}}],\"round\":4,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":553,\"y\":324},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":572,\"y\":266}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":598,\"y\":283}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":625,\"y\":301}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":653,\"y\":319}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":550,\"y\":285}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":576,\"y\":303}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":603,\"y\":322}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":631,\"y\":342}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":527,\"y\":305}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":580,\"y\":344}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":609,\"y\":365}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":528,\"y\":346}}],\"round\":4,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":654,\"y\":307}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":333}}],\"round\":4,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"extract\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"accessibility\":{\"focus_order\":[\"brace\",\"take_cover\",\"toggle_run\",\"endturn\",\"evac\"],\"focused_control\":\"@Button@274\",\"focused_control_is_core\":false,\"motion_scale\":1,\"reduced_motion\":false},\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":2,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[],\"cover_faces\":[],\"kind\":\"observation\",\"layout\":{\"action_dock_clearance\":265,\"action_dock_height\":132,\"action_dock_left\":265,\"action_dock_top\":482,\"auto_parked\":[],\"constrained\":false,\"event_rail_bottom\":468,\"event_rail_cramped\":true,\"event_rail_height\":44,\"event_rail_top\":424,\"event_rail_visible\":true,\"status_rail_bottom\":410,\"surface_opacity\":{\"dock\":1,\"feed\":1,\"status\":1,\"tutorial\":1},\"tutorial_bottom\":112,\"tutorial_clearance\":352,\"tutorial_dock_clear\":true,\"tutorial_left\":352},\"move_targets\":[{\"ap\":3,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":575,\"y\":255}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":600,\"y\":271}},{\"ap\":3,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":626,\"y\":289}},{\"ap\":4,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":654,\"y\":307}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":583,\"y\":330}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":532,\"y\":333}}],\"round\":4,\"tutorial\":{\"complete\":true,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":7,\"step\":\"complete\",\"total_steps\":7},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[PayloadBridge] PUSHING EXTRACTION RESULT: { \"outcome\": \"SUCCESS\", \"survivors\": 3, \"gains\": { \"neural\": 75, \"capital\": 852, \"loot\": [\"grenade\", \"arrow\", \"arrow\", \"arrow\"] }, \"replay\": { \"mission_seed\": 1167583760, \"generator_version\": 1, \"rules_version\": \"alpha-1\", \"actions\": [{ \"sequence\": 2, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"select\", \"target\": { \"x\": -999, \"y\": -999, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 10, \"ap_after_dispatch\": 10, \"accepted\": true }, { \"sequence\": 4, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"move\", \"target\": { \"x\": 3, \"y\": 0, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 10, \"ap_after_dispatch\": 10, \"accepted\": true }, { \"sequence\": 7, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"brace\", \"target\": { \"x\": -999, \"y\": -999, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 7, \"ap_after_dispatch\": 5, \"accepted\": true }, { \"sequence\": 9, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"melee\", \"target\": { \"x\": 3, \"y\": 1, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 5, \"ap_after_dispatch\": 1, \"accepted\": true }, { \"sequence\": 12, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"endturn\", \"target\": { \"x\": -999, \"y\": -999, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 1, \"ap_after_dispatch\": 1, \"accepted\": true }, { \"sequence\": 58, \"record_type\": \"action\", \"round\": 2, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"move\", \"target\": { \"x\": 1, \"y\": 2, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 10, \"ap_after_dispatch\": 10, \"accepted\": true }, { \"sequence\": 60, \"record_type\": \"action\", \"round\": 2, \"active_team\":"
+  ],
+  "page_errors": [],
+  "observations": {
+    "strategic_before": {
+      "missions": "0",
+      "history": "No completed missions in this browser."
+    },
+    "deployment_brief": {
+      "sector": "Proving Ground",
+      "faction": "HAD // HEAVY ARMOR DIVISION",
+      "seed": "1167583760",
+      "squad": "3 units · AUTOPILOT, SCOUT-3, MEDIC-2",
+      "objectives": [
+        "Select the Commander",
+        "Move and practice defense",
+        "Complete a basic attack",
+        "End turn and observe the phases",
+        "Extract to strategy"
+      ],
+      "runtime_status": "GODOT RUNTIME LOADED · PLAYABLE · BASE-10 AP"
+    },
+    "canvas_box": {
+      "x": 305,
+      "y": 52,
+      "width": 1112,
+      "height": 626
+    },
+    "move_choice": {
+      "reason": "brace-plus-melee-adjacent-visible-hostile",
+      "reserve_ap": 6,
+      "published_targets": 8,
+      "target": {
+        "cell": {
+          "x": 3,
+          "y": 0
+        },
+        "ap": 3
+      }
+    },
+    "published_attack_targets": 2,
+    "aimed_actions": {
+      "move": 1,
+      "cover": 0,
+      "attack": 1,
+      "swept": 0
+    },
+    "strategic_after": {
+      "missions": "1",
+      "history": "SUCCESS · Proving Ground · 3 survivors · seed 1167583760",
+      "neural": "125",
+      "capital": "$25,852"
+    },
+    "m03": {
+      "canonical_rationale_observed": true,
+      "signature_hits": [
+        "cover route"
+      ],
+      "decision_hits": [],
+      "decision_count": 53
+    }
+  },
+  "ledger": {
+    "extraction_id": "xcommand:1167583760:1785390734787",
+    "outcome": "SUCCESS",
+    "survivors": 3,
+    "seed": 1167583760,
+    "rules_version": "alpha-1",
+    "generator_version": 1,
+    "payload_contract_version": "1.0",
+    "action_count": 11,
+    "event_count": 121,
+    "event_histogram": {
+      "tutorial_step_changed": 8,
+      "movement_resolved": 2,
+      "damage_resolved": 20,
+      "agent_decision": 53,
+      "unit_killed": 3,
+      "terrain_damaged": 18,
+      "blast_resolved": 2,
+      "turn_started": 9,
+      "loot_collected": 5,
+      "mission_resolved": 1
+    },
+    "tutorial_steps": [
+      {
+        "seq": 1,
+        "complete": false,
+        "display_step": 1,
+        "step": "select_commander",
+        "total_steps": 7
+      },
+      {
+        "seq": 3,
+        "complete": false,
+        "display_step": 2,
+        "step": "move",
+        "total_steps": 7
+      },
+      {
+        "seq": 6,
+        "complete": false,
+        "display_step": 3,
+        "step": "defense",
+        "total_steps": 7
+      },
+      {
+        "seq": 8,
+        "complete": false,
+        "display_step": 5,
+        "step": "attack",
+        "total_steps": 7
+      },
+      {
+        "seq": 10,
+        "complete": false,
+        "display_step": 6,
+        "step": "end_turn",
+        "total_steps": 7
+      },
+      {
+        "seq": 13,
+        "complete": false,
+        "display_step": 6,
+        "step": "observe_phases",
+        "total_steps": 7
+      },
+      {
+        "seq": 57,
+        "complete": false,
+        "display_step": 7,
+        "step": "extract",
+        "total_steps": 7
+      },
+      {
+        "seq": 132,
+        "complete": true,
+        "display_step": 7,
+        "step": "complete",
+        "total_steps": 7
+      }
+    ],
+    "agent_decisions": [
+      {
+        "actor": 2,
+        "ap_before": 10,
+        "decision": "melee",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "adjacent hostile",
+        "round": 1,
+        "score": 87.714,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 6,
+        "decision": "melee",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "adjacent hostile",
+        "round": 1,
+        "score": 86.75,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 10,
+        "decision": "throw_item",
+        "position": {
+          "x": 1,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "legal ranged attack",
+        "round": 1,
+        "score": 74.027,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 6,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 59.734,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 5,
+        "decision": "melee",
+        "position": {
+          "x": 2,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "adjacent hostile",
+        "round": 1,
+        "score": 86.988,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 1,
+        "decision": "approach",
+        "position": {
+          "x": 2,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 57.684,
+        "team": 0
+      },
+      {
+        "actor": 6,
+        "ap_before": 10,
+        "decision": "approach",
+        "position": {
+          "x": 6,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 60.532,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 9,
+        "decision": "approach",
+        "position": {
+          "x": 5,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 60.293,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 8,
+        "decision": "approach",
+        "position": {
+          "x": 5,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 60.415,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 7,
+        "decision": "grab",
+        "position": {
+          "x": 5,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "recover weapon at current position",
+        "round": 1,
+        "score": 65.491,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 6,
+        "decision": "throw_item",
+        "position": {
+          "x": 5,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "legal ranged attack",
+        "round": 1,
+        "score": 65.463,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 3,
+        "decision": "approach",
+        "position": {
+          "x": 5,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 59.548,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 2,
+        "decision": "approach",
+        "position": {
+          "x": 5,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 57.33,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 1,
+        "decision": "approach",
+        "position": {
+          "x": 5,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 59.375,
+        "team": 1
+      },
+      {
+        "actor": 2,
+        "ap_before": 10,
+        "decision": "throw_item",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "legal ranged attack",
+        "round": 2,
+        "score": 65.128,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 6,
+        "decision": "approach",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 2,
+        "score": 57.667,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 5,
+        "decision": "approach",
+        "position": {
+          "x": 3,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 2,
+        "score": 60.37,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 4,
+        "decision": "grab",
+        "position": {
+          "x": 3,
+          "y": 0,
+          "z": 0
+        },
+        "rationale": "recover weapon at current position",
+        "round": 2,
+        "score": 70.921,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 3,
+        "decision": "throw_item",
+        "position": {
+          "x": 3,
+          "y": 0,
+          "z": 0
+        },
+        "rationale": "legal ranged attack",
+        "round": 2,
+        "score": 66.517,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 10,
+        "decision": "approach",
+        "position": {
+          "x": 2,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 2,
+        "score": 57.065,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 9,
+        "decision": "approach",
+        "position": {
+          "x": 2,
+          "y": 4,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 2,
+        "score": 58.343,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 7,
+        "decision": "approach",
+        "position": {
+          "x": 2,
+          "y": 5,
+          "z": 1
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 2,
+        "score": 57.618,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 6,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 5,
+          "z": 1
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 2,
+        "score": 59.17,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 5,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 6,
+          "z": 1
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 2,
+        "score": 58.461,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 4,
+        "decision": "grab",
+        "position": {
+          "x": 0,
+          "y": 6,
+          "z": 1
+        },
+        "rationale": "recover weapon at current position",
+        "round": 2,
+        "score": 65.097,
+        "team": 0
+      },
+      {
+        "actor": 6,
+        "ap_before": 10,
+        "decision": "grab",
+        "position": {
+          "x": 6,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "recover weapon at current position",
+        "round": 2,
+        "score": 66.013,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 9,
+        "decision": "seek_cover",
+        "position": {
+          "x": 6,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "cover route 5 AP; exposure 3→2; retain 3 AP",
+        "round": 2,
+        "score": 76,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 8,
+        "decision": "seek_cover",
+        "position": {
+          "x": 6,
+          "y": 4,
+          "z": 0
+        },
+        "rationale": "cover route 4 AP; exposure 2→2; retain 3 AP",
+        "round": 2,
+        "score": 72,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 6,
+        "decision": "throw_item",
+        "position": {
+          "x": 6,
+          "y": 5,
+          "z": 1
+        },
+        "rationale": "legal ranged attack",
+        "round": 2,
+        "score": 60.72,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 3,
+        "decision": "approach",
+        "position": {
+          "x": 6,
+          "y": 5,
+          "z": 1
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 2,
+        "score": 59.688,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 1,
+        "decision": "approach",
+        "position": {
+          "x": 6,
+          "y": 6,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 2,
+        "score": 60.328,
+        "team": 1
+      },
+      {
+        "actor": 2,
+        "ap_before": 10,
+        "decision": "approach",
+        "position": {
+          "x": 3,
+          "y": 0,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 3,
+        "score": 57.2,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 9,
+        "decision": "approach",
+        "position": {
+          "x": 3,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 3,
+        "score": 58.399,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 8,
+        "decision": "approach",
+        "position": {
+          "x": 3,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 3,
+        "score": 60.785,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 7,
+        "decision": "approach",
+        "position": {
+          "x": 3,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "direct approach; retain 4 AP attack reserve",
+        "round": 3,
+        "score": 55.72,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 6,
+        "decision": "approach",
+        "position": {
+          "x": 3,
+          "y": 4,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 3,
+        "score": 55.334,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 4,
+        "decision": "approach",
+        "position": {
+          "x": 3,
+          "y": 5,
+          "z": 1
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 3,
+        "score": 55.054,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 3,
+        "decision": "approach",
+        "position": {
+          "x": 3,
+          "y": 6,
+          "z": 1
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 3,
+        "score": 59.53,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 2,
+        "decision": "approach",
+        "position": {
+          "x": 4,
+          "y": 6,
+          "z": 1
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 3,
+        "score": 60.378,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 1,
+        "decision": "approach",
+        "position": {
+          "x": 4,
+          "y": 7,
+          "z": 1
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 3,
+        "score": 57.924,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 10,
+        "decision": "approach",
+        "position": {
+          "x": 0,
+          "y": 6,
+          "z": 1
+        },
+        "rationale": "direct approach; retain 4 AP attack reserve",
+        "round": 3,
+        "score": 43.05,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 9,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 6,
+          "z": 1
+        },
+        "rationale": "direct approach; retain 4 AP attack reserve",
+        "round": 3,
+        "score": 45.186,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 8,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 7,
+          "z": 1
+        },
+        "rationale": "direct approach; retain 4 AP attack reserve",
+        "round": 3,
+        "score": 45.134,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 6,
+        "decision": "step",
+        "position": {
+          "x": 2,
+          "y": 7,
+          "z": 2
+        },
+        "rationale": "greedy legal step; retain 4 AP attack reserve",
+        "round": 3,
+        "score": 39.673,
+        "team": 0
+      },
+      {
+        "actor": 6,
+        "ap_before": 10,
+        "decision": "approach",
+        "position": {
+          "x": 6,
+          "y": 7,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 3,
+        "score": 55.274,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 9,
+        "decision": "melee",
+        "position": {
+          "x": 5,
+          "y": 7,
+          "z": 0
+        },
+        "rationale": "adjacent hostile",
+        "round": 3,
+        "score": 97.173,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 5,
+        "decision": "melee",
+        "position": {
+          "x": 5,
+          "y": 7,
+          "z": 0
+        },
+        "rationale": "adjacent hostile",
+        "round": 3,
+        "score": 98.771,
+        "team": 1
+      },
+      {
+        "actor": 6,
+        "ap_before": 1,
+        "decision": "grab",
+        "position": {
+          "x": 5,
+          "y": 7,
+          "z": 0
+        },
+        "rationale": "recover weapon at current position",
+        "round": 3,
+        "score": 70.863,
+        "team": 1
+      },
+      {
+        "actor": 2,
+        "ap_before": 10,
+        "decision": "melee",
+        "position": {
+          "x": 4,
+          "y": 7,
+          "z": 1
+        },
+        "rationale": "adjacent hostile",
+        "round": 4,
+        "score": 79.882,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 6,
+        "decision": "melee",
+        "position": {
+          "x": 4,
+          "y": 7,
+          "z": 1
+        },
+        "rationale": "adjacent hostile",
+        "round": 4,
+        "score": 80.598,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 2,
+        "decision": "approach",
+        "position": {
+          "x": 4,
+          "y": 7,
+          "z": 1
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 4,
+        "score": 57.435,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 10,
+        "decision": "approach",
+        "position": {
+          "x": 3,
+          "y": 7,
+          "z": 2
+        },
+        "rationale": "direct approach; retain 4 AP attack reserve",
+        "round": 4,
+        "score": 42.286,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 8,
+        "decision": "melee",
+        "position": {
+          "x": 4,
+          "y": 7,
+          "z": 1
+        },
+        "rationale": "adjacent hostile",
+        "round": 4,
+        "score": 78.431,
+        "team": 0
+      }
+    ],
+    "decision_histogram": {
+      "melee": 8,
+      "throw_item": 5,
+      "approach": 32,
+      "grab": 5,
+      "seek_cover": 2,
+      "step": 1
+    },
+    "m03_signature_hits": [
+      "cover route"
+    ],
+    "m03_decision_hits": []
+  },
+  "gates": {
+    "runtime_clean": {
+      "ok": true,
+      "required": true,
+      "detail": "0 page errors"
+    },
+    "full_loop": {
+      "ok": true,
+      "required": true,
+      "detail": "SUCCESS; 3 survivors; seed 1167583760"
+    },
+    "idempotence": {
+      "ok": true,
+      "required": true,
+      "detail": "forced reload does not double-apply"
+    },
+    "full_extraction_captured": {
+      "ok": true,
+      "required": true,
+      "detail": "11 actions, 121 events"
+    },
+    "base10_ap_authority": {
+      "ok": true,
+      "required": true,
+      "detail": "no record exceeds 10 AP"
+    },
+    "M01_proving_ground_completes": {
+      "ok": true,
+      "required": true,
+      "detail": "reached step 7/7"
+    },
+    "M03_canonical_rationale_observed": {
+      "ok": true,
+      "required": false,
+      "detail": "cover route"
+    }
+  },
+  "findings": [],
+  "screenshots": [
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "strategic-console",
+      "at": "2026-07-30T05:51:25.300Z",
+      "file": "screenshots/01-strategic-console.png",
+      "bytes": 321293,
+      "sha256": "2d673ba29c85a9afe893f014505da68d7f399150880234434faec10ca5d84efc"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "tactical-booted",
+      "at": "2026-07-30T05:51:36.961Z",
+      "file": "screenshots/02-tactical-booted.png",
+      "bytes": 202111,
+      "sha256": "0733f241607fcc02e04b6526100b54ae6e4ab5cacce9ffa48d27a0c3a65832a2"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "tutorial-1-select",
+      "at": "2026-07-30T05:51:40.969Z",
+      "file": "screenshots/03-tutorial-1-select.png",
+      "bytes": 190711,
+      "sha256": "4f420daa59510109cbd4b0b031fe23f411f05e6175b458dddd51478e4c878349"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "tutorial-2-move",
+      "at": "2026-07-30T05:51:44.134Z",
+      "file": "screenshots/04-tutorial-2-move.png",
+      "bytes": 195036,
+      "sha256": "68f69c54a4b5787548d9ba35292dd673fce10e86bbc572b989d68ec2c27ba6e0"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "tutorial-3-defense",
+      "at": "2026-07-30T05:51:47.881Z",
+      "file": "screenshots/05-tutorial-3-defense.png",
+      "bytes": 195134,
+      "sha256": "53960cd0a521166ef3c5c9c7ffffad40b322e7d60e322792a3107a4f1e8199da"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "tutorial-5-attack",
+      "at": "2026-07-30T05:51:51.291Z",
+      "file": "screenshots/06-tutorial-5-attack.png",
+      "bytes": 196062,
+      "sha256": "83702f6afd71609034503664816cc99767bfd7bef0111ec80f02762c0a225e5b"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "tutorial-5-endturn",
+      "at": "2026-07-30T05:51:56.927Z",
+      "file": "screenshots/07-tutorial-5-endturn.png",
+      "bytes": 193328,
+      "sha256": "cfea1fcec32b4aa193acc4552b73d9a86ae8226458040e064b009bf16a3068a1"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "round-04",
+      "at": "2026-07-30T05:52:21.299Z",
+      "file": "screenshots/08-round-04.png",
+      "bytes": 323524,
+      "sha256": "76619cd294d8ead31a7db4bbf214a3807a4acb1835b2125d539e2db310561403"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "round-08",
+      "at": "2026-07-30T05:52:44.239Z",
+      "file": "screenshots/09-round-08.png",
+      "bytes": 353191,
+      "sha256": "7e8fb4007e483386e43695643e98a32f316a37077a8c98ac1cd8dd78bd65a908"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "post-extract",
+      "at": "2026-07-30T05:52:49.665Z",
+      "file": "screenshots/10-post-extract.png",
+      "bytes": 349692,
+      "sha256": "3a8bd22568687b09f66a4177ed375c071d95752a36c0d7062f91d3351e48e7ea"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "strategic-return",
+      "at": "2026-07-30T05:52:50.165Z",
+      "file": "screenshots/11-strategic-return.png",
+      "bytes": 349706,
+      "sha256": "f9bc8fc847028293e2713914440f33677166ae5e4ebe904f3b1cffd33c698d7f"
+    },
+    {
+      "run_id": "20260730T055121924Z-12a4a72a",
+      "label": "after-reload",
+      "at": "2026-07-30T05:52:53.337Z",
+      "file": "screenshots/12-after-reload.png",
+      "bytes": 324302,
+      "sha256": "f8ae57eeb62d52332aa6175ea3149225530f7b5390ae48094a87d648fee22cad"
+    }
+  ],
+  "artifacts": {
+    "extraction": {
+      "file": "extraction.json",
+      "bytes": 28286,
+      "sha256": "10c7c6e1dc23f174d1eb77061d0f0f14a6e8a4e622e9ebe0ad481e14ba2c5934"
+    }
+  },
+  "server": {
+    "url": "http://127.0.0.1:8781/",
+    "status": 200,
+    "marker": "1",
+    "tactical_pck": {
+      "url": "http://127.0.0.1:8781/tactical/index.pck",
+      "bytes": 297804,
+      "sha256": "a7e8a31ddfee924952c30d712e5ddbbd5553d4fae3d1ef85bf5a35f27f0270c6"
+    }
+  },
+  "finished_at": "2026-07-30T05:52:53.776Z",
+  "failed_gates": [],
+  "result": "PASS"
+}

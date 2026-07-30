@@ -16,6 +16,18 @@ const TUTORIAL_HEIGHT := HudLayout.TUTORIAL_HEIGHT
 const ACTION_DOCK_BOTTOM_MARGIN := HudLayout.ACTION_DOCK_BOTTOM_MARGIN
 const ACTION_DOCK_BASE_HEIGHT := HudLayout.ACTION_DOCK_BASE_HEIGHT
 const EVENT_RAIL_TOP := HudLayout.EVENT_RAIL_TOP
+
+## The specials whose availability the action router decides through
+## `Main._special_enabled`. This list must match the names Main actually gates, because the
+## interface asks that authority rather than re-deciding. `_special_enabled` is
+## `unit.has_special(name, dev_god_mode)`, which is `dev_god_mode or skills.has(name)` — so a
+## unit carrying the skill token is represented with God Mode off, which the previous
+## `visible = dev_god_mode` could never express.
+##
+## `precision_jump` is deliberately absent: it modifies the existing Jump button rather than
+## having a button of its own. `frenzy` and the flight aids are absent because Main does not
+## gate them through this authority; they remain on the God Mode toggle.
+const SPECIAL_ACTIONS := ["flip", "wall_run", "wall_jump", "cover_monkey", "remotes"]
 const FOCUS_ORDER_KEYS := HudLayout.FOCUS_ORDER_KEYS
 const GRIP_SIZE := 16.0
 
@@ -698,8 +710,8 @@ func _build_ui() -> void:
 	_add_action_btn(sg, "brace", "Brace (B)", func(): ActionRouter.request_action(main.selected, "brace"), 74)
 	_add_action_btn(sg, "crouch", "Crouch (C)", func(): ActionRouter.request_action(main.selected, "crouch"), 74)
 	_add_action_btn(sg, "prone", "Prone (P)", func(): ActionRouter.request_action(main.selected, "prone"), 74)
-	_add_action_btn(sg, "lean_l", "Lean L (Q)", func(): ActionRouter.request_action(main.selected, "lean_l"), 74)
-	_add_action_btn(sg, "lean_r", "Lean R (E)", func(): ActionRouter.request_action(main.selected, "lean_r"), 74)
+	_add_action_btn(sg, "lean_l", "Lean L ([)", func(): ActionRouter.request_action(main.selected, "lean_l"), 74)
+	_add_action_btn(sg, "lean_r", "Lean R (])", func(): ActionRouter.request_action(main.selected, "lean_r"), 74)
 	_add_action_btn(sg, "toggle_orient", "Face Up/Dn", func(): ActionRouter.request_action(main.selected, "toggle_orient"), 74)
 	_add_action_btn(sg, "take_cover", "Take Cover (T)", _request_cover_action, 74)
 	action_groups["stance"] = {"group": g_stance, "content": sg}
@@ -1321,6 +1333,32 @@ func set_tutorial_guidance(snapshot: Dictionary) -> void:
 	else:
 		tutorial_title_label.add_theme_color_override("font_color", Color(0.35, 1.0, 0.78))
 
+## Apply a special's *precondition* to its button. Availability — whether the unit has the
+## special at all — is decided once, from `Main._special_enabled`, and is not touched here.
+##
+## A precondition may only disable. Hiding a special the unit possesses removes the only place
+## its requirement is written down: the tooltip. That is how Wall Run came to be missing from
+## dev mode rather than merely greyed out.
+func _gate_special(name: String, blocked_reason: String) -> void:
+	if not action_btns.has(name):
+		return
+	var btn: Button = action_btns[name]
+	btn.disabled = not blocked_reason.is_empty()
+	var base := String(action_tooltips.get(name, ""))
+	if blocked_reason.is_empty():
+		btn.tooltip_text = base
+	else:
+		btn.tooltip_text = "%s\n\nUnavailable right now: %s." % [base, blocked_reason]
+
+## First reason that applies, or "" when nothing blocks. Each entry is `[reason, condition]`.
+## Order is the reporting priority: the cheapest thing to fix is listed first, so a player
+## short on AP is told that rather than being told about wall geometry they cannot change.
+func _first_reason(candidates: Array) -> String:
+	for entry in candidates:
+		if entry is Array and entry.size() == 2 and bool(entry[1]):
+			return String(entry[0])
+	return ""
+
 func update_ui() -> void:
 	if turn_label:
 		if main.turn == main.player_faction:
@@ -1403,11 +1441,15 @@ func update_ui() -> void:
 		if action_btns.has(contextual_name):
 			action_btns[contextual_name].visible = false
 
-	# God-mode specials (Remotes, Cover Monkey, Flip/Wall, etc.)
 	var god = bool(main.dev_god_mode)
-	for special_name in ["remotes", "cover_monkey", "flip", "wall_run", "wall_jump", "frenzy"]:
+	# Specials ask the same authority the action router uses, so "does this unit have it"
+	# is answered in exactly one place. Frenzy is not gated through `_special_enabled` in
+	# Main, so it stays on the God Mode toggle.
+	for special_name in SPECIAL_ACTIONS:
 		if action_btns.has(special_name):
-			action_btns[special_name].visible = god
+			action_btns[special_name].visible = main._special_enabled(main.selected, special_name)
+	if action_btns.has("frenzy"):
+		action_btns["frenzy"].visible = god
 	if action_btns.has("remotes_home"):
 		var pilot_home = main._active_human_pilot() if main.has_method("_active_human_pilot") else null
 		var remoted = pilot_home != null and not bool(pilot_home.is_commander)
@@ -1472,16 +1514,40 @@ func update_ui() -> void:
 			action_btns["jump"].disabled = not main.can_begin_jump(main.selected)
 			action_btns["grab"].disabled = (main.selected.ap < Config.GRAB_COST) or not main.debris.has(main.selected.cell)
 			action_btns["assemble"].disabled = (main.selected.ap < Config.ASSEMBLE_COST)
-			if main.dev_god_mode:
-				var runnable_walls: Array[Vector2i] = main.wall_run_options(main.selected)
-				action_btns["flip"].disabled = (not airborne or main.selected.ap < Config.FLIP_COST)
-				action_btns["wall_run"].disabled = (
-					main.selected.ap < Config.WALL_RUN_COST
-					or (not wall_running and runnable_walls.is_empty())
-				)
-				action_btns["wall_jump"].disabled = (not wall_running or main.selected.ap < Config.WALL_JUMP_COST)
-				action_btns["cover_monkey"].disabled = false
+			# Specials the router gates: availability was already set above from
+			# `_special_enabled`. Everything decided here is *precondition*, which may only
+			# grey a button out. It must never hide one.
+			#
+			# The previous version computed these `disabled` states and then immediately
+			# overwrote `visible` from the same conditions -- `wall_run.visible = wall_running
+			# or not runnable_walls.is_empty()`. That made the disabled computation unreachable
+			# in exactly the cases it was written for, and it is why Wall Run was reported
+			# "just missing" from dev mode: with no qualifying wall adjacent, which is most of
+			# the time, the button vanished and its requirement became undiscoverable.
+			# Two writers over one property, later one wins.
+			var runnable_walls: Array[Vector2i] = main.wall_run_options(main.selected)
+			_gate_special("flip", _first_reason([
+				["needs an airborne stage", not airborne],
+				["needs %d AP" % Config.FLIP_COST, main.selected.ap < Config.FLIP_COST]
+			]))
+			_gate_special("wall_run", _first_reason([
+				["needs %d AP per segment" % Config.WALL_RUN_COST, main.selected.ap < Config.WALL_RUN_COST],
+				[
+					"needs actual Run/Sprint momentum and an adjacent continuous wall",
+					not wall_running and runnable_walls.is_empty()
+				]
+			]))
+			_gate_special("wall_jump", _first_reason([
+				["only available while wall-running", not wall_running],
+				["needs %d AP" % Config.WALL_JUMP_COST, main.selected.ap < Config.WALL_JUMP_COST]
+			]))
+			_gate_special("cover_monkey", "")
+			if action_btns.has("cover_monkey"):
 				action_btns["cover_monkey"].text = "Cover Monkey: %s" % ["ON" if main.selected.cover_monkey_active else "OFF"]
+
+			# Development aids Main does not gate through `_special_enabled`. These stay bound
+			# to the God Mode toggle, unchanged.
+			if main.dev_god_mode:
 				action_btns["hover"].disabled = (main.selected.ap < Config.HOVER_COST)
 				action_btns["frenzy"].disabled = (main.selected.frenzied and main.selected.ap < 1)
 				action_btns["frenzy"].text = "Frenzy: %s" % ["ON" if main.selected.frenzied else "OFF"]
@@ -1491,10 +1557,6 @@ func update_ui() -> void:
 				var terrain_z := int(main.cells.get(main.selected.cell, {}).get("z", 0))
 				action_btns["flight_land"].disabled = not main.selected.flying or main.selected.z <= terrain_z
 				action_btns["toggle_free_fly"].disabled = false
-				action_btns["flip"].visible = airborne
-				action_btns["wall_run"].visible = wall_running or not runnable_walls.is_empty()
-				action_btns["wall_jump"].visible = wall_running
-				action_btns["cover_monkey"].visible = true
 				action_btns["hover"].visible = true
 				action_btns["frenzy"].visible = true
 				action_btns["toggle_flight"].visible = true
@@ -1503,10 +1565,6 @@ func update_ui() -> void:
 				action_btns["flight_land"].visible = true
 				action_btns["toggle_free_fly"].visible = true
 			else:
-				action_btns["flip"].visible = false
-				action_btns["wall_run"].visible = false
-				action_btns["wall_jump"].visible = false
-				action_btns["cover_monkey"].visible = false
 				action_btns["hover"].visible = false
 				action_btns["frenzy"].visible = false
 				action_btns["toggle_flight"].visible = false

@@ -1,0 +1,692 @@
+{
+  "harness": "gzg.battlestar.autonomous-playtest/3.0",
+  "run_id": "20260729T105741264Z-6aedeca9",
+  "started_at": "2026-07-29T10:57:41.267Z",
+  "config": {
+    "base": "http://127.0.0.1:8781/",
+    "rounds": 0,
+    "require_m03": false,
+    "callsign": "M05-AUDIT",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "browser": {
+    "resolver_source": "PW_CHROMIUM",
+    "headed": false,
+    "version": "150.0.4078.105"
+  },
+  "identity": {
+    "run_id": "20260729T105741264Z-6aedeca9",
+    "deployment_message_id": "battlestar:1167583760:1",
+    "extraction_message_id": "xcommand:1167583760:1785322693359",
+    "extraction_id": "xcommand:1167583760:1785322693359",
+    "correlation_id": "battlestar:1167583760:1",
+    "seed": 1167583760,
+    "extracted_at": "2026-07-29 10:58:13Z"
+  },
+  "deployment": {
+    "gzg": "galaxy-message",
+    "version": "1.0",
+    "id": "battlestar:1167583760:1",
+    "type": "battlestar.deploy",
+    "source": {
+      "galaxy": "BattleStarSol",
+      "version": "0.1.1-prealpha.1",
+      "instance": "browser-local"
+    },
+    "target": {
+      "galaxy": "xCommand",
+      "capability": "tactical.deploy"
+    },
+    "created_at": "2026-07-29T10:57:46.226Z",
+    "payload": {
+      "schema": "gzg.battlestar.deploy/1.0",
+      "deploy": {
+        "type": "deploy",
+        "payload_contract_version": "1.0",
+        "generator_version": 1,
+        "rules_version": "alpha-1",
+        "sector": "Proving Ground",
+        "faction": "HAD // HEAVY ARMOR DIVISION",
+        "seed": 1167583760,
+        "atlas_state": "#%7B%22fps%22%3A15%2C%22mode%22%3A%22satellite%22%2C%22speed%22%3A0%2C%22layers%22%3A%5B%22dc%22%2C%22ixp%22%2C%22crisis%22%5D%2C%22cam%22%3A%7B%22x%22%3A0%2C%22y%22%3A10%2C%22z%22%3A22%2C%22tx%22%3A0%2C%22ty%22%3A0%2C%22tz%22%3A0%7D%7D",
+        "squad": [
+          {
+            "name": "M05-AUDIT",
+            "cls": "Heavy"
+          },
+          {
+            "name": "SCOUT-3",
+            "cls": "Recon"
+          },
+          {
+            "name": "MEDIC-2",
+            "cls": "Support"
+          }
+        ],
+        "objectives": [
+          "Select the Commander",
+          "Move and practice defense",
+          "Complete a basic attack",
+          "End turn and observe the phases",
+          "Extract to strategy"
+        ],
+        "map": {
+          "target": {
+            "type": "coordinate",
+            "name": "Proving Ground",
+            "latitude": 34.0522,
+            "longitude": -118.2437
+          }
+        },
+        "resources": {
+          "neural": 50,
+          "capital": 25000,
+          "alloys": 100
+        }
+      }
+    }
+  },
+  "steps": [
+    {
+      "name": "canonical development server responds",
+      "ok": true,
+      "detail": "http://127.0.0.1:8781/ marker=1",
+      "at": "2026-07-29T10:57:41.294Z"
+    },
+    {
+      "name": "served tactical package identified",
+      "ok": true,
+      "detail": "263972 bytes sha256:ad091f07ed11ecfc56800bb8f0c1668eb72c44698878e8587359bfe7f257b835",
+      "at": "2026-07-29T10:57:41.294Z"
+    },
+    {
+      "name": "strategic console loads",
+      "ok": true,
+      "detail": "Battle/Star.SOL // Strategic Command",
+      "at": "2026-07-29T10:57:44.514Z"
+    },
+    {
+      "name": "commander callsign accepted",
+      "ok": true,
+      "detail": "M05-AUDIT",
+      "at": "2026-07-29T10:57:45.662Z"
+    },
+    {
+      "name": "quick deploy control present",
+      "ok": true,
+      "detail": "▶ QUICK DEPLOY: PROVING GROUND",
+      "at": "2026-07-29T10:57:45.748Z"
+    },
+    {
+      "name": "same-tab launch to tactical launcher",
+      "ok": true,
+      "detail": "battlestar.html",
+      "at": "2026-07-29T10:57:46.425Z"
+    },
+    {
+      "name": "deployment brief populated",
+      "ok": true,
+      "detail": "seed=1167583760 sector=Proving Ground",
+      "at": "2026-07-29T10:57:49.631Z"
+    },
+    {
+      "name": "godot tactical runtime booted",
+      "ok": true,
+      "detail": "3.4s",
+      "at": "2026-07-29T10:57:53.959Z"
+    },
+    {
+      "name": "roster select advances the guided tutorial",
+      "ok": true,
+      "detail": "step=2/6 move",
+      "at": "2026-07-29T10:57:56.738Z"
+    },
+    {
+      "name": "a completed move advances to defense",
+      "ok": true,
+      "detail": "step=3/6 defense; choice=brace-plus-melee-adjacent-visible-hostile",
+      "at": "2026-07-29T10:57:59.228Z"
+    },
+    {
+      "name": "defensive posture advances to attack",
+      "ok": true,
+      "detail": "step=4/6 attack",
+      "at": "2026-07-29T10:58:02.915Z"
+    },
+    {
+      "name": "basic attack advances to end turn",
+      "ok": true,
+      "detail": "step=5/6 end_turn",
+      "at": "2026-07-29T10:58:05.708Z"
+    },
+    {
+      "name": "end turn advances to phase observation",
+      "ok": true,
+      "detail": "step=6/6 extract",
+      "at": "2026-07-29T10:58:10.941Z"
+    },
+    {
+      "name": "returned player turn exposes extraction",
+      "ok": true,
+      "detail": "step=6/6 extract",
+      "at": "2026-07-29T10:58:11.833Z"
+    },
+    {
+      "name": "turn cycle survives full run",
+      "ok": true,
+      "detail": "0 free rounds",
+      "at": "2026-07-29T10:58:11.833Z"
+    },
+    {
+      "name": "one full extraction message captured",
+      "ok": true,
+      "detail": "7300 bytes",
+      "at": "2026-07-29T10:58:17.656Z"
+    },
+    {
+      "name": "strategic console shows a completed mission",
+      "ok": true,
+      "detail": "SUCCESS · Proving Ground · 3 survivors · seed 1167583760",
+      "at": "2026-07-29T10:58:18.080Z"
+    },
+    {
+      "name": "mission count is idempotent under forced reload",
+      "ok": true,
+      "detail": "1 -> 1",
+      "at": "2026-07-29T10:58:20.869Z"
+    }
+  ],
+  "console_lines": [
+    "[.WebGL-0x61dc001ad400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x61dc001ad400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "[.WebGL-0x61dc001ad400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x61dc001ad400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+    "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+    "OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL",
+    "Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.",
+    "[PayloadBridge] Payload updated: Proving Ground seed=1167583760",
+    "[PayloadBridge] Loaded payload from Web URL!",
+    "ItemDB: Loaded 20 items.",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":541,\"y\":72},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":576,\"y\":90},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":560,\"y\":100},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":539,\"y\":55}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":556,\"y\":63}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":573,\"y\":71}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":591,\"y\":80}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":524,\"y\":64}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":508,\"y\":73}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":542,\"y\":91}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":491,\"y\":83}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":507,\"y\":92}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":525,\"y\":101}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":543,\"y\":111}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":552,\"y\":250},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":602,\"y\":283},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":580,\"y\":303},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":550,\"y\":218}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":573,\"y\":233}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":597,\"y\":248}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":622,\"y\":264}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":529,\"y\":234}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":252}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":554,\"y\":285}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":483,\"y\":270}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":507,\"y\":287}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":531,\"y\":305}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":557,\"y\":324}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":308},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":610,\"y\":347},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":587,\"y\":371},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":553,\"y\":270}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":578,\"y\":287}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":306}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":632,\"y\":325}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":289}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":310}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":558,\"y\":349}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":481,\"y\":331}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":506,\"y\":352}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":533,\"y\":373}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":396}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":611,\"y\":351},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":587,\"y\":375},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":559,\"y\":353}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":506,\"y\":355}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":533,\"y\":377}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":400}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":611,\"y\":351},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":587,\"y\":375},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":559,\"y\":353}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":506,\"y\":355}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":533,\"y\":377}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":400}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":9,\"cell\":{\"x\":1,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":559,\"y\":308},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":590,\"y\":372},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":565,\"y\":397},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":534,\"y\":290}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":586,\"y\":328}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":614,\"y\":348}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":510,\"y\":310}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":535,\"y\":330}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":484,\"y\":332}},{\"ap\":7,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":537,\"y\":374}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":9,\"cell\":{\"x\":1,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":587,\"y\":375},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":561,\"y\":401},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":530,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":582,\"y\":331}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":610,\"y\":351}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":506,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":531,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":480,\"y\":335}},{\"ap\":7,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":533,\"y\":378}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":8,\"cell\":{\"x\":2,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":559,\"y\":313},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":562,\"y\":356},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":537,\"y\":380},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":510,\"y\":277}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":534,\"y\":295}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":586,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":617,\"y\":337}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":485,\"y\":297}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":510,\"y\":315}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":592,\"y\":362}},{\"ap\":4,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":460,\"y\":317}},{\"ap\":8,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":510,\"y\":358}},{\"ap\":5,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":566,\"y\":388}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":8,\"cell\":{\"x\":2,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":558,\"y\":353},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":533,\"y\":377},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":506,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":530,\"y\":292}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":582,\"y\":330}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":482,\"y\":294}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":506,\"y\":313}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":588,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":456,\"y\":315}},{\"ap\":8,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":506,\"y\":355}},{\"ap\":5,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":562,\"y\":385}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":559,\"y\":313},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":535,\"y\":335},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":510,\"y\":358},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":510,\"y\":277}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":534,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":588,\"y\":316}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":617,\"y\":337}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":485,\"y\":297}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":563,\"y\":340}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":592,\"y\":362}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":536,\"y\":365}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":566,\"y\":389}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":559,\"y\":313},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":535,\"y\":335},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":510,\"y\":358},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":510,\"y\":277}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":534,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":588,\"y\":316}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":617,\"y\":337}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":485,\"y\":297}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":563,\"y\":340}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":592,\"y\":362}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":536,\"y\":365}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":566,\"y\":389}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":555,\"y\":310},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":531,\"y\":332},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":506,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":530,\"y\":292}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":612,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":294}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":558,\"y\":336}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":588,\"y\":358}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":531,\"y\":361}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":561,\"y\":385}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":507,\"y\":356},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":314}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":614,\"y\":335}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":483,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":332},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":385}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":5,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":5,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":4,\"step\":\"attack\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":561,\"y\":306},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":538,\"y\":327},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":512,\"y\":350},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":536,\"y\":288}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":555,\"y\":312},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":530,\"y\":334},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":505,\"y\":357},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":529,\"y\":294}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":332},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":507,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":292}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"observe_phases\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"observe_phases\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":1,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"observe_phases\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":2,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"observe_phases\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"extract\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":457,\"y\":315}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":6,\"step\":\"extract\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"M05-AUDIT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":457,\"y\":315}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":2,\"tutorial\":{\"complete\":true,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":6,\"step\":\"complete\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[PayloadBridge] PUSHING EXTRACTION RESULT: { \"outcome\": \"SUCCESS\", \"survivors\": 3, \"gains\": { \"neural\": 25, \"capital\": 301, \"loot\": [] }, \"note\": \"evac\", \"replay\": { \"mission_seed\": 1167583760, \"generator_version\": 1, \"rules_version\": \"alpha-1\", \"actions\": [{ \"sequence\": 2, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"M05-AUDIT\", \"team\": 0 }, \"action\": \"select\", \"target\": { \"x\": -999, \"y\": -999, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 10, \"ap_after_dispatch\": 10, \"accepted\": true }, { \"sequence\": 4, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"M05-AUDIT\", \"team\": 0 }, \"action\": \"move\", \"target\": { \"x\": 3, \"y\": 0, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 10, \"ap_after_dispatch\": 10, \"accepted\": true }, { \"sequence\": 7, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"M05-AUDIT\", \"team\": 0 }, \"action\": \"brace\", \"target\": { \"x\": -999, \"y\": -999, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 7, \"ap_after_dispatch\": 5, \"accepted\": true }, { \"sequence\": 9, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"M05-AUDIT\", \"team\": 0 }, \"action\": \"melee\", \"target\": { \"x\": 3, \"y\": 1, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 5, \"ap_after_dispatch\": 1, \"accepted\": true }, { \"sequence\": 12, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"M05-AUDIT\", \"team\": 0 }, \"action\": \"endturn\", \"target\": { \"x\": -999, \"y\": -999, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 1, \"ap_after_dispatch\": 1, \"accepted\": true }], \"events\": [{ \"sequence\": 1, \"record_type\": \"event\", \"event\": \"tutorial_step_changed\", \"payload\": { \"step\": \"select_commander\", \"display_step\": 1, \"total_steps\": 6, \"complete\": false } }, { \"sequence\": 3, \"record_type\": \"event\", \"event\": \"tutorial_step_changed\", \"payload\": { \"step\": \"move\", \"display_step\": 2, \"total_steps\": 6, \"complete\": false } }, { \"sequenc"
+  ],
+  "page_errors": [],
+  "observations": {
+    "strategic_before": {
+      "missions": "0",
+      "history": "No completed missions in this browser."
+    },
+    "deployment_brief": {
+      "sector": "Proving Ground",
+      "faction": "HAD // HEAVY ARMOR DIVISION",
+      "seed": "1167583760",
+      "squad": "3 units · M05-AUDIT, SCOUT-3, MEDIC-2",
+      "objectives": [
+        "Select the Commander",
+        "Move and practice defense",
+        "Complete a basic attack",
+        "End turn and observe the phases",
+        "Extract to strategy"
+      ],
+      "runtime_status": "GODOT RUNTIME LOADED · PLAYABLE · BASE-10 AP"
+    },
+    "canvas_box": {
+      "x": 305,
+      "y": 52,
+      "width": 1112,
+      "height": 626
+    },
+    "move_choice": {
+      "reason": "brace-plus-melee-adjacent-visible-hostile",
+      "reserve_ap": 6,
+      "published_targets": 11,
+      "target": {
+        "cell": {
+          "x": 3,
+          "y": 0
+        },
+        "ap": 3
+      }
+    },
+    "published_attack_targets": 2,
+    "aimed_actions": {
+      "move": 1,
+      "cover": 0,
+      "attack": 1,
+      "swept": 0
+    },
+    "strategic_after": {
+      "missions": "1",
+      "history": "SUCCESS · Proving Ground · 3 survivors · seed 1167583760",
+      "neural": "75",
+      "capital": "$25,301"
+    },
+    "m03": {
+      "canonical_rationale_observed": false,
+      "signature_hits": [],
+      "decision_hits": [],
+      "decision_count": 11
+    }
+  },
+  "ledger": {
+    "extraction_id": "xcommand:1167583760:1785322693359",
+    "outcome": "SUCCESS",
+    "survivors": 3,
+    "seed": 1167583760,
+    "rules_version": "alpha-1",
+    "generator_version": 1,
+    "payload_contract_version": "1.0",
+    "action_count": 5,
+    "event_count": 30,
+    "event_histogram": {
+      "tutorial_step_changed": 8,
+      "movement_resolved": 1,
+      "damage_resolved": 4,
+      "agent_decision": 11,
+      "loot_collected": 1,
+      "unit_killed": 1,
+      "turn_started": 3,
+      "mission_resolved": 1
+    },
+    "tutorial_steps": [
+      {
+        "seq": 1,
+        "complete": false,
+        "display_step": 1,
+        "step": "select_commander",
+        "total_steps": 6
+      },
+      {
+        "seq": 3,
+        "complete": false,
+        "display_step": 2,
+        "step": "move",
+        "total_steps": 6
+      },
+      {
+        "seq": 6,
+        "complete": false,
+        "display_step": 3,
+        "step": "defense",
+        "total_steps": 6
+      },
+      {
+        "seq": 8,
+        "complete": false,
+        "display_step": 4,
+        "step": "attack",
+        "total_steps": 6
+      },
+      {
+        "seq": 10,
+        "complete": false,
+        "display_step": 5,
+        "step": "end_turn",
+        "total_steps": 6
+      },
+      {
+        "seq": 13,
+        "complete": false,
+        "display_step": 5,
+        "step": "observe_phases",
+        "total_steps": 6
+      },
+      {
+        "seq": 33,
+        "complete": false,
+        "display_step": 6,
+        "step": "extract",
+        "total_steps": 6
+      },
+      {
+        "seq": 35,
+        "complete": true,
+        "display_step": 6,
+        "step": "complete",
+        "total_steps": 6
+      }
+    ],
+    "agent_decisions": [
+      {
+        "actor": 2,
+        "ap_before": 10,
+        "decision": "melee",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "adjacent hostile",
+        "round": 1,
+        "score": 87.714,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 6,
+        "decision": "melee",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "adjacent hostile",
+        "round": 1,
+        "score": 86.75,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 2,
+        "decision": "approach",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 59.36,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 1,
+        "decision": "approach",
+        "position": {
+          "x": 2,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 58.514,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 10,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 59.041,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 9,
+        "decision": "approach",
+        "position": {
+          "x": 0,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 58.36,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 8,
+        "decision": "grab",
+        "position": {
+          "x": 0,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "recover weapon at current position",
+        "round": 1,
+        "score": 70.055,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 7,
+        "decision": "throw_spear",
+        "position": {
+          "x": 0,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "legal ranged attack",
+        "round": 1,
+        "score": 87.655,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 3,
+        "decision": "approach",
+        "position": {
+          "x": 0,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 59.23,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 2,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 60.415,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 1,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 60.02,
+        "team": 0
+      }
+    ],
+    "decision_histogram": {
+      "melee": 2,
+      "approach": 7,
+      "grab": 1,
+      "throw_spear": 1
+    },
+    "m03_signature_hits": [],
+    "m03_decision_hits": []
+  },
+  "gates": {
+    "runtime_clean": {
+      "ok": true,
+      "required": true,
+      "detail": "0 page errors"
+    },
+    "full_loop": {
+      "ok": true,
+      "required": true,
+      "detail": "SUCCESS; 3 survivors; seed 1167583760"
+    },
+    "idempotence": {
+      "ok": true,
+      "required": true,
+      "detail": "forced reload does not double-apply"
+    },
+    "full_extraction_captured": {
+      "ok": true,
+      "required": true,
+      "detail": "5 actions, 30 events"
+    },
+    "base10_ap_authority": {
+      "ok": true,
+      "required": true,
+      "detail": "no record exceeds 10 AP"
+    },
+    "M01_proving_ground_completes": {
+      "ok": true,
+      "required": true,
+      "detail": "reached step 6/6"
+    },
+    "M03_canonical_rationale_observed": {
+      "ok": false,
+      "required": false,
+      "detail": "11 decisions; none canonical (melee/approach/grab/throw_spear)"
+    }
+  },
+  "findings": [
+    {
+      "severity": "INFO",
+      "module": "M03",
+      "text": "No canonical positional rationale appeared in 11 live decisions; the Proving Ground remains scenario-limited."
+    }
+  ],
+  "screenshots": [
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "strategic-console",
+      "at": "2026-07-29T10:57:44.514Z",
+      "file": "screenshots/01-strategic-console.png",
+      "bytes": 321826,
+      "sha256": "c503b3b000e5799cbbbe11d4b0b6239f807d7deb82af2ac83133d9f49f092849"
+    },
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "tactical-booted",
+      "at": "2026-07-29T10:57:53.959Z",
+      "file": "screenshots/02-tactical-booted.png",
+      "bytes": 196979,
+      "sha256": "0bfbff6d32cfd48ca4cc16965c1538bf01699c9569bdd4a877817bf1de3fa6c7"
+    },
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "tutorial-1-select",
+      "at": "2026-07-29T10:57:56.738Z",
+      "file": "screenshots/03-tutorial-1-select.png",
+      "bytes": 192796,
+      "sha256": "424b03b30977845adb513d47d9c1674743e0ffa7f73d4f2a8058c14ffc885dda"
+    },
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "tutorial-2-move",
+      "at": "2026-07-29T10:57:59.228Z",
+      "file": "screenshots/04-tutorial-2-move.png",
+      "bytes": 197309,
+      "sha256": "8b0231c9beb6e79a2b3262f9253154d776c7cc627fe8c81257fd3a426ed09934"
+    },
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "tutorial-3-defense",
+      "at": "2026-07-29T10:58:02.916Z",
+      "file": "screenshots/05-tutorial-3-defense.png",
+      "bytes": 198388,
+      "sha256": "f2758c560e72ecc332051307fbd1ae996ed41d02d7518223681ad440d76d6b05"
+    },
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "tutorial-4-attack",
+      "at": "2026-07-29T10:58:05.708Z",
+      "file": "screenshots/06-tutorial-4-attack.png",
+      "bytes": 196554,
+      "sha256": "b5f0bc9197a76e9d2528e24c039f6c2a95ab8cdfe14cade0f1b918b1fb57754b"
+    },
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "tutorial-5-endturn",
+      "at": "2026-07-29T10:58:10.941Z",
+      "file": "screenshots/07-tutorial-5-endturn.png",
+      "bytes": 196560,
+      "sha256": "3885cbf9c35681696c1eab75eeab8a2aaddc3f6fe91b427208b5750a29ecbc1a"
+    },
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "post-extract",
+      "at": "2026-07-29T10:58:17.072Z",
+      "file": "screenshots/08-post-extract.png",
+      "bytes": 324727,
+      "sha256": "5d8fcd75df3e06fccf42c185c24bbc5200a30ac74e08426b821ec59822f3feff"
+    },
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "strategic-return",
+      "at": "2026-07-29T10:58:17.656Z",
+      "file": "screenshots/09-strategic-return.png",
+      "bytes": 324652,
+      "sha256": "c7be2b7181695c5e7979872224555fbb0033365908ea174974d0b551d583d0df"
+    },
+    {
+      "run_id": "20260729T105741264Z-6aedeca9",
+      "label": "after-reload",
+      "at": "2026-07-29T10:58:20.870Z",
+      "file": "screenshots/10-after-reload.png",
+      "bytes": 324557,
+      "sha256": "37d5a5cd2891064b6b5f32a3498c15da85bb52e741cc4f123ad2390859afe523"
+    }
+  ],
+  "artifacts": {
+    "extraction": {
+      "file": "extraction.json",
+      "bytes": 7300,
+      "sha256": "ad385c33c8d43014b18eee76aebcb7e8b96c5b890f7ef6eb0024303419cbfc20"
+    }
+  },
+  "server": {
+    "url": "http://127.0.0.1:8781/",
+    "status": 200,
+    "marker": "1",
+    "tactical_pck": {
+      "url": "http://127.0.0.1:8781/tactical/index.pck",
+      "bytes": 263972,
+      "sha256": "ad091f07ed11ecfc56800bb8f0c1668eb72c44698878e8587359bfe7f257b835"
+    }
+  },
+  "finished_at": "2026-07-29T10:58:21.305Z",
+  "failed_gates": [],
+  "result": "PASS"
+}

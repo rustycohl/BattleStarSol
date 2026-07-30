@@ -798,8 +798,13 @@ func _setup_input_map() -> void:
 		"take_cover": [KEY_T],
 		"crouch": [KEY_C],
 		"prone": [KEY_P],
-		"lean_left": [KEY_Q],
-		"lean_right": [KEY_E],
+		# Lean was bound to Q and E, which camera_descend and camera_elevate already
+		# claimed. Nothing consumes the event — Main polls `lean_left` in its input
+		# handler while CameraController independently polls `camera_descend` — so a
+		# single Q press did both: the unit leaned and the camera dropped. Bracket keys
+		# read as lean direction and collide with nothing.
+		"lean_left": [KEY_BRACKETLEFT],
+		"lean_right": [KEY_BRACKETRIGHT],
 		"jump": [KEY_J],
 		"toggle_run": [KEY_M],
 		"toggle_orient": [KEY_N],

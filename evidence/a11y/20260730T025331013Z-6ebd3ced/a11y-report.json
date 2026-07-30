@@ -1,0 +1,866 @@
+{
+  "harness": "gzg.battlestar.a11y-matrix/1.0",
+  "run_id": "20260730T025331013Z-6ebd3ced",
+  "started_at": "2026-07-30T02:53:31.015Z",
+  "scope": {
+    "claims": [
+      "published layout clearance at each supported browser viewport",
+      "resolved reduced-motion preference",
+      "observed keyboard traversal order across the core tactical controls"
+    ],
+    "not_claimed": [
+      "mechanical result, extraction, or reproduction equivalence",
+      "screen-reader or assistive-technology behavior",
+      "browser coverage beyond the resolved Chromium build",
+      "operating-system text scaling"
+    ]
+  },
+  "config": {
+    "base": "http://127.0.0.1:8781/",
+    "callsign": "A11Y-MATRIX",
+    "reduced_motion_viewports": [
+      {
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "width": 1366,
+        "height": 768
+      }
+    ],
+    "max_tab_presses": 12
+  },
+  "browser": {
+    "resolver_source": "PW_CHROMIUM",
+    "headed": false,
+    "version": "150.0.4078.105"
+  },
+  "server": {
+    "url": "http://127.0.0.1:8781/",
+    "status": 200,
+    "marker": "1",
+    "tactical_pck": {
+      "url": "http://127.0.0.1:8781/tactical/index.pck",
+      "bytes": 280024,
+      "sha256": "7f4154e74d47d861de129718a2c93bd67692c2f7d3aa29479c88f1a927b1adf0"
+    }
+  },
+  "cases": [
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "motion": "no-preference",
+      "expectation": "supported",
+      "canvas": {
+        "x": 515,
+        "y": 52,
+        "width": 1172,
+        "height": 659
+      },
+      "reported_viewport": {
+        "h": 659,
+        "w": 1172
+      },
+      "layout": {
+        "action_dock_clearance": 265,
+        "action_dock_height": 16,
+        "action_dock_left": 265,
+        "action_dock_top": 631,
+        "auto_parked": [],
+        "constrained": false,
+        "event_rail_bottom": 617,
+        "event_rail_cramped": false,
+        "event_rail_height": 193,
+        "event_rail_top": 424,
+        "event_rail_visible": true,
+        "status_rail_bottom": 410,
+        "surface_opacity": {
+          "dock": 1,
+          "feed": 1,
+          "status": 1,
+          "tutorial": 1
+        },
+        "tutorial_bottom": 112,
+        "tutorial_clearance": 352,
+        "tutorial_dock_clear": true,
+        "tutorial_left": 352
+      },
+      "accessibility": {
+        "focus_order": [
+          "brace",
+          "take_cover",
+          "toggle_run",
+          "endturn",
+          "evac"
+        ],
+        "focused_control": "",
+        "focused_control_is_core": false,
+        "motion_scale": 1,
+        "reduced_motion": false
+      },
+      "focus_sequence": [],
+      "core_focus_sequence": [],
+      "checks": {
+        "published_layout": true,
+        "tutorial_clears_status_rail": true,
+        "dock_clears_feed_rail": true,
+        "dock_clears_tutorial": true,
+        "layout_resolves": true,
+        "adaptation_matches_declaration": true,
+        "actions_never_auto_parked": true,
+        "motion_preference_resolved": true,
+        "focus_order_observed": false,
+        "keyboard_entry_adopted": false,
+        "traversal_advances": false,
+        "core_controls_reachable": false
+      },
+      "adapted": []
+    },
+    {
+      "viewport": {
+        "width": 1600,
+        "height": 900
+      },
+      "motion": "no-preference",
+      "expectation": "supported",
+      "canvas": {
+        "x": 355,
+        "y": 52,
+        "width": 1172,
+        "height": 659
+      },
+      "reported_viewport": {
+        "h": 659,
+        "w": 1172
+      },
+      "layout": {
+        "action_dock_clearance": 265,
+        "action_dock_height": 16,
+        "action_dock_left": 265,
+        "action_dock_top": 631,
+        "auto_parked": [],
+        "constrained": false,
+        "event_rail_bottom": 617,
+        "event_rail_cramped": false,
+        "event_rail_height": 193,
+        "event_rail_top": 424,
+        "event_rail_visible": true,
+        "status_rail_bottom": 410,
+        "surface_opacity": {
+          "dock": 1,
+          "feed": 1,
+          "status": 1,
+          "tutorial": 1
+        },
+        "tutorial_bottom": 112,
+        "tutorial_clearance": 352,
+        "tutorial_dock_clear": true,
+        "tutorial_left": 352
+      },
+      "accessibility": {
+        "focus_order": [
+          "brace",
+          "take_cover",
+          "toggle_run",
+          "endturn",
+          "evac"
+        ],
+        "focused_control": "",
+        "focused_control_is_core": false,
+        "motion_scale": 1,
+        "reduced_motion": false
+      },
+      "focus_sequence": [],
+      "core_focus_sequence": [],
+      "checks": {
+        "published_layout": true,
+        "tutorial_clears_status_rail": true,
+        "dock_clears_feed_rail": true,
+        "dock_clears_tutorial": true,
+        "layout_resolves": true,
+        "adaptation_matches_declaration": true,
+        "actions_never_auto_parked": true,
+        "motion_preference_resolved": true,
+        "focus_order_observed": false,
+        "keyboard_entry_adopted": false,
+        "traversal_advances": false,
+        "core_controls_reachable": false
+      },
+      "adapted": []
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "motion": "no-preference",
+      "expectation": "supported",
+      "canvas": {
+        "x": 305,
+        "y": 52,
+        "width": 1112,
+        "height": 626
+      },
+      "reported_viewport": {
+        "h": 626,
+        "w": 1112
+      },
+      "layout": {
+        "action_dock_clearance": 265,
+        "action_dock_height": 16,
+        "action_dock_left": 265,
+        "action_dock_top": 598,
+        "auto_parked": [],
+        "constrained": false,
+        "event_rail_bottom": 584,
+        "event_rail_cramped": false,
+        "event_rail_height": 160,
+        "event_rail_top": 424,
+        "event_rail_visible": true,
+        "status_rail_bottom": 410,
+        "surface_opacity": {
+          "dock": 1,
+          "feed": 1,
+          "status": 1,
+          "tutorial": 1
+        },
+        "tutorial_bottom": 112,
+        "tutorial_clearance": 352,
+        "tutorial_dock_clear": true,
+        "tutorial_left": 352
+      },
+      "accessibility": {
+        "focus_order": [
+          "brace",
+          "take_cover",
+          "toggle_run",
+          "endturn",
+          "evac"
+        ],
+        "focused_control": "",
+        "focused_control_is_core": false,
+        "motion_scale": 1,
+        "reduced_motion": false
+      },
+      "focus_sequence": [
+        "brace",
+        "crouch",
+        "prone",
+        "toggle_orient",
+        "take_cover"
+      ],
+      "core_focus_sequence": [
+        "brace",
+        "take_cover"
+      ],
+      "checks": {
+        "published_layout": true,
+        "tutorial_clears_status_rail": true,
+        "dock_clears_feed_rail": true,
+        "dock_clears_tutorial": true,
+        "layout_resolves": true,
+        "adaptation_matches_declaration": true,
+        "actions_never_auto_parked": true,
+        "motion_preference_resolved": true,
+        "focus_order_observed": true,
+        "keyboard_entry_adopted": true,
+        "traversal_advances": true,
+        "core_controls_reachable": true
+      },
+      "adapted": []
+    },
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "motion": "no-preference",
+      "expectation": "supported",
+      "canvas": {
+        "x": 305,
+        "y": 52,
+        "width": 1038,
+        "height": 584
+      },
+      "reported_viewport": {
+        "h": 584,
+        "w": 1038
+      },
+      "layout": {
+        "action_dock_clearance": 265,
+        "action_dock_height": 16,
+        "action_dock_left": 265,
+        "action_dock_top": 556,
+        "auto_parked": [],
+        "constrained": false,
+        "event_rail_bottom": 542,
+        "event_rail_cramped": false,
+        "event_rail_height": 118,
+        "event_rail_top": 424,
+        "event_rail_visible": true,
+        "status_rail_bottom": 410,
+        "surface_opacity": {
+          "dock": 1,
+          "feed": 1,
+          "status": 1,
+          "tutorial": 1
+        },
+        "tutorial_bottom": 112,
+        "tutorial_clearance": 352,
+        "tutorial_dock_clear": true,
+        "tutorial_left": 352
+      },
+      "accessibility": {
+        "focus_order": [
+          "brace",
+          "take_cover",
+          "toggle_run",
+          "endturn",
+          "evac"
+        ],
+        "focused_control": "",
+        "focused_control_is_core": false,
+        "motion_scale": 1,
+        "reduced_motion": false
+      },
+      "focus_sequence": [
+        "brace",
+        "crouch",
+        "prone",
+        "toggle_orient",
+        "take_cover"
+      ],
+      "core_focus_sequence": [
+        "brace",
+        "take_cover"
+      ],
+      "checks": {
+        "published_layout": true,
+        "tutorial_clears_status_rail": true,
+        "dock_clears_feed_rail": true,
+        "dock_clears_tutorial": true,
+        "layout_resolves": true,
+        "adaptation_matches_declaration": true,
+        "actions_never_auto_parked": true,
+        "motion_preference_resolved": true,
+        "focus_order_observed": true,
+        "keyboard_entry_adopted": true,
+        "traversal_advances": true,
+        "core_controls_reachable": true
+      },
+      "adapted": []
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "motion": "no-preference",
+      "expectation": "constrained",
+      "canvas": {
+        "x": 305,
+        "y": 52,
+        "width": 952,
+        "height": 536
+      },
+      "reported_viewport": {
+        "h": 536,
+        "w": 952
+      },
+      "layout": {
+        "action_dock_clearance": 265,
+        "action_dock_height": 16,
+        "action_dock_left": 265,
+        "action_dock_top": 508,
+        "auto_parked": [],
+        "constrained": false,
+        "event_rail_bottom": 494,
+        "event_rail_cramped": true,
+        "event_rail_height": 70,
+        "event_rail_top": 424,
+        "event_rail_visible": true,
+        "status_rail_bottom": 410,
+        "surface_opacity": {
+          "dock": 1,
+          "feed": 1,
+          "status": 1,
+          "tutorial": 1
+        },
+        "tutorial_bottom": 112,
+        "tutorial_clearance": 352,
+        "tutorial_dock_clear": true,
+        "tutorial_left": 352
+      },
+      "accessibility": {
+        "focus_order": [
+          "brace",
+          "take_cover",
+          "toggle_run",
+          "endturn",
+          "evac"
+        ],
+        "focused_control": "",
+        "focused_control_is_core": false,
+        "motion_scale": 1,
+        "reduced_motion": false
+      },
+      "focus_sequence": [
+        "brace",
+        "crouch",
+        "prone",
+        "toggle_orient",
+        "take_cover"
+      ],
+      "core_focus_sequence": [
+        "brace",
+        "take_cover"
+      ],
+      "checks": {
+        "published_layout": true,
+        "tutorial_clears_status_rail": true,
+        "dock_clears_feed_rail": true,
+        "dock_clears_tutorial": true,
+        "layout_resolves": true,
+        "adaptation_matches_declaration": false,
+        "actions_never_auto_parked": true,
+        "motion_preference_resolved": true,
+        "focus_order_observed": true,
+        "keyboard_entry_adopted": true,
+        "traversal_advances": true,
+        "core_controls_reachable": true
+      },
+      "adapted": []
+    },
+    {
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "motion": "no-preference",
+      "expectation": "constrained",
+      "canvas": {
+        "x": 305,
+        "y": 52,
+        "width": 696,
+        "height": 420
+      },
+      "reported_viewport": {
+        "h": 420,
+        "w": 696
+      },
+      "layout": {
+        "action_dock_clearance": 46,
+        "action_dock_height": 16,
+        "action_dock_left": 111.36,
+        "action_dock_top": 392,
+        "auto_parked": [
+          "feed"
+        ],
+        "constrained": false,
+        "event_rail_bottom": 378,
+        "event_rail_cramped": false,
+        "event_rail_height": -46,
+        "event_rail_top": 424,
+        "event_rail_visible": true,
+        "status_rail_bottom": 410,
+        "surface_opacity": {
+          "dock": 1,
+          "feed": 1,
+          "status": 1,
+          "tutorial": 1
+        },
+        "tutorial_bottom": 112,
+        "tutorial_clearance": 352,
+        "tutorial_dock_clear": true,
+        "tutorial_left": 352
+      },
+      "accessibility": {
+        "focus_order": [
+          "brace",
+          "take_cover",
+          "toggle_run",
+          "endturn",
+          "evac"
+        ],
+        "focused_control": "",
+        "focused_control_is_core": false,
+        "motion_scale": 1,
+        "reduced_motion": false
+      },
+      "focus_sequence": [
+        "brace",
+        "crouch",
+        "prone",
+        "toggle_orient",
+        "take_cover"
+      ],
+      "core_focus_sequence": [
+        "brace",
+        "take_cover"
+      ],
+      "checks": {
+        "published_layout": true,
+        "tutorial_clears_status_rail": true,
+        "dock_clears_feed_rail": true,
+        "dock_clears_tutorial": true,
+        "layout_resolves": true,
+        "adaptation_matches_declaration": true,
+        "actions_never_auto_parked": true,
+        "motion_preference_resolved": true,
+        "focus_order_observed": true,
+        "keyboard_entry_adopted": true,
+        "traversal_advances": true,
+        "core_controls_reachable": true
+      },
+      "adapted": [
+        "feed"
+      ]
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "motion": "no-preference",
+      "expectation": "constrained",
+      "canvas": {
+        "x": 17,
+        "y": 468,
+        "width": 734,
+        "height": 413
+      },
+      "reported_viewport": {
+        "h": 413,
+        "w": 734
+      },
+      "layout": {
+        "action_dock_clearance": 46,
+        "action_dock_height": 16,
+        "action_dock_left": 117.44,
+        "action_dock_top": 385,
+        "auto_parked": [
+          "feed"
+        ],
+        "constrained": false,
+        "event_rail_bottom": 371,
+        "event_rail_cramped": false,
+        "event_rail_height": -53,
+        "event_rail_top": 424,
+        "event_rail_visible": true,
+        "status_rail_bottom": 410,
+        "surface_opacity": {
+          "dock": 1,
+          "feed": 1,
+          "status": 1,
+          "tutorial": 1
+        },
+        "tutorial_bottom": 112,
+        "tutorial_clearance": 352,
+        "tutorial_dock_clear": true,
+        "tutorial_left": 352
+      },
+      "accessibility": {
+        "focus_order": [
+          "brace",
+          "take_cover",
+          "toggle_run",
+          "endturn",
+          "evac"
+        ],
+        "focused_control": "",
+        "focused_control_is_core": false,
+        "motion_scale": 1,
+        "reduced_motion": false
+      },
+      "focus_sequence": [
+        "brace",
+        "crouch",
+        "prone",
+        "toggle_orient",
+        "take_cover"
+      ],
+      "core_focus_sequence": [
+        "brace",
+        "take_cover"
+      ],
+      "checks": {
+        "published_layout": true,
+        "tutorial_clears_status_rail": true,
+        "dock_clears_feed_rail": true,
+        "dock_clears_tutorial": true,
+        "layout_resolves": true,
+        "adaptation_matches_declaration": true,
+        "actions_never_auto_parked": true,
+        "motion_preference_resolved": true,
+        "focus_order_observed": true,
+        "keyboard_entry_adopted": true,
+        "traversal_advances": true,
+        "core_controls_reachable": true
+      },
+      "adapted": [
+        "feed"
+      ]
+    },
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "motion": "reduce",
+      "expectation": "supported",
+      "canvas": {
+        "x": 515,
+        "y": 52,
+        "width": 1172,
+        "height": 659
+      },
+      "reported_viewport": {
+        "h": 659,
+        "w": 1172
+      },
+      "layout": {
+        "action_dock_clearance": 265,
+        "action_dock_height": 16,
+        "action_dock_left": 265,
+        "action_dock_top": 631,
+        "auto_parked": [],
+        "constrained": false,
+        "event_rail_bottom": 617,
+        "event_rail_cramped": false,
+        "event_rail_height": 193,
+        "event_rail_top": 424,
+        "event_rail_visible": true,
+        "status_rail_bottom": 410,
+        "surface_opacity": {
+          "dock": 1,
+          "feed": 1,
+          "status": 1,
+          "tutorial": 1
+        },
+        "tutorial_bottom": 112,
+        "tutorial_clearance": 352,
+        "tutorial_dock_clear": true,
+        "tutorial_left": 352
+      },
+      "accessibility": {
+        "focus_order": [
+          "brace",
+          "take_cover",
+          "toggle_run",
+          "endturn",
+          "evac"
+        ],
+        "focused_control": "",
+        "focused_control_is_core": false,
+        "motion_scale": 0,
+        "reduced_motion": true
+      },
+      "focus_sequence": [],
+      "core_focus_sequence": [],
+      "checks": {
+        "published_layout": true,
+        "tutorial_clears_status_rail": true,
+        "dock_clears_feed_rail": true,
+        "dock_clears_tutorial": true,
+        "layout_resolves": true,
+        "adaptation_matches_declaration": true,
+        "actions_never_auto_parked": true,
+        "motion_preference_resolved": true,
+        "focus_order_observed": false,
+        "keyboard_entry_adopted": false,
+        "traversal_advances": false,
+        "core_controls_reachable": false
+      },
+      "adapted": []
+    },
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "motion": "reduce",
+      "expectation": "supported",
+      "canvas": {
+        "x": 305,
+        "y": 52,
+        "width": 1038,
+        "height": 584
+      },
+      "reported_viewport": {
+        "h": 584,
+        "w": 1038
+      },
+      "layout": {
+        "action_dock_clearance": 265,
+        "action_dock_height": 16,
+        "action_dock_left": 265,
+        "action_dock_top": 556,
+        "auto_parked": [],
+        "constrained": false,
+        "event_rail_bottom": 542,
+        "event_rail_cramped": false,
+        "event_rail_height": 118,
+        "event_rail_top": 424,
+        "event_rail_visible": true,
+        "status_rail_bottom": 410,
+        "surface_opacity": {
+          "dock": 1,
+          "feed": 1,
+          "status": 1,
+          "tutorial": 1
+        },
+        "tutorial_bottom": 112,
+        "tutorial_clearance": 352,
+        "tutorial_dock_clear": true,
+        "tutorial_left": 352
+      },
+      "accessibility": {
+        "focus_order": [
+          "brace",
+          "take_cover",
+          "toggle_run",
+          "endturn",
+          "evac"
+        ],
+        "focused_control": "",
+        "focused_control_is_core": false,
+        "motion_scale": 0,
+        "reduced_motion": true
+      },
+      "focus_sequence": [
+        "brace",
+        "crouch",
+        "prone",
+        "toggle_orient",
+        "take_cover"
+      ],
+      "core_focus_sequence": [
+        "brace",
+        "take_cover"
+      ],
+      "checks": {
+        "published_layout": true,
+        "tutorial_clears_status_rail": true,
+        "dock_clears_feed_rail": true,
+        "dock_clears_tutorial": true,
+        "layout_resolves": true,
+        "adaptation_matches_declaration": true,
+        "actions_never_auto_parked": true,
+        "motion_preference_resolved": true,
+        "focus_order_observed": true,
+        "keyboard_entry_adopted": true,
+        "traversal_advances": true,
+        "core_controls_reachable": true
+      },
+      "adapted": []
+    }
+  ],
+  "gates": {
+    "supported viewport rail and tutorial clearance": {
+      "ok": true,
+      "required": true,
+      "detail": "9/9 cases published a layout"
+    },
+    "every window resolves to a usable layout": {
+      "ok": true,
+      "required": true,
+      "detail": "no window reports a constrained layout once the HUD adapts"
+    },
+    "adaptation matches the declared boundary": {
+      "ok": false,
+      "required": true,
+      "detail": "supported windows adapt nothing; short windows park the tactical feed"
+    },
+    "actions and instructions are never auto-parked": {
+      "ok": true,
+      "required": true,
+      "detail": "only the tactical feed may be parked automatically"
+    },
+    "reduced-motion preference resolved": {
+      "ok": true,
+      "required": true,
+      "detail": "the game resolved the host preference for every evaluated case"
+    },
+    "Tab enters the tactical HUD from the canvas": {
+      "ok": false,
+      "required": true,
+      "detail": "6/9 cases entered at a declared core control"
+    },
+    "keyboard traversal keeps advancing through the action dock": {
+      "ok": false,
+      "required": true,
+      "detail": "6/9 cases reached three or more distinct controls"
+    }
+  },
+  "findings": [],
+  "screenshots": [
+    {
+      "run_id": "20260730T025331013Z-6ebd3ced",
+      "name": "1920x1080-no-preference",
+      "file": "screenshots/01-1920x1080-no-preference.png",
+      "bytes": 151194,
+      "sha256": "7354a18fc47fe2f1bbc667f7a9c05a6360fa3d55fcc28c06242a98fc8ef3f8f4"
+    },
+    {
+      "run_id": "20260730T025331013Z-6ebd3ced",
+      "name": "1600x900-no-preference",
+      "file": "screenshots/02-1600x900-no-preference.png",
+      "bytes": 112051,
+      "sha256": "17da8649147c83ecd66b4843f60ea95cc90eccd933ea9ae651ba6c4ed1ac922e"
+    },
+    {
+      "run_id": "20260730T025331013Z-6ebd3ced",
+      "name": "1440x900-no-preference",
+      "file": "screenshots/03-1440x900-no-preference.png",
+      "bytes": 192349,
+      "sha256": "82b5c82696a444ca088a8c35358220d72aaa51267760320530fa68cb14f6b2b9"
+    },
+    {
+      "run_id": "20260730T025331013Z-6ebd3ced",
+      "name": "1366x768-no-preference",
+      "file": "screenshots/04-1366x768-no-preference.png",
+      "bytes": 180246,
+      "sha256": "e0d7ab9d72dbb37833f6925a5d424fd9446e2a7e0abbb0c173f7e43dfff773cb"
+    },
+    {
+      "run_id": "20260730T025331013Z-6ebd3ced",
+      "name": "1280x800-no-preference",
+      "file": "screenshots/05-1280x800-no-preference.png",
+      "bytes": 173794,
+      "sha256": "911e1c68e948d082295bec91ca9a8931a29ce9b3e4ff88dedd56437749df4a95"
+    },
+    {
+      "run_id": "20260730T025331013Z-6ebd3ced",
+      "name": "1024x768-no-preference",
+      "file": "screenshots/06-1024x768-no-preference.png",
+      "bytes": 148339,
+      "sha256": "3d91bbe6888c42bb7daff739d1d12b53ee6bdb552d6354e56473918eecce7db0"
+    },
+    {
+      "run_id": "20260730T025331013Z-6ebd3ced",
+      "name": "768x1024-no-preference",
+      "file": "screenshots/07-768x1024-no-preference.png",
+      "bytes": 153490,
+      "sha256": "4a57d0c3d47f73958e1a829fc60d3c1bea9a9a901029950d4dd354fef88065d7"
+    },
+    {
+      "run_id": "20260730T025331013Z-6ebd3ced",
+      "name": "1920x1080-reduce",
+      "file": "screenshots/08-1920x1080-reduce.png",
+      "bytes": 151194,
+      "sha256": "7354a18fc47fe2f1bbc667f7a9c05a6360fa3d55fcc28c06242a98fc8ef3f8f4"
+    },
+    {
+      "run_id": "20260730T025331013Z-6ebd3ced",
+      "name": "1366x768-reduce",
+      "file": "screenshots/09-1366x768-reduce.png",
+      "bytes": 180235,
+      "sha256": "6742f68907f4d270c41fd4cd81bc6821e078a46479a66c2567f478267badcd0e"
+    }
+  ],
+  "artifacts": {},
+  "finished_at": "2026-07-30T02:55:31.459Z",
+  "result": "FAIL"
+}

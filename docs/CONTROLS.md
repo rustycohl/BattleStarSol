@@ -75,7 +75,8 @@ canceling any targeting mode.
 | T | take or leave cover |
 | C | crouch |
 | P | prone |
-| Q / E | lean left/right when contextual; also camera elevation controls |
+| `[` / `]` | lean left/right when in cover |
+| Q / E | camera descend/elevate |
 | J | jump |
 | M | toggle run/sprint |
 | N | toggle facing/orientation |

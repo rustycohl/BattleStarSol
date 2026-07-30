@@ -1,0 +1,338 @@
+{
+  "harness": "gzg.battlestar.m03-standoff/1.0",
+  "run_id": "20260730T023049023Z-cc3d715e",
+  "started_at": "2026-07-30T02:30:49.025Z",
+  "scope": {
+    "claims": [
+      "an armed hostile scenario reachable through the ordinary deployment path",
+      "canonical cover or flank rationale present in the game's own extraction ledger",
+      "decision, position, AP, and score recorded by the game for each agent choice"
+    ],
+    "not_claimed": [
+      "guided-mode cover_faces publication, which M01 deliberately bounds to the tutorial",
+      "any change to production AI, scenario generation, or the observation surface",
+      "reproduction-bundle or cross-platform state equivalence"
+    ]
+  },
+  "config": {
+    "base": "http://127.0.0.1:8781/",
+    "callsign": "HAILI-GUIDED",
+    "rounds": 8
+  },
+  "browser": {
+    "resolver_source": "PW_CHROMIUM",
+    "headed": false,
+    "version": "150.0.4078.105"
+  },
+  "server": {
+    "url": "http://127.0.0.1:8781/",
+    "status": 200,
+    "marker": "1",
+    "tactical_pck": {
+      "url": "http://127.0.0.1:8781/tactical/index.pck",
+      "bytes": 278312,
+      "sha256": "11cf0e013e49231f86f496d34a1dbf4dccdfa86005adbaa105e8701d17d0c796"
+    }
+  },
+  "deployment": {
+    "gzg": "galaxy-message",
+    "version": "1.0",
+    "id": "battlestar:1167583760:1",
+    "type": "battlestar.deploy",
+    "source": {
+      "galaxy": "BattleStarSol",
+      "version": "0.1.1-prealpha.1",
+      "instance": "browser-local"
+    },
+    "target": {
+      "galaxy": "xCommand",
+      "capability": "tactical.deploy"
+    },
+    "created_at": "2026-07-30T02:30:55.194Z",
+    "payload": {
+      "schema": "gzg.battlestar.deploy/1.0",
+      "deploy": {
+        "type": "deploy",
+        "payload_contract_version": "1.0",
+        "generator_version": 1,
+        "rules_version": "alpha-1",
+        "sector": "Proving Ground",
+        "faction": "HAD // HEAVY ARMOR DIVISION",
+        "seed": 1167583760,
+        "atlas_state": "#%7B%22fps%22%3A15%2C%22mode%22%3A%22satellite%22%2C%22speed%22%3A0%2C%22layers%22%3A%5B%22dc%22%2C%22ixp%22%2C%22crisis%22%5D%2C%22cam%22%3A%7B%22x%22%3A0%2C%22y%22%3A10%2C%22z%22%3A22%2C%22tx%22%3A0%2C%22ty%22%3A0%2C%22tz%22%3A0%7D%7D",
+        "squad": [
+          {
+            "name": "HAILI-GUIDED",
+            "cls": "Heavy"
+          },
+          {
+            "name": "SCOUT-3",
+            "cls": "Recon"
+          },
+          {
+            "name": "MEDIC-2",
+            "cls": "Support"
+          }
+        ],
+        "objectives": [
+          "Select the Commander",
+          "Move and practice defense",
+          "Complete a basic attack",
+          "End turn and observe the phases",
+          "Extract to strategy"
+        ],
+        "map": {
+          "target": {
+            "type": "coordinate",
+            "name": "Proving Ground",
+            "latitude": 34.0522,
+            "longitude": -118.2437
+          }
+        },
+        "resources": {
+          "neural": 50,
+          "capital": 25000,
+          "alloys": 100
+        }
+      }
+    }
+  },
+  "steps": [
+    {
+      "name": "served tactical package identified",
+      "ok": true,
+      "detail": "278312 bytes sha256:11cf0e013e49231f86f496d34a1dbf4dccdfa86005adbaa105e8701d17d0c796",
+      "at": "2026-07-30T02:30:49.056Z"
+    },
+    {
+      "name": "deployment targets the guided Proving Ground",
+      "ok": true,
+      "detail": "sector=Proving Ground seed=1167583760",
+      "at": "2026-07-30T02:30:55.381Z"
+    },
+    {
+      "name": "godot tactical runtime booted",
+      "ok": true,
+      "detail": "5.3s",
+      "at": "2026-07-30T02:31:00.755Z"
+    },
+    {
+      "name": "free rounds played",
+      "ok": true,
+      "detail": "8 rounds",
+      "at": "2026-07-30T02:31:50.126Z"
+    },
+    {
+      "name": "one full extraction ledger captured",
+      "ok": true,
+      "detail": "31780 bytes",
+      "at": "2026-07-30T02:31:55.971Z"
+    }
+  ],
+  "gates": {
+    "guided scenario reached with an agent able to act": {
+      "ok": true,
+      "required": true,
+      "detail": "sector=Proving Ground decisions=89"
+    },
+    "canonical positional rationale present in the live ledger": {
+      "ok": true,
+      "required": true,
+      "detail": "cover=[protective cover now, lean from committed cover, cover has no legal attack lane] flank=[simple flank]"
+    },
+    "positional decisions carry decision, position, AP, and score": {
+      "ok": true,
+      "required": true,
+      "detail": "7/7 complete records"
+    },
+    "flank rationale observed": {
+      "ok": true,
+      "required": false,
+      "detail": "geometry-dependent; cover alone still closes the required gate"
+    },
+    "observation surface publishes movement, cover faces, and attack targets": {
+      "ok": false,
+      "required": true,
+      "detail": "9 samples: move=9 cover=0 attack=6"
+    }
+  },
+  "observations": {
+    "mission": {
+      "sector": "Proving Ground",
+      "seed": 1167583760,
+      "faction": "HAD // HEAVY ARMOR DIVISION"
+    },
+    "surface": {
+      "samples": 9,
+      "with_move": 9,
+      "with_cover": 0,
+      "with_attack": 6,
+      "best": null
+    },
+    "m03": {
+      "decisions_recorded": 89,
+      "cover_signature_hits": [
+        "protective cover now",
+        "lean from committed cover",
+        "cover has no legal attack lane"
+      ],
+      "flank_signature_hits": [
+        "simple flank"
+      ],
+      "positional_decision_hits": [
+        "take_cover",
+        "flank"
+      ],
+      "positional_decisions": 7,
+      "first_positional_round": 3,
+      "sample": [
+        {
+          "round": 3,
+          "team": 0,
+          "decision": "flank",
+          "rationale": "simple flank 2 AP; cover 0→0; exposure 1→1; retain 5 AP",
+          "score": 91,
+          "ap_before": 7,
+          "position": {
+            "x": 0,
+            "y": 8,
+            "z": 1
+          }
+        },
+        {
+          "round": 3,
+          "team": 0,
+          "decision": "flank",
+          "rationale": "simple flank 1 AP; cover 0→0; exposure 0→1; retain 5 AP",
+          "score": 92,
+          "ap_before": 6,
+          "position": {
+            "x": 0,
+            "y": 7,
+            "z": 1
+          }
+        },
+        {
+          "round": 7,
+          "team": 0,
+          "decision": "flank",
+          "rationale": "simple flank 3 AP; cover 1→1; exposure 0→0; retain 7 AP",
+          "score": 91,
+          "ap_before": 10,
+          "position": {
+            "x": 3,
+            "y": 7,
+            "z": 2
+          }
+        },
+        {
+          "round": 7,
+          "team": 0,
+          "decision": "flank",
+          "rationale": "simple flank 1 AP; cover 1→1; exposure 0→0; retain 7 AP",
+          "score": 93,
+          "ap_before": 8,
+          "position": {
+            "x": 3,
+            "y": 6,
+            "z": 1
+          }
+        },
+        {
+          "round": 7,
+          "team": 0,
+          "decision": "take_cover",
+          "rationale": "protective cover now; retain 6 AP for offense",
+          "score": 94,
+          "ap_before": 7,
+          "position": {
+            "x": 3,
+            "y": 5,
+            "z": 1
+          }
+        },
+        {
+          "round": 8,
+          "team": 0,
+          "decision": "lean_cover",
+          "rationale": "lean from committed cover; retain 9 AP for fire",
+          "score": 96,
+          "ap_before": 10,
+          "position": {
+            "x": 3,
+            "y": 5,
+            "z": 1
+          }
+        }
+      ]
+    },
+    "outcome": {
+      "outcome": "SUCCESS",
+      "survivors": 2,
+      "seed": 1167583760,
+      "actions": 9,
+      "events": 148
+    }
+  },
+  "findings": [],
+  "screenshots": [
+    {
+      "run_id": "20260730T023049023Z-cc3d715e",
+      "name": "strategic-console",
+      "file": "screenshots/01-strategic-console.png",
+      "bytes": 321639,
+      "sha256": "f3bf779981ea0d526009c3e0f85ccf90387421cc4415509572f5ee923abd8c39"
+    },
+    {
+      "run_id": "20260730T023049023Z-cc3d715e",
+      "name": "tactical-booted",
+      "file": "screenshots/02-tactical-booted.png",
+      "bytes": 194328,
+      "sha256": "24d9ee4ca86658df9ef863cfc148269bcbb96085a510a1372315b3652576390c"
+    },
+    {
+      "run_id": "20260730T023049023Z-cc3d715e",
+      "name": "round-01",
+      "file": "screenshots/03-round-01.png",
+      "bytes": 189513,
+      "sha256": "c899aba9189eb6fb6ed3a9b16430106e4485c0656c32eddb5219e51ecc896002"
+    },
+    {
+      "run_id": "20260730T023049023Z-cc3d715e",
+      "name": "round-03",
+      "file": "screenshots/04-round-03.png",
+      "bytes": 187641,
+      "sha256": "ceff7b5a9ae7a90cbcc92cf59da597d2f7fb530fa659b00621b72e6cfba059c5"
+    },
+    {
+      "run_id": "20260730T023049023Z-cc3d715e",
+      "name": "round-06",
+      "file": "screenshots/05-round-06.png",
+      "bytes": 184884,
+      "sha256": "abf813b2ecf06228e60b0026e31c743f403a1216ee1a8bf613e77a23c697f03a"
+    },
+    {
+      "run_id": "20260730T023049023Z-cc3d715e",
+      "name": "round-08",
+      "file": "screenshots/06-round-08.png",
+      "bytes": 182464,
+      "sha256": "6aea40995c481f00b4bd86072367b767007f3571fbd7eb78241b86b562cc970b"
+    },
+    {
+      "run_id": "20260730T023049023Z-cc3d715e",
+      "name": "post-extract",
+      "file": "screenshots/07-post-extract.png",
+      "bytes": 323802,
+      "sha256": "23936b253981068d4264c5543695389b6479344cefdfc35fbca04f33cfaf0f52"
+    }
+  ],
+  "artifacts": {
+    "extraction": {
+      "file": "extraction.json",
+      "bytes": 31796,
+      "sha256": "0cebfa489922956c73d06109cb43464554908465117428afa275435bf703ed31"
+    }
+  },
+  "finished_at": "2026-07-30T02:31:55.973Z",
+  "result": "FAIL"
+}

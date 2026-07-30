@@ -30,6 +30,7 @@ func _run() -> void:
 	_test_web_contract()
 	await _test_main_scene()
 	await _test_scene_cover_is_material()
+	await _test_specials_stay_visible_in_god_mode()
 	await _test_multi_round_cycle()
 	await _test_strategic_scene()
 	if failures.is_empty():
@@ -251,6 +252,103 @@ func _test_scene_cover_is_material() -> void:
 			int(sc.get("density", 0)) == int(World.material_cell(Config.COVER, 3).get("density", -1)),
 			"standoff lane cover density diverges from the shared material model"
 		)
+
+	main.free()
+
+## A special the unit possesses stays on screen and explains itself. It is never hidden for
+## failing its own precondition.
+##
+## This is the control for a defect found by hand in playtest rather than by any test: the
+## Wall Run button was reported "just missing" in dev mode. `update_ui` set
+## `visible = dev_god_mode` for the specials and then, twenty lines later, overwrote it with
+## `visible = wall_running or not runnable_walls.is_empty()`. With no qualifying wall adjacent
+## — most of the time — the button vanished, taking its tooltip with it. The tooltip is the
+## only place the requirement is written down, so the mechanic became undiscoverable and the
+## God Mode toggle looked like it did nothing.
+##
+## Two separate assertions, because they fail for different reasons:
+##   1. availability comes from `Main._special_enabled` — the same authority the action router
+##      uses — so it cannot drift from what is actually permitted;
+##   2. an unmet precondition disables and annotates, never hides.
+func _test_specials_stay_visible_in_god_mode() -> void:
+	var packed := load("res://Main.tscn") as PackedScene
+	_expect(packed != null, "Main.tscn did not load for the specials check")
+	if packed == null:
+		return
+	var main := packed.instantiate()
+	root.add_child(main)
+	await process_frame
+	await process_frame
+	if not main.has_method("_special_enabled"):
+		_expect(false, "Main.gd did not load for the specials check")
+		main.free()
+		return
+
+	var pilot = main._active_human_pilot()
+	_expect(pilot != null, "no human pilot to check specials against")
+	if pilot == null:
+		main.free()
+		return
+	main.selected = pilot
+	var ui = main.tactical_ui
+	_expect(ui != null, "TacticalUI was not constructed")
+	if ui == null:
+		main.free()
+		return
+
+	# God Mode off: with no skill token, nothing is claimed and nothing is shown.
+	main.dev_god_mode = false
+	ui.update_ui()
+	for special_name in ui.SPECIAL_ACTIONS:
+		if not ui.action_btns.has(special_name):
+			continue
+		_expect(
+			not main._special_enabled(pilot, special_name),
+			"%s is enabled with God Mode off and no skill token" % special_name
+		)
+		_expect(
+			not ui.action_btns[special_name].visible,
+			"%s is visible while the authority says the unit does not have it" % special_name
+		)
+
+	# God Mode on: every special the authority grants is on screen, whatever the situation.
+	main.dev_god_mode = true
+	ui.update_ui()
+	var checked := 0
+	for special_name in ui.SPECIAL_ACTIONS:
+		if not ui.action_btns.has(special_name):
+			continue
+		checked += 1
+		var btn: Button = ui.action_btns[special_name]
+		_expect(
+			main._special_enabled(pilot, special_name),
+			"God Mode did not grant %s" % special_name
+		)
+		_expect(
+			btn.visible,
+			"%s is hidden in God Mode -- a special the unit has must be shown, disabled if its precondition is unmet, never hidden" % special_name
+		)
+		# A disabled special must say why, or the requirement is undiscoverable.
+		if btn.disabled:
+			_expect(
+				btn.tooltip_text.contains("Unavailable right now:"),
+				"%s is disabled without stating a reason" % special_name
+			)
+
+	_expect(checked >= 3, "fewer specials were checked than expected (%d)" % checked)
+
+	# The specific case from playtest: standing still on open ground, Wall Run has no
+	# qualifying wall and no momentum, so it must be visible-and-disabled.
+	if ui.action_btns.has("wall_run"):
+		var wall_btn: Button = ui.action_btns["wall_run"]
+		var walls: Array[Vector2i] = main.wall_run_options(pilot)
+		if walls.is_empty() and not Maneuvers.is_wall_running(pilot.maneuver):
+			_expect(wall_btn.visible, "Wall Run vanished with no wall available instead of greying out")
+			_expect(wall_btn.disabled, "Wall Run is enabled with no wall available and no momentum")
+			_expect(
+				wall_btn.tooltip_text.contains("momentum"),
+				"Wall Run's disabled tooltip does not state the momentum requirement"
+			)
 
 	main.free()
 
@@ -1649,6 +1747,33 @@ func _test_main_scene() -> void:
 		and InputMap.action_get_events("toggle_legend").size() > 0,
 		"the tactical help overlay lost its keyboard binding"
 	)
+	# No physical key may drive two different actions. The Tab check above was the only
+	# key invariant that existed, and it guarded exactly one key; meanwhile `lean_left`
+	# and `camera_descend` both held Q, and `lean_right` and `camera_elevate` both held E.
+	# Nothing consumes the event -- Main polls the lean actions in its input handler while
+	# CameraController independently polls the camera actions -- so one Q press leaned the
+	# unit *and* dropped the camera, silently, whenever the unit was in cover.
+	#
+	# An action may carry several keys. A key may not carry several actions.
+	var key_owner := {}
+	for bound_action in InputMap.get_actions():
+		var bound_name := String(bound_action)
+		if bound_name.begins_with("ui_"):
+			continue
+		for bound_event in InputMap.action_get_events(bound_name):
+			if not (bound_event is InputEventKey):
+				continue
+			var code: int = (bound_event as InputEventKey).keycode
+			if key_owner.has(code):
+				_expect(
+					false,
+					"key %s drives both '%s' and '%s' -- neither consumes the event, so both fire" % [
+						OS.get_keycode_string(code), String(key_owner[code]), bound_name
+					]
+				)
+			else:
+				key_owner[code] = bound_name
+	_expect(key_owner.size() >= 20, "the input map looks unexpectedly small (%d keys)" % key_owner.size())
 	# Live keyboard traversal must be observable, not inferred.
 	_expect(
 		String(main.tactical_ui.focused_control_key).is_empty(),
