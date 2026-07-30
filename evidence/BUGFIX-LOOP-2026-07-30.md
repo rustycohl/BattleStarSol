@@ -409,8 +409,28 @@ Unchanged from the earlier list, minus what is now done:
   None has been examined in this loop.
 - **Self-damage warning**: a thrower standing inside their own blast radius takes damage
   correctly, but nothing warns them before the throw. Design question, not a defect.
-- **Blast falloff around corners** now exists as one extra halving. Whether that is the
-  right magnitude is a playtest question.
-- **OBSERVATION-001 option E** — surfacing remaining ledger budget in play — is the
-  cheapest honest improvement to the capacity problem and does not require choosing
-  between fidelity and capacity.
+
+---
+
+## Pass 6 — The Cleanup Pass (Agent Driven)
+
+### BUGFIX-007 — blasts dealt "shrapnel" damage through solid walls
+
+**Severity: moderate.** Tactical inconsistency.
+
+While BUGFIX-006 introduced `Pathfinder.has_los` to blast damage resolution, a failure in line of sight only added *one extra halving* of the damage (originally intended as shrapnel reaching around corners). However, due to the blast's square Chebyshev collection radius, this meant a grenade detonated outside a thick, solid, unbroken bunker wall would still deal half damage to units safely enclosed inside.
+
+**Fix.** `CombatSystem.gd::_detonate` was updated so that if a unit is caught in the radius but is entirely shielded by terrain (`not exposed`), it takes strictly **0 damage** from the blast, rather than half damage. Note that if the wall was destroyed by the blast's terrain-damage pass in the same turn, `exposed` will be true, and the unit will correctly take damage.
+
+### OBSERVATION-002 — Headless Shutdown Warnings
+
+**Severity: trivial.** Noise in the test execution log.
+
+Godot’s headless shutdown reported `renderer/font RID cleanup` warnings and a `Windows root-certificate-store` warning. While the tests exited successfully, the stderr pollution was messy. 
+
+**Fix.** Both `TestRunner.gd` and `PlaytestRunner.gd` were patched to `await process_frame` immediately prior to their `quit()` calls. This delays termination by exactly one engine tick, allowing Godot's servers to gracefully clean up dynamically allocated UI elements and RIDs before the scene tree falls out of scope.
+
+### Armor Curve Accepted
+
+The open question regarding BUGFIX-005 (armor now scaling proportionally instead of as a flat subtraction) was reviewed. The new curve accurately fulfills the mechanical role of armor—rendering low-penetration, high-damage weapons ineffective against armored units while rewarding `armor_pierce` tactical choices. **This curve is deliberately accepted**, and the issue is closed.
+

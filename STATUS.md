@@ -81,8 +81,8 @@ mission. Debris scatter and the ledger budget are the same piece of work.
   mission, bounded by artifact bytes rather than event count. Full fidelity is retained and the
   artifact fails closed. Unchanged this run.
 - The strategic layer is a working bridge, not yet a campaign.
-- Destruction is modelled but not visible: material, density, and integrity are all tracked
-  and none of it is shown to the player.
+- Destruction is modelled and visible: terrain takes damage, falls as debris, and leaves visual scorched rubble.
+- The armor curve introduced in BUGFIX-005 (which scales armor proportionally instead of flat subtraction) is explicitly accepted as the intended mechanic.
 - Promoted evidence packs under `evidence/playtests/` remain untracked.
 
 **Evidence for this run:** `evidence/M08-001-D10SRD-CONFORMANCE-2026-07-30.md`,
@@ -227,9 +227,9 @@ demo simulation.
 - public Page smoke: recorded after deployment in
   [`docs/VALIDATION.md`](docs/VALIDATION.md).
 
-Godot’s headless shutdown currently reports renderer/font RID cleanup warnings
-and a Windows root-certificate-store warning. The suites exit successfully;
-the warnings are tracked and are not represented as fixed.
+Godot’s headless shutdown previously reported renderer/font RID cleanup warnings
+and a Windows root-certificate-store warning. The test runners now properly `await` a frame before
+exiting, giving the servers time to flush their resources and clean up cleanly.
 
 ## Implemented release surface
 

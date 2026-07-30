@@ -48,10 +48,12 @@ func _run() -> void:
 		)
 	if failures.is_empty():
 		print("PASS: Battle/Star.SOL headless tests, %d checks" % checks)
+		await process_frame
 		quit(0)
 	else:
 		for failure in failures:
 			push_error("FAIL: " + failure)
+		await process_frame
 		quit(1)
 
 ## Every assertion is counted. A test that dies mid-way -- a runtime error abandons the rest

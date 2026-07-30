@@ -222,11 +222,12 @@ func _detonate(attacker: Unit, centre: Vector2i, kind: String, dmg: int, radius:
 			int(main.cells.get(centre, {}).get("z", 0)),
 			int(unit.z)
 		)
+		var blast_damage := 0
 		if not exposed:
-			steps += 1.0
 			shielded += 1
-		var blast_damage := maxi(int(round(float(dmg) / pow(2.0, steps))), 1)
-		total_dealt += apply_damage(unit, blast_damage, true, centre, kind, attacker)
+		else:
+			blast_damage = maxi(int(round(float(dmg) / pow(2.0, steps))), 1)
+			total_dealt += apply_damage(unit, blast_damage, true, centre, kind, attacker)
 
 	_resolving_blast = false
 	GameState.record_event("blast_resolved", {

@@ -44,11 +44,13 @@ func _run() -> void:
 	var elapsed = Time.get_ticks_msec() - started_ms
 	if failures.is_empty():
 		print("PASS: PlaytestRunner %d checks in %d ms" % [passed, elapsed])
+		await process_frame
 		quit(0)
 	else:
 		print("FAIL: PlaytestRunner %d passed, %d failed in %d ms" % [passed, failures.size(), elapsed])
 		for failure in failures:
 			push_error("FAIL: " + failure)
+		await process_frame
 		quit(1)
 
 func _expect(condition: bool, message: String) -> void:
