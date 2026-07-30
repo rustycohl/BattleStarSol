@@ -4,7 +4,7 @@
   "source": {
     "authority": "tools/repro-bundle.mjs",
     "constants": ["MAX_EVENTS", "MAX_REPRO_BYTES"],
-    "note": "The reproduction artifact's caps live in the Node bundler, which the Godot runtime cannot import. This file is the res://-readable view of them, not a second authority. tests/repro-budget.test.mjs asserts these values equal the exported constants, so the two cannot drift."
+    "note": "The reproduction artifact's caps live in the Node bundler, which the Godot runtime cannot import. This file is the runtime-readable view of them, not a second authority. tests/repro-budget.test.mjs asserts these values equal the exported constants, so the two cannot drift."
   },
   "max_events": 1024,
   "max_repro_bytes": 128000,

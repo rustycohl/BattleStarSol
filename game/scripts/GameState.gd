@@ -187,7 +187,7 @@ func replay_bundle() -> Dictionary:
 ## This does not raise the ceiling. It makes the ceiling visible while a player can still act.
 ##
 ## The caps are not retyped here. They live in `tools/repro-bundle.mjs`, which the runtime
-## cannot import, so `game/data/repro_budget.json` is their res://-readable view and
+## cannot import, so `game/data/repro_budget.json` is the runtime-readable view of them and
 ## `tests/repro-budget.test.mjs` asserts the two agree.
 
 const REPRO_BUDGET_PATH := "res://data/repro_budget.json"
