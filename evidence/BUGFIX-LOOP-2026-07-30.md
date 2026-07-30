@@ -363,3 +363,54 @@ BUGFIX-005 is the clearest case yet for rule 12 in the live build notes. The uni
 armor scale passed every test I had written, because those tests asserted monotonicity
 and range — properties that a collapsed curve satisfies perfectly. Only printing the
 actual numbers exposed it. **Invariants are not a substitute for looking at the output.**
+
+---
+
+## Published as 0.1.3-prealpha.1
+
+The principal authorised publishing the bugfix pass. Procedure followed in order.
+
+| Step | Result |
+|---|---|
+| Full gates | static PASS, TestRunner PASS, PlaytestRunner **312**, `npm test` **43/43**, `check` PASS |
+| Runtime and manifest regenerated together | 298,012 bytes, `e389910c3ab2b7a1…`; 134 manifest entries |
+| Live validation against the committed runtime | guided 7/7 and the nine-case matrix, served hash matching the committed file |
+| Backup | `…20260730T0810Z-pre-push-0.1.3-prealpha.1.zip`, 606 files, 83,656,565 bytes, SHA-256 `ee74b44e364699abfcd1a57bc10f49d179d679fae81331f560e334d06e1b7ef6` |
+| Human authorisation | given in the same instruction |
+| Push | `9e01d89..29d5a83`, tag `v0.1.3-prealpha.1` |
+| CI | green on `29d5a83` |
+| Live endpoint | serves `e389910c`, matching the committed runtime |
+| Public smoke test | boots, tutorial 1/7, Tab focuses Brace, zero page errors |
+
+The manifest gate returned to 43/43 at this release, exactly as the pass-1 note said it
+would. Rollback handles: `v0.1.2-prealpha.4` and `v0.1.1-prealpha.1`.
+
+## Loop status at publication
+
+Five passes. Six defects fixed, one capacity limit measured and documented rather than
+patched. PlaytestRunner **294 → 312 checks**.
+
+| ID | Severity | Status |
+|---|---|---|
+| BUGFIX-001 | high | fixed, published |
+| BUGFIX-002 | moderate | fixed, published |
+| BUGFIX-003 | high | fixed, published |
+| BUGFIX-004 | low | fixed, published |
+| BUGFIX-005 | high | fixed, published, curve pinned by test |
+| BUGFIX-006 | moderate | fixed, published |
+| OBSERVATION-001 | — | measured, analysed at length, decision open |
+
+## Next pass would start here
+
+Unchanged from the earlier list, minus what is now done:
+
+- **Older, unaudited paths**: the flight and wall-run maneuver state machine, inventory
+  and hand-swapping, the strategic import path, and the A.T.L.A.S. selection surface.
+  None has been examined in this loop.
+- **Self-damage warning**: a thrower standing inside their own blast radius takes damage
+  correctly, but nothing warns them before the throw. Design question, not a defect.
+- **Blast falloff around corners** now exists as one extra halving. Whether that is the
+  right magnitude is a playtest question.
+- **OBSERVATION-001 option E** — surfacing remaining ledger budget in play — is the
+  cheapest honest improvement to the capacity problem and does not require choosing
+  between fidelity and capacity.
