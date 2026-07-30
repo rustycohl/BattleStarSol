@@ -22,6 +22,7 @@ func _run() -> void:
 	_test_seeded_generation()
 	_test_d10_conformance()
 	_test_balance_baseline()
+	_test_damage_appearance()
 	_test_payload_contract()
 	_test_faction_vocabulary()
 	_test_action_economy()
@@ -253,6 +254,44 @@ func _test_scene_cover_is_material() -> void:
 			"standoff lane cover density diverges from the shared material model"
 		)
 
+	# The appearance model being correct is not the same as it reaching the screen. Damage a
+	# real cover cell through the single authority and confirm the tile that comes back
+	# carries a damage override, while an untouched tile carries none.
+	var pristine_probe := Vector2i(-1, -1)
+	var target_probe := Vector2i(-1, -1)
+	for cell in main.cells.keys():
+		var probe = main.cells[cell]
+		if not (probe is Dictionary):
+			continue
+		if int((probe as Dictionary).get("type", Config.FLOOR)) != Config.COVER:
+			continue
+		if target_probe.x < 0:
+			target_probe = cell
+		elif pristine_probe.x < 0:
+			pristine_probe = cell
+			break
+	if target_probe.x >= 0 and pristine_probe.x >= 0:
+		var untouched := main.tiles_root.get_node_or_null("Tile_%d_%d" % [pristine_probe.x, pristine_probe.y]) as MeshInstance3D
+		_expect(untouched != null, "no tile for the untouched probe cell")
+		if untouched != null:
+			_expect(
+				untouched.material_override == null,
+				"an undamaged tile carries a damage override, so every rebuild duplicates a material"
+			)
+		main.damage_terrain(target_probe, 20, "test", null)
+		await process_frame
+		var damaged := main.tiles_root.get_node_or_null("Tile_%d_%d" % [target_probe.x, target_probe.y]) as MeshInstance3D
+		_expect(damaged != null, "the damaged cell lost its tile")
+		if damaged != null:
+			_expect(
+				damaged.material_override != null,
+				"a damaged tile has no override material, so the damage is invisible in play"
+			)
+		_expect(
+			World.wear_of(main.cells.get(target_probe, {})) < 1.0,
+			"damaging a cell did not reduce its material"
+		)
+
 	main.free()
 
 ## A special the unit possesses stays on screen and explains itself. It is never hidden for
@@ -351,6 +390,122 @@ func _test_specials_stay_visible_in_god_mode() -> void:
 			)
 
 	main.free()
+
+## Damage appearance follows the number, and an undamaged cell draws nothing.
+##
+## The destruction model has always been continuous — integrity runs from its original
+## density down to zero — while the visuals were three discrete states of which only two drew
+## anything. A hard wall at 54 of 96 integrity is three hits from gone and rendered identical
+## to an untouched one.
+##
+## The pristine assertions below are not padding. The first version of this model tested the
+## material name before wear, and `material_cell` names HALF_COVER's material "soft" while
+## `degrade_cell` writes "soft" for a hard wall worked down — the same string for two
+## different things. Every untouched half-cover tile on the board was therefore classified as
+## damaged: a duplicated material per tile and a visible lean on undamaged terrain. Monotonic
+## darkening still held. Printing the table is what caught it.
+func _test_damage_appearance() -> void:
+	# Pristine terrain of every type must draw nothing at all, so no material is duplicated
+	# and no rebuild leaks one.
+	for pristine_type in [Config.FLOOR, Config.HALF_COVER, Config.COVER]:
+		var height := 3 if pristine_type == Config.COVER else (1 if pristine_type == Config.HALF_COVER else 0)
+		var fresh := World.material_cell(pristine_type, height)
+		var fresh_look := World.damage_appearance(fresh)
+		_expect(
+			is_equal_approx(World.wear_of(fresh), 1.0),
+			"freshly generated type %d is not at full material (wear %f)" % [pristine_type, World.wear_of(fresh)]
+		)
+		_expect(
+			String(fresh_look["state"]) == "pristine",
+			"freshly generated type %d reads as '%s' rather than pristine" % [pristine_type, String(fresh_look["state"])]
+		)
+		_expect(
+			not bool(fresh_look["draws"]),
+			"freshly generated type %d would draw a damage override, duplicating a material for undamaged terrain" % pristine_type
+		)
+
+	# Cells authored before materials existed — the golden fixtures — imply full material
+	# from their type, exactly as Ballistics.density_of treats them.
+	var legacy := {"type": Config.COVER, "z": 3}
+	_expect(is_equal_approx(World.wear_of(legacy), 1.0), "a pre-material cell does not read as pristine")
+	_expect(
+		not bool(World.damage_appearance(legacy)["draws"]),
+		"a pre-material cell would draw a damage override"
+	)
+
+	# Walk a hard wall down and require the appearance to track it: strictly increasing
+	# darkening, never exceeding rubble, and reaching each state in order.
+	var cell := World.material_cell(Config.COVER, 6)
+	var previous_darken := -1.0
+	var previous_wear := 2.0
+	var seen := {}
+	for hit in range(1, 9):
+		cell = Ballistics.degrade_cell(cell, 14)
+		var look := World.damage_appearance(cell)
+		var wear := float(look["wear"])
+		var darken := float(look["darken"])
+		seen[String(look["state"])] = true
+		_expect(wear <= previous_wear, "wear increased after taking damage (hit %d)" % hit)
+		_expect(
+			darken >= previous_darken,
+			"a further hit made the tile lighter (hit %d: %f then %f)" % [hit, previous_darken, darken]
+		)
+		_expect(
+			darken <= World.RUBBLE_DARKEN + 0.0001,
+			"damage darkened past rubble (hit %d: %f)" % [hit, darken]
+		)
+		_expect(bool(look["draws"]), "a damaged tile would not draw anything (hit %d)" % hit)
+		previous_darken = darken
+		previous_wear = wear
+	_expect(seen.has("worn"), "a hard wall never passed through a visibly worn state")
+	_expect(seen.has("soft"), "a degraded wall never reached the soft state")
+	_expect(seen.has("rubble"), "a wall reduced to nothing never reached rubble")
+	_expect(is_equal_approx(previous_wear, 0.0), "a destroyed cell retains material")
+
+	# Only rubble is scorched, and only rubble sits at the darkening ceiling.
+	var rubble := Ballistics.degrade_cell(World.material_cell(Config.COVER, 3), 999)
+	var rubble_look := World.damage_appearance(rubble)
+	_expect(bool(rubble_look["scorched"]), "rubble is not scorched")
+	_expect(
+		is_equal_approx(float(rubble_look["darken"]), World.RUBBLE_DARKEN),
+		"rubble is not at the darkening ceiling"
+	)
+	var worn := Ballistics.degrade_cell(World.material_cell(Config.COVER, 6), 14)
+	_expect(not bool(World.damage_appearance(worn)["scorched"]), "a merely worn wall is scorched")
+
+	# The redraw trigger must be as continuous as the appearance. `Main.damage_terrain` used
+	# to rebuild a tile only when its height or cover level changed -- both threshold
+	# crossings -- so a wall could take three rounds, lose a third of its material, and never
+	# be redrawn. Continuous appearance behind a threshold trigger is still three states.
+	var sig_cell := World.material_cell(Config.COVER, 6)
+	var signature := World.tile_visual_signature(sig_cell)
+	var redraws := 0
+	for hit in range(1, 8):
+		sig_cell = Ballistics.degrade_cell(sig_cell, 12)
+		var next_signature := World.tile_visual_signature(sig_cell)
+		_expect(
+			next_signature != signature,
+			"hit %d changed the wall's material but not its visual signature, so no redraw fires (%s)" % [hit, signature]
+		)
+		if next_signature != signature:
+			redraws += 1
+		signature = next_signature
+	_expect(redraws == 7, "only %d of 7 hits would have redrawn the tile" % redraws)
+	# The signature must subsume what it replaced: type and height are part of it.
+	var tall := World.material_cell(Config.COVER, 6)
+	var short := World.material_cell(Config.COVER, 3)
+	_expect(
+		World.tile_visual_signature(tall) != World.tile_visual_signature(short),
+		"the visual signature ignores height, so a collapsing wall may not redraw"
+	)
+
+	# Deterministic: the same cell must look the same on every rebuild, or a replay diverges.
+	var repeat_a := World.damage_appearance(rubble)
+	var repeat_b := World.damage_appearance(rubble)
+	_expect(
+		is_equal_approx(float(repeat_a["yaw_deg"]), float(repeat_b["yaw_deg"])),
+		"damage appearance is not repeatable for the same cell"
+	)
 
 func _load_json(res_path: String) -> Dictionary:
 	if not FileAccess.file_exists(res_path):

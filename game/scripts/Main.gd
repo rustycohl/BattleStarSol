@@ -2091,7 +2091,13 @@ func damage_terrain(cell: Vector2i, damage: int, weapon: String = "", attacker =
 		GameState.cells = cells
 	var cover_before := Ballistics.effective_cover_level(before)
 	var cover_after := Ballistics.effective_cover_level(after)
-	if int(before.get("z", 0)) != int(after.get("z", 0)) or cover_before != cover_after:
+	# Redraw whenever the tile should *look* different, not only when it crosses a height or
+	# cover threshold. The old condition was `z changed or cover level changed`, both of which
+	# are threshold crossings, so a wall could take three rounds, lose a third of its
+	# material, and never be redrawn — which is why damage appeared to arrive in three sudden
+	# jumps rather than accumulating. The signature includes type and z, so it subsumes both
+	# of the conditions it replaces.
+	if WorldBuilderScript.tile_visual_signature(before) != WorldBuilderScript.tile_visual_signature(after):
 		_rebuild_tile(cell)
 	var delta := {
 		"cell": {"x": cell.x, "y": cell.y, "z": int(before.get("z", 0))},
@@ -2138,7 +2144,11 @@ func _rebuild_tile(cell: Vector2i) -> void:
 		int(data.get("type", Config.FLOOR)),
 		int(data.get("z", 0)),
 		mission_seed,
-		String(data.get("material", ""))
+		# The whole cell, not just its material tag. Appearance is derived from the
+		# integrity it has left against the density it started with, so a wall that has
+		# taken four rounds looks like a wall that has taken four rounds instead of
+		# staying pristine until it crosses a threshold.
+		data
 	)
 
 ## Elevation-aware: the caller supplies the shooter's and target's heights so a

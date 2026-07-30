@@ -198,6 +198,142 @@ static func cover_near_spawn(
 	)
 	return found
 
+## Below this fraction of its original material, a cell has taken a hit worth showing.
+## Not zero: floating-point division on an undamaged cell must not register as wear.
+const WEAR_VISIBLE_AT := 0.995
+
+## Scorched-ground darkening for a cell with nothing left standing. Also the ceiling on
+## the continuous curve below, so nothing can look worse than rubble.
+const RUBBLE_DARKEN := 0.55
+
+## How fast damage darkens a surface. Chosen so the single continuous formula reproduces
+## both constants the old three-state version used: at the soft-cover threshold (integrity
+## just under half its original density) it lands on 0.30, and at total loss it reaches
+## 0.60 and clamps to RUBBLE_DARKEN.
+const DARKEN_PER_DAMAGE := 0.6
+
+## How much of its original material a cell still has: 1.0 pristine, 0.0 nothing left.
+##
+## Pure, so the appearance model can be asserted headlessly without building a scene —
+## the same reason `HudLayout` exists for the HUD and `Ballistics` for combat.
+##
+## `density` is what the material started as and `integrity` is what is left, so the ratio
+## is already in the data. Nothing new is stored to support the visuals.
+static func wear_of(cell_data) -> float:
+	if not (cell_data is Dictionary):
+		return 1.0
+	var data: Dictionary = cell_data
+	var started := int(data.get("density", 0))
+	if started <= 0:
+		# Open ground has no material to lose, so it cannot be worn. Rubble is the
+		# exception: it *is* the end state and carries density 0 by construction, so the
+		# material tag is what separates "never had anything" from "lost everything".
+		return 0.0 if String(data.get("material", "")) == "rubble" else 1.0
+	if not data.has("integrity"):
+		# Pre-material cells — including the golden fixtures — imply full material from
+		# their type, exactly as `Ballistics.density_of` treats them.
+		return 1.0
+	return clampf(float(int(data["integrity"])) / float(started), 0.0, 1.0)
+
+## How a cell should look, derived from how much material it has lost.
+##
+## The destruction model has always been continuous — integrity runs from its original
+## density down to zero — while the visuals were three discrete states and only two of them
+## drew anything at all. A hard wall at 51 of 100 integrity is one shot from collapsing and
+## rendered identical to an untouched one. This makes the appearance follow the number.
+static func damage_appearance(cell_data) -> Dictionary:
+	var wear := wear_of(cell_data)
+	var material := ""
+	if cell_data is Dictionary:
+		material = String((cell_data as Dictionary).get("material", ""))
+	# Wear decides *whether* a cell looks damaged. The material only decides *how* damage
+	# reads once there is damage to show.
+	#
+	# The order matters and the first version got it wrong. `material_cell` names
+	# HALF_COVER's material "soft" as a description of what it is made of, while
+	# `degrade_cell` writes "soft" to mean a hard wall worked down to soft — the same string
+	# for two different things. Testing the material before wear classified every untouched
+	# half-cover tile on the board as damaged, which would have duplicated a material per
+	# tile and leaned them all. Every invariant still held; the numbers printed in a table
+	# are what showed it.
+	var state := "pristine"
+	if material == "rubble" or wear <= 0.0:
+		state = "rubble"
+	elif wear >= WEAR_VISIBLE_AT:
+		state = "pristine"
+	elif material == "soft":
+		state = "soft"
+	else:
+		state = "worn"
+	var damage := 1.0 - wear
+	var appearance := {
+		"state": state,
+		"wear": wear,
+		"damage": damage,
+		"draws": state != "pristine",
+		"darken": 0.0,
+		"scorched": false,
+		"yaw_deg": 0.0,
+		"tilt_deg": 0.0
+	}
+	if state == "pristine":
+		return appearance
+	appearance["darken"] = minf(damage * DARKEN_PER_DAMAGE, RUBBLE_DARKEN)
+	match state:
+		"rubble":
+			# Nothing standing: dark, matte, faintly warm from the detonation, and
+			# rotated off-grid so the ground reads as disturbed.
+			appearance["darken"] = RUBBLE_DARKEN
+			appearance["scorched"] = true
+			appearance["yaw_deg"] = _visual_jitter(cell_data, 31, 23, 11.0)
+		"soft":
+			# Worked down to soft material: cracked, dulled, and leaning.
+			appearance["tilt_deg"] = _visual_jitter(cell_data, 13, 29, 4.0)
+		"worn":
+			# Still standing and still hard. It darkens and roughens with each hit, and
+			# it does not lean, because leaning is what soft material does.
+			pass
+	return appearance
+
+## Darkening steps finer than this are not worth a rebuild. Roughly 28 distinguishable steps
+## between pristine and rubble, which is far more than a player can see and far fewer than one
+## rebuild per point of integrity.
+const DARKEN_QUANTUM := 0.02
+
+## Everything about a cell that changes how its tile is drawn, as one comparable string.
+##
+## This exists because appearance being continuous is useless if the *redraw* is not.
+## `Main.damage_terrain` used to rebuild a tile only when the cell's height or its cover level
+## changed, both of which are threshold crossings — so a wall could take three rifle rounds,
+## lose a third of its material, and never be redrawn. The old three-state visual was not
+## merely coarse; it was the only thing the rebuild trigger could ever express.
+##
+## Height and type are included, so this fully subsumes the height and cover-level conditions
+## it replaces: crossing a cover threshold changes the state, and crossing a height change
+## changes `z`.
+static func tile_visual_signature(cell_data) -> String:
+	if not (cell_data is Dictionary):
+		return "none"
+	var data: Dictionary = cell_data
+	var look := damage_appearance(data)
+	var darken_step := int(round(float(look["darken"]) / DARKEN_QUANTUM))
+	return "%d|%d|%s|%d|%s" % [
+		int(data.get("type", Config.FLOOR)),
+		int(data.get("z", 0)),
+		String(look["state"]),
+		darken_step,
+		"1" if bool(look["scorched"]) else "0"
+	]
+
+## Deterministic per-cell visual variation. Derived from the coordinates so a rebuild of the
+## same cell looks the same every time, which a replay depends on.
+static func _visual_jitter(cell_data, a: int, b: int, spread: float) -> float:
+	var cell := Vector2i.ZERO
+	if cell_data is Dictionary and (cell_data as Dictionary).has("cell"):
+		cell = (cell_data as Dictionary)["cell"]
+	var span := int(spread * 2.0) + 1
+	return float(absi(cell.x * a + cell.y * b) % span) - spread
+
 static func build_grid(
 	parent: Node3D,
 	tiles_root: Node3D,
@@ -208,30 +344,37 @@ static func build_grid(
 		for y in Config.GRID_H:
 			var c := Vector2i(x, y)
 			var data: Dictionary = cells[c]
-			_spawn_tile(tiles_root, c, int(data["type"]), int(data["z"]), map_seed)
+			# Pass the cell through, so a map that arrives already damaged — an imported
+			# strategic hand-off or a replayed mission — builds looking damaged instead of
+			# rendering pristine until something hits it again.
+			spawn_tile(tiles_root, c, int(data["type"]), int(data["z"]), map_seed, data)
 
 	var game_state = parent.get_node_or_null("/root/GameState")
 	if game_state:
 		game_state.cells = cells
 	return cells
 
-## Public so a mid-mission terrain change can rebuild exactly one tile. `material`
-## lets a damaged cell read as damaged rather than as pristine terrain of the new
-## height — rubble is scorched and slumped, and a weakened wall is visibly cracked.
+## Public so a mid-mission terrain change can rebuild exactly one tile. `cell_data` is the
+## cell itself, so appearance is derived from the material it has left rather than passed in
+## as a separate label that could disagree with it.
 static func spawn_tile(
 	tiles_root: Node3D,
 	c: Vector2i,
 	t: int,
 	h: int,
 	map_seed: int,
-	material_state: String = ""
+	cell_data: Dictionary = {}
 ) -> void:
 	_spawn_tile(tiles_root, c, t, h, map_seed)
-	# Only damaged states change how a tile looks. Anything else must leave the tile
-	# exactly as `_spawn_tile` built it: the earlier version duplicated a material and
-	# attached an override for pristine terrain too, which meant every rebuild leaked a
-	# material and no override actually distinguished damage.
-	if material_state != "rubble" and material_state != "soft":
+	# `cell` is only needed so the deterministic jitter matches the coordinate being drawn;
+	# the caller's dictionary is not mutated.
+	var described := cell_data.duplicate()
+	described["cell"] = c
+	var look := damage_appearance(described)
+	# An undamaged tile must be left exactly as `_spawn_tile` built it. An earlier version
+	# duplicated the material and attached an override for pristine terrain too, which leaked
+	# a material per rebuild and meant no override actually distinguished damage.
+	if not bool(look.get("draws", false)):
 		return
 	var tile := tiles_root.get_node_or_null("Tile_%d_%d" % [c.x, c.y]) as MeshInstance3D
 	if tile == null:
@@ -240,25 +383,27 @@ static func spawn_tile(
 	if surface == null:
 		return
 	surface = surface.duplicate() as StandardMaterial3D
-	match material_state:
-		"rubble":
-			# Blast-scorched ground: dark, matte, faintly warm from the detonation.
-			surface.albedo_color = surface.albedo_color.darkened(0.55)
-			surface.roughness = 1.0
-			surface.metallic = 0.0
-			surface.emission_enabled = true
-			surface.emission = Color(0.35, 0.12, 0.05)
-			surface.emission_energy_multiplier = 0.25
-			tile.rotation_degrees.y = float(absi(c.x * 31 + c.y * 17) % 23) - 11.0
-		"soft":
-			# A wall worked down to soft material: cracked, dulled, leaning.
-			surface.albedo_color = surface.albedo_color.darkened(0.3)
-			surface.roughness = 1.0
-			surface.metallic = 0.0
-			tile.rotation_degrees.z = float(absi(c.x * 13 + c.y * 29) % 9) - 4.0
-		_:
-			pass
+	surface.albedo_color = surface.albedo_color.darkened(float(look["darken"]))
+	# Damage is matte. Anything that was polished stops being polished once it is broken.
+	surface.roughness = 1.0
+	surface.metallic = 0.0
+	if bool(look.get("scorched", false)):
+		surface.emission_enabled = true
+		surface.emission = Color(0.35, 0.12, 0.05)
+		surface.emission_energy_multiplier = 0.25
+	else:
+		# A pillar that was emissive when pristine loses its glow as it is worked down, in
+		# step with the darkening rather than all at once.
+		surface.emission_energy_multiplier = surface.emission_energy_multiplier * float(look["wear"])
+	#  rather than a per-surface override: it is what the rest of this
+	# codebase and the playtest suite already assert on, and the tiles are single-surface.
 	tile.material_override = surface
+	var yaw := float(look.get("yaw_deg", 0.0))
+	var tilt := float(look.get("tilt_deg", 0.0))
+	if not is_zero_approx(yaw):
+		tile.rotation_degrees.y = yaw
+	if not is_zero_approx(tilt):
+		tile.rotation_degrees.z = tilt
 
 static func _spawn_tile(tiles_root: Node3D, c: Vector2i, _t: int, h: int, map_seed: int) -> void:
 	var mi := MeshInstance3D.new()
