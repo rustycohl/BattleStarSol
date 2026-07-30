@@ -643,6 +643,29 @@ func perform_action(
 			actor.left = ""; actor.right = ""; actor.two_handed = false
 			_refresh_label(actor); _update_ui(); return true
 
+		"stow":
+			if actor.left == "" and actor.right == "":
+				return true
+			if actor.ap < Config.STOW_COST:
+				_hint("Not enough AP to stow equipment.")
+				return false
+			actor.ap -= Config.STOW_COST
+			actor.left = ""; actor.right = ""; actor.two_handed = false
+			_refresh_label(actor); _update_ui(); return true
+
+		"swap_hands":
+			if actor.two_handed:
+				_hint("Cannot swap hands with a two-handed weapon.")
+				return false
+			if actor.ap < Config.SWAP_COST:
+				_hint("Not enough AP to swap hands.")
+				return false
+			actor.ap -= Config.SWAP_COST
+			var temp = actor.left
+			actor.left = actor.right
+			actor.right = temp
+			_refresh_label(actor); _update_ui(); return true
+
 		_:
 			if action.begins_with("equip_"):
 				var kind = action.substr(6)
@@ -1551,6 +1574,20 @@ func _enemy_act(u) -> void:
 			var step_cell: Vector2i = action_scores["step"]
 			if step_cell != INVALID_CELL:
 				await _step_enemy(u, step_cell)
+			else:
+				break
+		elif action_scores.has("toggle_flight"):
+			if _special_enabled(u, "flight") and not u.flying and u.ap >= Config.FLIGHT_TOGGLE_COST:
+				u.ap -= Config.FLIGHT_TOGGLE_COST
+				u.flying = true
+				if Narrative: Narrative.generate_mobility_narrative(u.name, "FLIGHT")
+				_hint("%s flight mode: %s" % [u.name, u.flying])
+			else:
+				break
+		elif action_scores.has("wall_run"):
+			var wr_cell: Vector2i = action_scores["wall_run"]
+			if _special_enabled(u, "wall_run") and _wall_run_target_valid(u, wr_cell):
+				_resolve_wall_run(u, wr_cell)
 			else:
 				break
 		else:

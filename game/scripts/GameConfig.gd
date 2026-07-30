@@ -69,6 +69,8 @@ const TAKE_COVER_COST := 1
 const LEAVE_COVER_COST := 1
 const COVER_MONKEY_MOVE_SURCHARGE := 1
 const EQUIP_COST := 1
+const STOW_COST := 1
+const SWAP_COST := 1
 const UNIT_HP := 10
 
 const FLOOR := 0

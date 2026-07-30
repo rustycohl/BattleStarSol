@@ -44,6 +44,10 @@ static func fixed_cost(action: String) -> int:
 			return Config.LEAVE_COVER_COST
 		"equip_fist":
 			return Config.EQUIP_COST
+		"stow":
+			return Config.STOW_COST
+		"swap_hands":
+			return Config.SWAP_COST
 	return 0
 
 static func weapon_cost(item: Dictionary) -> int:

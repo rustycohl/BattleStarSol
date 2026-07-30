@@ -1763,6 +1763,32 @@ func _update_weapons_bar() -> void:
 			fb.disabled = true
 		weapons_grid.add_child(fb)
 		weapon_btns["fist"] = fb
+		
+		# Inventory Management: Stow and Swap
+		if main.selected.left != "" or main.selected.right != "":
+			var btn_stow := Button.new()
+			_enable_keyboard_focus(btn_stow)
+			btn_stow.text = "Stow"
+			btn_stow.tooltip_text = "Return equipped items to inventory (%d AP)" % Config.STOW_COST
+			btn_stow.custom_minimum_size = Vector2(72, 22)
+			btn_stow.add_theme_font_size_override("font_size", 10)
+			btn_stow.pressed.connect(func(): ActionRouter.request_action(main.selected, "stow"))
+			if not is_player or main.busy or main.game_over or main.selected.ap < Config.STOW_COST:
+				btn_stow.disabled = true
+			weapons_grid.add_child(btn_stow)
+			weapon_btns["stow"] = btn_stow
+
+			var btn_swap := Button.new()
+			_enable_keyboard_focus(btn_swap)
+			btn_swap.text = "Swap"
+			btn_swap.tooltip_text = "Swap items between left and right hands (%d AP)" % Config.SWAP_COST
+			btn_swap.custom_minimum_size = Vector2(72, 22)
+			btn_swap.add_theme_font_size_override("font_size", 10)
+			btn_swap.pressed.connect(func(): ActionRouter.request_action(main.selected, "swap_hands"))
+			if not is_player or main.busy or main.game_over or main.selected.ap < Config.SWAP_COST or main.selected.two_handed:
+				btn_swap.disabled = true
+			weapons_grid.add_child(btn_swap)
+			weapon_btns["swap_hands"] = btn_swap
 
 func build_roster() -> void:
 	if not roster_box: return

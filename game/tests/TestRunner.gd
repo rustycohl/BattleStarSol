@@ -1707,7 +1707,7 @@ func _test_web_contract() -> void:
 	_expect(bridge.contains("applied_extractions.includes"), "strategic persistence is not idempotent")
 	_expect(bridge.contains("compactExtractionMessage"), "long extraction recovery has no bounded storage path")
 	_expect(launcher.contains("applyExtraction(bridge.loadProfile()"), "same-tab extraction is not applied before recovery storage")
-	_expect(strat.contains("tools/launch-web.ps1"), "native A.T.L.A.S. launch does not start the bundled HTTP server")
+	_expect(strat.contains("https://rustycohl.github.io/BattleStarSol"), "native A.T.L.A.S. launch does not open the production GitHub Pages endpoint")
 	_expect(not strat.contains("OS.shell_open(\"file:///\""), "native A.T.L.A.S. launch still opens the broken direct-file route")
 	_expect(server.contains("X-BattleStar-Dev-Server"), "local Web server cannot identify and reuse an existing instance")
 	_expect(server.contains("'font/otf'"), "local Web server does not serve the bundled icon font with an explicit MIME type")

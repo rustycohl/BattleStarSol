@@ -11,6 +11,9 @@
 > [`docs/PREALPHA-02-RELEASE-CONTRACT.md`](docs/PREALPHA-02-RELEASE-CONTRACT.md)
 > passes.
 
+> [!CAUTION]
+> **AI AGENT POLICY:** All future agents and developers must strictly adhere to the [**Agent Development & Testing Policy**](docs/AGENT_POLICY.md). Do NOT mangle production code (e.g. `StratLayer.gd`, `Main.gd`) to point to local loopbacks or bypass core logic for "local testing". Local testing must use the designated headless suites (`tools/test.ps1`).
+
 This repository contains the game: a browser-local strategic command surface,
 an embedded A.T.L.A.S. target selector, and a real Godot 4.7.1 tactical
 runtime. A deployment enters the Base-10 action-point simulation; a victory,

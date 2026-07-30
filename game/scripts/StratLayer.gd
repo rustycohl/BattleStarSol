@@ -189,24 +189,7 @@ func _build_launcher_ui() -> void:
 	vbox.add_child(btn_logout)
 
 func _launch_atlas() -> void:
-	# Godot Web exports must be served over HTTP so their .pck and WebAssembly
-	# can load. Start the bundled loopback-only server; it opens the correct
-	# strategic URL itself and reuses an existing Battle/Star server.
-	var server_script := ProjectSettings.globalize_path("res://tools/launch-web.ps1")
-	if not FileAccess.file_exists(server_script):
-		push_error("Missing local Web launcher: " + server_script)
-		return
-	var pid := OS.create_process(
-		"powershell.exe",
-		[
-			"-NoProfile",
-			"-ExecutionPolicy", "Bypass",
-			"-File", server_script
-		],
-		false
-	)
-	if pid <= 0:
-		push_error("Could not start the local A.T.L.A.S. Web link.")
+	OS.shell_open("https://rustycohl.github.io/BattleStarSol")
 
 func _open_vault() -> void:
 	var PayloadPanel = load("res://scripts/PayloadPanel.gd")

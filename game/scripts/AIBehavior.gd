@@ -135,7 +135,38 @@ func score_actions(
 					"score": score
 				})
 
-	# 7. Current-cover and bounded positional tactics. These candidates use the
+	# 7. Advanced Mobility (Gated by God Mode)
+	var main_node = Engine.get_main_loop().root.get_node_or_null("Main")
+	var dev_god_mode = main_node.dev_god_mode if main_node else false
+
+	if dev_god_mode:
+		var target = _nearest_player(u, units)
+		if target != null:
+			# FLIGHT EVALUATION
+			if not u.flying and u.ap >= GameConfig.FLIGHT_TOGGLE_COST:
+				# Score flight if the target is significantly higher and we have the special
+				if main_node._special_enabled(u, "flight") and _vertical_score(u, target.cell, cells) > 16.0:
+					var score = 70.0 + _jit(rng)
+					candidates.append({"key": "toggle_flight", "value": true, "score": score})
+			
+			# WALL RUN EVALUATION
+			if main_node._special_enabled(u, "wall_run") and u.ap >= GameConfig.WALL_RUN_COST:
+				# Simple heuristic: if a wall-run towards the target is valid, score it.
+				# We check adjacent cells in the direction of the target.
+				var dir_x = sign(target.cell.x - u.cell.x)
+				var dir_y = sign(target.cell.y - u.cell.y)
+				var potential_targets = [
+					Vector2i(u.cell.x + dir_x, u.cell.y),
+					Vector2i(u.cell.x, u.cell.y + dir_y)
+				]
+				for pt in potential_targets:
+					if pt != u.cell and main_node._wall_run_target_valid(u, pt):
+						# Must bring us closer to target vertically or horizontally
+						var score = 65.0 + _vertical_score(u, pt, cells) + _jit(rng)
+						candidates.append({"key": "wall_run", "value": pt, "score": score})
+						break # only need one valid wall run candidate
+
+	# 8. Current-cover and bounded positional tactics. These candidates use the
 	# same path, LOS, cover, and AP authorities as player actions.
 	candidates.append_array(
 		Tactics.positioning_candidates(

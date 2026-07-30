@@ -190,6 +190,7 @@ func _test_cover_and_los() -> void:
 	_expect(MovementRules.can_lean(unit, "left"), "lean available in cover")
 	unit.cover_monkey_active = true
 	_expect(not MovementRules.movement_locked(unit), "cover monkey unlocks movement")
+	path_rules.queue_free()
 
 func _test_login_and_launcher() -> void:
 	print("  [5] login + launcher surfaces")
