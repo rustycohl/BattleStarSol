@@ -1,0 +1,40 @@
+{
+  "schema": "gzg.battlestar.vendored-authority/1.0",
+  "name": "d10SRD",
+  "rules_id": "gzg.d10/0.1",
+  "version": "0.1.0-alpha.2",
+  "source": {
+    "repository": "rustycohl/d10SRD",
+    "commit": "c77005b20d74d25a426e6b7620e63d49b0778105",
+    "commit_subject": "feat: publish the audience-facing SRD reference",
+    "working_tree": "clean at the time of vendoring",
+    "vendored_on": "2026-07-30",
+    "vendored_by": "Claude Opus 5"
+  },
+  "why_vendored": "The rules are an external authority that this product must conform to, and a conformance test that cannot execute the rules is not a conformance test. Transcribing the numbers into a test made the assertion self-referential: it would keep passing while the published rules moved underneath it. The rules module is distributed here so the test executes the real implementation, and the digests below make a divergence from upstream a build failure rather than a silent drift.",
+  "files": [
+    {
+      "path": "d10.mjs",
+      "upstream_path": "site/lib/d10.mjs",
+      "sha256": "8b9467dd2c9c8bfcc7cd97c34e2c0bf154d039175381a9e25703b78331ea2baf",
+      "license": "MIT OR Apache-2.0",
+      "role": "executable rules: abilityModifier, scaleD20DC, resolveCheck, rollCheck"
+    },
+    {
+      "path": "core.mjs",
+      "upstream_path": "site/lib/core.mjs",
+      "sha256": "b13edc2624e67a7bbc4a5c58f515a1193e7c7568ad901dc3e06b60f58c1e2c01",
+      "license": "MIT OR Apache-2.0",
+      "role": "canonicalisation and deterministic d10 derivation; required by d10.mjs"
+    },
+    {
+      "path": "SRD.md",
+      "upstream_path": "SRD.md",
+      "sha256": "931b41bdc336e9c046967dab397c382e423c1dbe6c867ff28e2d2eb21ea84bb8",
+      "license": "CC BY 4.0",
+      "role": "the published document, including the Conformance section and the authority boundary"
+    }
+  ],
+  "licensing_note": "The rules code is offered upstream under MIT OR Apache-2.0 (see LICENSE-MIT, LICENSE-APACHE, NOTICE-d10SRD, all carried alongside). The current-alpha SRD document is original CC BY 4.0 material. Earlier d10 SRD material released under CC0 remains CC0 and is not withdrawn or relicensed by that grant. Attribution: d10SRD, Copyright 2026 Rusty Cohl and contributors.",
+  "update_procedure": "When upstream d10SRD publishes a change: re-copy the files, update every sha256 and the commit here, bump `version` if upstream did, re-pin game/data/d10srd_conformance.json to the same version, and re-run `npm test`. tests/d10srd-conformance.test.mjs fails until the digests and the two version fields agree, so a partial update cannot pass."
+}
