@@ -1,6 +1,6 @@
 # Battle/Star.SOL
 
-**Playable pre-alpha `0.1.2-prealpha.3`**
+**Playable pre-alpha `0.1.2-prealpha.4`**
 
 [Play the current Web build](https://rustycohl.github.io/BattleStarSol/)
 

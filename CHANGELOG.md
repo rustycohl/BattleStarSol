@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2-prealpha.4 — 2026-07-30
+
+### Fixed
+- HUD grip glyphs rendered as placeholder boxes on the live build: the bundled font
+  has no arrow or half-circle glyphs. The slide and transparency grips now use ASCII.
+
 ## 0.1.2-prealpha.3 — 2026-07-30
 
 ### Fixed

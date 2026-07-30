@@ -794,13 +794,13 @@ func _build_hud_grips() -> void:
 	grips.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(grips)
 	for key in surface_keys():
-		var slide_grip := _mk_grip("⇥", "Slide %s out of the way (F4)" % key)
+		var slide_grip := _mk_grip(">", "Slide %s out of the way (F4)" % key)
 		slide_grip.name = "Slide_%s" % key
 		slide_grip.pressed.connect(func(): toggle_surface_parked(key))
 		grips.add_child(slide_grip)
 		hud_surfaces[key]["slide_grip"] = slide_grip
 
-		var fade_grip := _mk_grip("◐", "Cycle %s transparency (F3)" % key)
+		var fade_grip := _mk_grip("%", "Cycle %s transparency (F3)" % key)
 		fade_grip.name = "Fade_%s" % key
 		fade_grip.pressed.connect(func(): cycle_surface_opacity(key))
 		grips.add_child(fade_grip)
@@ -858,7 +858,7 @@ func _place_hud_grips() -> void:
 					(rect.position.y + 1.0) if parked else rect.position.y + 3.0
 				)
 		slide_grip.position = anchor
-		slide_grip.text = "⇤" if parked else "⇥"
+		slide_grip.text = "<" if parked else ">"
 		slide_grip.visible = node.visible
 		fade_grip.visible = node.visible and not parked
 		fade_grip.position = anchor + (
