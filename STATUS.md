@@ -89,7 +89,7 @@ Current bounded state:
   units and terrain, with a visible detonation and scorched rubble. Every squad
   member starts with one.
 
-**Release:** `0.1.2-prealpha.4`
+**Release:** `0.1.3-prealpha.1`
 **Date:** 2026-07-30
 **Channel:** public playable pre-alpha
 **Page:** <https://rustycohl.github.io/BattleStarSol/>

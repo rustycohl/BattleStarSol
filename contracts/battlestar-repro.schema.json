@@ -1267,6 +1267,7 @@
       "radius",
       "terrain_destroyed",
       "units_hit",
+      "units_shielded",
       "weapon"
      ],
      "properties": {
@@ -1301,6 +1302,11 @@
       "weapon": {
        "type": "string",
        "maxLength": 80
+      },
+      "units_shielded": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 1000
       }
      },
      "additionalProperties": false

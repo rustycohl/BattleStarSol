@@ -93,6 +93,7 @@ const EVENT_PAYLOAD_KEYS = Object.freeze({
     "radius",
     "terrain_destroyed",
     "units_hit",
+    "units_shielded",
     "weapon",
   ],
   // Terrain destruction. Carried on the same terms as unit_killed: a bounded grid
@@ -364,6 +365,7 @@ function projectEventPayload(eventName, value, path) {
         radius: finiteNumber(payload.radius, `${path}.radius`, 0, 32, { integer: true }),
         terrain_destroyed: finiteNumber(payload.terrain_destroyed, `${path}.terrain_destroyed`, 0, 10_000, { integer: true }),
         units_hit: finiteNumber(payload.units_hit, `${path}.units_hit`, 0, 1_000, { integer: true }),
+        units_shielded: finiteNumber(payload.units_shielded, `${path}.units_shielded`, 0, 1_000, { integer: true }),
         weapon: boundedString(payload.weapon, `${path}.weapon`, 80, { pattern: ACTION_PATTERN }),
       };
     case "terrain_damaged":

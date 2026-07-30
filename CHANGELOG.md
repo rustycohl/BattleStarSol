@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.1.3-prealpha.1 — 2026-07-30
+
+Bugfix and balance pass. Six defects, each with a regression test verified to fail
+against the old behaviour first.
+
+### Fixed
+- Destroying a unit's cover charged that unit an action point for someone else's shot,
+  and silently failed at zero AP — leaving them flagged in cover, movement-locked,
+  behind rubble, permanently.
+- A blast damaged the same terrain once per unit it hit, so a grenade thrown into a
+  crowd chewed through cover several times faster than the same grenade on one target.
+- Every terrain rebuild leaked a tile node and left lookups resolving to the dying one,
+  which meant the damaged-terrain appearance was never actually visible.
+- Rebuilt tiles carried a pointless material override, duplicating a material per
+  rebuild and defeating the distinction between damaged and pristine terrain.
+- `armor_pierce` had stopped functioning: armor mapped onto terrain's density scale made
+  a vest as tough as concrete, so every tier-1 kinetic round was fully mitigated and a
+  pistol and a rifle became identical against every armor value. The authored
+  subtraction is restored as the curve; penetration now adds only the outright-defeat
+  case.
+- Blasts reached through walls they had not breached. Line of sight from the blast centre
+  now costs a shielded unit one extra halving rather than granting immunity, and the
+  blast ledger records how many were shielded.
+
+### Known limit, deliberately unchanged
+- Terrain events can exhaust the reproduction ledger: about 18 worst-case grenades per
+  mission, bounded by artifact bytes rather than event count. Full fidelity is retained
+  and the artifact fails closed. Measured and analysed in
+  `evidence/OBSERVATION-001-LEDGER-CAPACITY-2026-07-30.md`.
+
 ## 0.1.2-prealpha.4 — 2026-07-30
 
 ### Fixed

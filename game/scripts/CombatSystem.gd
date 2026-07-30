@@ -6,6 +6,10 @@ const Ballistics = preload("res://scripts/Ballistics.gd")
 
 var main: Node
 
+## Set while a detonation distributes its damage, so the per-shot terrain path does
+## not re-damage cells the blast already worked.
+var _resolving_blast: bool = false
+
 func setup(m: Node) -> void:
 	main = m
 
@@ -177,6 +181,7 @@ func _detonate(attacker: Unit, centre: Vector2i, kind: String, dmg: int, radius:
 	)
 
 	var terrain_broken := 0
+	_resolving_blast = true
 	if hits_terrain:
 		var cells_in_blast: Array[Vector2i] = []
 		for dy in range(-radius, radius + 1):
@@ -199,19 +204,38 @@ func _detonate(attacker: Unit, centre: Vector2i, kind: String, dmg: int, radius:
 				terrain_broken += 1
 
 	var total_dealt := 0
+	var shielded := 0
 	for entry in affected:
 		var unit = entry["unit"]
 		var distance := int(entry["distance"])
 		# Full damage at the centre, halving outward, never below one.
-		var blast_damage := maxi(int(round(float(dmg) / pow(2.0, float(distance)))), 1)
+		var steps := float(distance)
+		# Terrain between the unit and the blast shields it. The wall itself already
+		# took the blast above, and if it came down this check passes on the next one.
+		# Line of sight is read from the existing authority rather than re-derived, and
+		# it costs one extra halving rather than granting immunity: shrapnel reaches
+		# around a corner, weakly.
+		var exposed: bool = Pathfinder.has_los(
+			centre,
+			Vector2i(unit.cell),
+			main.cells,
+			int(main.cells.get(centre, {}).get("z", 0)),
+			int(unit.z)
+		)
+		if not exposed:
+			steps += 1.0
+			shielded += 1
+		var blast_damage := maxi(int(round(float(dmg) / pow(2.0, steps))), 1)
 		total_dealt += apply_damage(unit, blast_damage, true, centre, kind, attacker)
 
+	_resolving_blast = false
 	GameState.record_event("blast_resolved", {
 		"attacker": attacker.unit_id if attacker != null else 0,
 		"weapon": kind,
 		"cell": {"x": centre.x, "y": centre.y, "z": int(main.cells.get(centre, {}).get("z", 0))},
 		"radius": radius,
 		"units_hit": affected.size(),
+		"units_shielded": shielded,
 		"damage_dealt": total_dealt,
 		"terrain_destroyed": terrain_broken
 	})
@@ -455,6 +479,12 @@ func apply_damage(target: Unit, base_dmg: int, is_ranged: bool, from_c: Vector2i
 		# material takes its share of the hit either way.
 		var lane_cell = Ballistics.lane_cover_cell(from_c, target.cell, main.cells)
 		var cover_scale := 1.0
+		# A blast already worked every cell in its radius before distributing damage.
+		# Letting each victim's lane be damaged again here charged the same terrain
+		# once per unit hit, so a grenade near a crowd chewed through cover far faster
+		# than the same grenade thrown at one target.
+		if _resolving_blast:
+			lane_cell = null
 		if lane_cell != null and not penetrates_cover:
 			var shot: Dictionary = Ballistics.resolve_item_penetration(
 				main.cells.get(lane_cell, {}),
@@ -510,7 +540,15 @@ func apply_damage(target: Unit, base_dmg: int, is_ranged: bool, from_c: Vector2i
 	if armor_item.is_empty():
 		armor_item = {"armor_pierce": a_pierce, "damage_type": dmg_type}
 	var armor_shot: Dictionary = Ballistics.resolve_armor(target.armor, armor_item, 100)
-	var eff_armor = int(round(float(target.armor) * float(armor_shot["mitigation_scale"])))
+	# The authored subtraction is the primary curve: `armor_pierce` shaves points, so a
+	# rifle is meaningfully better against armor than a pistol. Mapping armor onto
+	# terrain's density scale alone made body armor as tough as concrete — every tier-1
+	# kinetic round was "stopped", every armor value mitigated fully, and the authored
+	# distinction between weapons disappeared. Penetration adds one case on top: a round
+	# that beats the armor outright is not mitigated at all.
+	var eff_armor = maxi(target.armor - a_pierce, 0)
+	if not bool(armor_shot["stopped"]):
+		eff_armor = 0
 	if is_kinetic:
 		if eff_armor > 0:
 			dmg_f = maxf(dmg_f - float(eff_armor), 1.0)

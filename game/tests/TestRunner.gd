@@ -550,6 +550,30 @@ func _test_tutorial_state_machine() -> void:
 		float(through_armor["mitigation_scale"]) >= 0.0,
 		"armor mitigation went negative"
 	)
+	# The armor curve is pinned so it cannot drift silently again. `armor_pierce` must
+	# keep shaving points — an earlier version put armor on terrain's density scale
+	# alone, which made every tier-1 kinetic round "stopped" and erased the difference
+	# between a pistol and a rifle.
+	var pistol_pierce := 1
+	var rifle_pierce := 2
+	for armor_points in [1, 2, 4, 6, 8]:
+		var pistol_eff: int = maxi(armor_points - pistol_pierce, 0)
+		var rifle_eff: int = maxi(armor_points - rifle_pierce, 0)
+		_expect(
+			rifle_eff < pistol_eff or armor_points <= pistol_pierce,
+			"a higher armour-piercing weapon does not beat more armour at %d points" % armor_points
+		)
+	# A round that defeats the armour outright is not mitigated at all.
+	var defeating: Dictionary = {"armor_pierce": 10, "damage_type": "rail"}
+	_expect(
+		not bool(Ballistics.resolve_armor(6, defeating)["stopped"]),
+		"a rail penetrator is stopped by medium armour"
+	)
+	# A round that cannot defeat it faces the authored subtraction, not zero.
+	_expect(
+		bool(Ballistics.resolve_armor(6, {"armor_pierce": 1, "damage_type": "kinetic"})["stopped"]),
+		"a light kinetic round defeats medium armour outright"
+	)
 	# More armor is never worse against the same round.
 	_expect(
 		float(Ballistics.resolve_armor(8, heavy_round)["mitigation_scale"])

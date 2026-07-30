@@ -227,7 +227,11 @@ static func spawn_tile(
 	material_state: String = ""
 ) -> void:
 	_spawn_tile(tiles_root, c, t, h, map_seed)
-	if material_state.is_empty():
+	# Only damaged states change how a tile looks. Anything else must leave the tile
+	# exactly as `_spawn_tile` built it: the earlier version duplicated a material and
+	# attached an override for pristine terrain too, which meant every rebuild leaked a
+	# material and no override actually distinguished damage.
+	if material_state != "rubble" and material_state != "soft":
 		return
 	var tile := tiles_root.get_node_or_null("Tile_%d_%d" % [c.x, c.y]) as MeshInstance3D
 	if tile == null:

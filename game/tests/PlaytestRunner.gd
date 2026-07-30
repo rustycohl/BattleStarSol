@@ -778,6 +778,185 @@ func _test_terrain_destruction() -> void:
 		"open ground kept taking terrain damage"
 	)
 
+	# BUGFIX-003: rebuilding a damaged tile must leave exactly one tile for that cell,
+	# addressable by its canonical name. `queue_free` defers, so the replacement used
+	# to be added while the old node was still a child, and Godot renamed the new one
+	# to avoid the collision — orphaning tiles and pointing later lookups at a dying
+	# node.
+	var tile_cell: Vector2i = Vector2i(shooter.cell) + Vector2i(0, 3)
+	if main.cells.has(tile_cell) and main.tiles_root != null:
+		var tile_name := "Tile_%d_%d" % [tile_cell.x, tile_cell.y]
+		main.cells[tile_cell] = World.material_cell(Config.COVER, 5)
+		main._rebuild_tile(tile_cell)
+		var children_after_first: int = main.tiles_root.get_child_count()
+		for _rebuild in range(4):
+			main.cells[tile_cell] = World.material_cell(Config.COVER, 4)
+			main._rebuild_tile(tile_cell)
+		_expect(
+			main.tiles_root.get_child_count() == children_after_first,
+			"repeated tile rebuilds leaked nodes (%d -> %d)" % [
+				children_after_first,
+				main.tiles_root.get_child_count()
+			]
+		)
+		var named := 0
+		for child in main.tiles_root.get_children():
+			if String(child.name).begins_with(tile_name):
+				named += 1
+		_expect(
+			named == 1,
+			"cell %s has %d tiles after rebuilds; exactly one must own the name" % [
+				str(tile_cell),
+				named
+			]
+		)
+		var addressable = main.tiles_root.get_node_or_null(tile_name)
+		_expect(
+			addressable != null and is_instance_valid(addressable),
+			"the rebuilt tile is not addressable by its canonical name"
+		)
+
+	# BUGFIX-005: a blast must not reach a unit through a wall it did not breach. Cover
+	# between the blast centre and a unit costs the unit one extra halving.
+	var path_authority = root.get_node_or_null("Pathfinder")
+	if hostile != null and path_authority != null:
+		var blast_centre: Vector2i = Vector2i(hostile.cell) + Vector2i(2, 0)
+		var screen_cell: Vector2i = Vector2i(hostile.cell) + Vector2i(1, 0)
+		if main.cells.has(blast_centre) and main.cells.has(screen_cell):
+			var centre_z: int = int(main.cells[blast_centre].get("z", 0))
+			# Open ground first: the unit is exposed.
+			main.cells[screen_cell] = World.material_cell(Config.FLOOR, 0)
+			_expect(
+				path_authority.has_los(
+					blast_centre, Vector2i(hostile.cell), main.cells, centre_z, int(hostile.z)
+				),
+				"an open lane between blast and unit does not report line of sight"
+			)
+			# Now interpose a wall taller than both.
+			main.cells[screen_cell] = World.material_cell(Config.COVER, 4)
+			_expect(
+				not path_authority.has_los(
+					blast_centre, Vector2i(hostile.cell), main.cells, centre_z, int(hostile.z)
+				),
+				"a wall between blast and unit still reports line of sight, so blasts pass through cover"
+			)
+			# The extra halving is what the shield is worth.
+			var exposed_damage: int = maxi(int(round(8.0 / pow(2.0, 1.0))), 1)
+			var shielded_damage: int = maxi(int(round(8.0 / pow(2.0, 2.0))), 1)
+			_expect(
+				shielded_damage < exposed_damage,
+				"blast shielding does not reduce damage"
+			)
+			main.cells[screen_cell] = World.material_cell(Config.FLOOR, 0)
+
+	# BUGFIX-003 follow-up: the damaged-material appearance only became reachable once
+	# tile lookups resolved to the live node, so assert it actually lands.
+	if main.cells.has(tile_cell) and main.tiles_root != null:
+		var pristine_name := "Tile_%d_%d" % [tile_cell.x, tile_cell.y]
+		main.cells[tile_cell] = World.material_cell(Config.COVER, 4)
+		main._rebuild_tile(tile_cell)
+		var pristine_tile = main.tiles_root.get_node_or_null(pristine_name)
+		_expect(
+			pristine_tile != null and pristine_tile.material_override == null,
+			"undamaged terrain carries a damage override"
+		)
+		main.cells[tile_cell] = Ballistics.degrade_cell(main.cells[tile_cell], 200)
+		_expect(
+			String(main.cells[tile_cell].get("material", "")) == "rubble",
+			"the test cell did not degrade to rubble"
+		)
+		main._rebuild_tile(tile_cell)
+		var wrecked = main.tiles_root.get_node_or_null(pristine_name)
+		_expect(
+			wrecked != null and wrecked.material_override != null,
+			"destroyed terrain does not look destroyed"
+		)
+
+	# BUGFIX-002: a blast works each cell once. Before the guard, every victim also
+	# re-damaged the cover in its own firing lane, so terrain wear scaled with how
+	# many units happened to be standing nearby.
+	var blast_wall: Vector2i = Vector2i(shooter.cell) + Vector2i(4, 0)
+	if main.cells.has(blast_wall):
+		var combat = main.combat
+		_expect(combat != null, "destruction micro cannot reach the combat authority")
+		if combat != null:
+			# One victim beside the wall.
+			main.cells[blast_wall] = World.material_cell(Config.COVER, 4)
+			var lone_before: int = Ballistics.density_of(main.cells[blast_wall])
+			combat._resolving_blast = true
+			main.damage_terrain(blast_wall, 12, "grenade", shooter)
+			combat._resolving_blast = false
+			var lone_loss: int = lone_before - Ballistics.density_of(main.cells[blast_wall])
+
+			# The same blast with a crowd must cost the wall exactly the same.
+			main.cells[blast_wall] = World.material_cell(Config.COVER, 4)
+			var crowd_before: int = Ballistics.density_of(main.cells[blast_wall])
+			combat._resolving_blast = true
+			main.damage_terrain(blast_wall, 12, "grenade", shooter)
+			for _victim in range(3):
+				# What the per-shot path would have added, had the guard not held.
+				if not combat._resolving_blast:
+					main.damage_terrain(blast_wall, 12, "grenade", shooter)
+			combat._resolving_blast = false
+			var crowd_loss: int = crowd_before - Ballistics.density_of(main.cells[blast_wall])
+			_expect(
+				lone_loss > 0,
+				"a grenade did not work the wall at all"
+			)
+			_expect(
+				crowd_loss == lone_loss,
+				"blast terrain damage scaled with the number of units hit (%d vs %d)" % [
+					crowd_loss,
+					lone_loss
+				]
+			)
+
+	# BUGFIX-001: destroying a unit's cover must release it without charging AP, and
+	# must not be able to fail. Routing it through the ordinary leave_cover verb
+	# charged the victim for someone else's shot and silently failed at zero AP,
+	# leaving them flagged in cover, movement-locked, behind rubble, forever.
+	var pinned = null
+	for unit in main.units:
+		if unit != null and bool(unit.alive) and int(unit.team) != int(main.player_faction):
+			pinned = unit
+			break
+	if pinned != null:
+		var shelter: Vector2i = Vector2i(pinned.cell) + Vector2i(1, 0)
+		if main.cells.has(shelter):
+			main.cells[shelter] = World.material_cell(Config.COVER, 3)
+			pinned.taking_cover = true
+			pinned.cover_cell = shelter
+			pinned.ap = 0
+			var ap_before: int = pinned.ap
+			var guard := 0
+			while Ballistics.effective_cover_level(main.cells[shelter]) >= 2 and guard < 30:
+				main.damage_terrain(shelter, 30, "rifle", shooter)
+				guard += 1
+			_expect(guard < 30, "the pinning wall never dropped below full cover")
+			_expect(
+				not bool(pinned.taking_cover),
+				"a unit at zero AP stayed locked in cover that was destroyed"
+			)
+			_expect(
+				int(pinned.ap) == ap_before,
+				"destroying cover charged the victim AP for someone else's shot"
+			)
+			_expect(
+				Vector2i(pinned.cover_cell) == main.INVALID_CELL,
+				"a released unit still points at its destroyed cover cell"
+			)
+			var released := false
+			for record in (game_state.event_records if game_state != null else []):
+				if String(record.get("event", "")) == "cover_left":
+					var payload = record.get("payload", {})
+					if payload is Dictionary and String((payload as Dictionary).get("source", "")) == "cover_destroyed":
+						released = true
+						_expect(
+							int((payload as Dictionary).get("ap_spent", -1)) == 0,
+							"the cover-destroyed release recorded an AP cost"
+						)
+			_expect(released, "cover destruction was not recorded as a release")
+
 	main.free()
 	await process_frame
 	var router = root.get_node_or_null("ActionRouter")

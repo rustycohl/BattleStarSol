@@ -2103,11 +2103,14 @@ func damage_terrain(cell: Vector2i, damage: int, weapon: String = "", attacker =
 	if bool(delta["destroyed"]):
 		_hint("Cover destroyed at %d,%d." % [cell.x, cell.y])
 	# A unit committed to cover that no longer protects is released rather than
-	# left holding a wall that is not there.
+	# left holding a wall that is not there. This is not their action: routing it
+	# through the ordinary leave_cover verb charged them AP for someone else's shot,
+	# and silently failed when they had none — leaving them flagged as in cover,
+	# movement-locked, behind rubble, permanently.
 	if cover_after < 2:
 		for unit in units:
 			if unit != null and bool(unit.taking_cover) and Vector2i(unit.cover_cell) == cell:
-				ActionRouter.request_action(unit, "leave_cover")
+				_leave_cover_state(unit, 0, "cover_destroyed")
 	return delta
 
 func _rebuild_tile(cell: Vector2i) -> void:
@@ -2115,6 +2118,11 @@ func _rebuild_tile(cell: Vector2i) -> void:
 		return
 	var existing := tiles_root.get_node_or_null("Tile_%d_%d" % [cell.x, cell.y])
 	if existing != null:
+		# `queue_free` alone defers removal to the end of the frame, so the
+		# replacement was added while the old node was still a child and Godot
+		# renamed it to avoid the collision. Detaching first frees the name
+		# immediately, which keeps exactly one addressable tile per cell.
+		tiles_root.remove_child(existing)
 		existing.queue_free()
 	var data: Dictionary = cells.get(cell, {})
 	WorldBuilderScript.spawn_tile(
