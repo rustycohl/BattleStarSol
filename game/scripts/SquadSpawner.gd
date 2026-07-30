@@ -179,9 +179,15 @@ static func spawn_into(main: Node, player_faction: int, payload: Dictionary) -> 
 		ranger.is_squad_bot = false
 		ranger.player_controlled = false
 		
-		# Inject cover
+		# Cover for the standoff lane. This has to come from `material_cell` like every
+		# other piece of cover in the game. A bare `{"type", "z"}` dict scores the same,
+		# because `Ballistics.density_of` falls back to the type's implied material and
+		# reaches the identical density of 60 -- which is exactly why the special case was
+		# invisible. What it loses is the `material` key: `_rebuild_tile` and the terrain
+		# ledger both read "" where they should read "hard", so a replay of a Standoff
+		# mission records that this wall was made of nothing before it broke.
 		if main.cells.has(cover_cell):
-			main.cells[cover_cell] = {"type": Config.COVER, "z": 3}
+			main.cells[cover_cell] = World.material_cell(Config.COVER, 3)
 			World.spawn_tile(main.tiles_root, cover_cell, Config.COVER, 3, 888888)
 	else:
 		for fac in [Config.FACTION_HAD, Config.FACTION_SYND, Config.FACTION_TIME]:

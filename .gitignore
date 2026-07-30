@@ -2,3 +2,9 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# Unpromoted evidence runs. Promotion is an atomic rename that happens only once a pack
+# is complete and hashed; a `.partial` directory is a run that never got there. Committing
+# one publishes an unfinished run as a result. The boundary is also asserted in
+# tests/evidence-hygiene.test.mjs, because an ignore rule is a default and not a control.
+*.partial/
