@@ -4,6 +4,8 @@ extends Node
 ## scripted, and learned behavior providers after the resolver is extracted.
 ## Transport-specific experiments do not belong here.
 
+signal action_requested(actor, action_name, target_cell)
+
 const Config = preload("res://scripts/GameConfig.gd")
 
 var game: Node = null
@@ -28,6 +30,9 @@ func request_action(
 		if not bool(actor.alive) or actor.node == null or not is_instance_valid(actor.node):
 			return false
 	var ap_before := int(actor.ap) if actor != null else -1
+	
+	action_requested.emit(actor, action, target_cell)
+	
 	var accepted := bool(game.perform_action(actor, action, target_cell, use_offhand, target_z))
 	# Note: AP for animated actions may still be in-flight; ap_after_dispatch is
 	# the value immediately after the sync portion of perform_action returns.
@@ -49,3 +54,4 @@ func request_action(
 		if actor != null and game.has_method("schedule_maneuver_support_check"):
 			game.schedule_maneuver_support_check(actor)
 	return accepted
+

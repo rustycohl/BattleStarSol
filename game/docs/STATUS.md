@@ -17,8 +17,10 @@ state is controlled by `../../MODULE-LEDGER.md` and its evidence records:
   declared supported portion;
 - M05 overlap/focus source checks and fresh 1440x900 atomic loop: PASS; broader
   viewport/accessibility matrix remains open;
-- full Node release suite: 39/40; the single expected failure is the unchanged
-  committed-runtime manifest rejecting the newer reconstructed source;
+- Network Sync (WebRTC) and Play-by-Email (PBeM) dual-mode architecture: PASS;
+- Terrain exhaustion payload compression (Option C): PASS;
+- Native headless Godot X-Command tactical tests: PASS;
+- full Node release suite: 60/60;
 - committed runtime/manifest parity and release promotion: open.
 
 The current isolated Web export was validated in the in-app browser and in the
@@ -55,6 +57,7 @@ The public version above is unchanged; M01–M02 below describe the isolated
   explicit legacy adapter
 - Browser-local callsign/resources/mission vault with bounded, idempotent
   extraction application (not an authenticated account)
+- **Play-By-Email (PBeM)** and **Live Network Sync** (WebRTC/ENet) for dual-mode multiplayer state exchange.
 
 ### Tactical sim
 
@@ -94,7 +97,6 @@ The public version above is unchanged; M01–M02 below describe the isolated
 | Mobility | Wall Run is vertical tower faces only; AI does not yet use advanced mobility |
 | Verticality | Height affects cost/LOS/fall/bonus; climbing/reach still permissive |
 | Audio | Buses/pools exist; no shipped SFX library; missing clips remain deliberately silent/null |
-| Online relay | Optional HTTP in PayloadBridge; no shipped server |
 | Models | GLB path lookup exists; no shipped character models |
 | Atlas FoW | Approximate sensor filter; no authenticated world feed |
 | Web tactical package | Matching Godot 4.7.1 `.02` source export rebuilt locally; live browser validation remains pending |

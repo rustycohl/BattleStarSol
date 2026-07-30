@@ -134,7 +134,17 @@ func _ready() -> void:
 	tiles_root = env["tiles_root"]
 	highlight_root = env["highlight_root"]
 
-	cells = WorldBuilderScript.build_grid(self, tiles_root, mission_seed)
+	if payload.get("type", "") == "tactical_state" and payload.has("cells"):
+		var parsed_cells: Dictionary = payload.get("cells", {})
+		for key in parsed_cells:
+			var s := String(key)
+			var parts := s.replace("(", "").replace(")", "").split(",")
+			if parts.size() >= 2:
+				var c = Vector2i(int(parts[0]), int(parts[1]))
+				cells[c] = parsed_cells[key]
+				WorldBuilderScript.spawn_tile(tiles_root, c, int(cells[c].get("type", FLOOR)), int(cells[c].get("z", 0)), mission_seed, cells[c])
+	else:
+		cells = WorldBuilderScript.build_grid(self, tiles_root, mission_seed)
 
 	sel_ring = WorldBuilderScript.build_ring(self)
 
@@ -157,12 +167,35 @@ func _ready() -> void:
 
 	# Reuse the mission payload already loaded above for GameState.begin_mission.
 	player_faction = SquadSpawn.resolve_player_faction(payload, String(GameState.commander_faction))
-	turn = player_faction
-	GameState.turn = turn
-	GameState.turn_count = global_turn
+	
+	if payload.get("type", "") == "tactical_state":
+		turn = int(payload.get("turn", player_faction))
+		global_turn = int(payload.get("global_turn", 1))
+		GameState.turn = turn
+		GameState.turn_count = global_turn
+		GameState.action_records = payload.get("actions", []).duplicate(true)
+		GameState.event_records = payload.get("events", []).duplicate(true)
+		
+		var parsed_debris: Dictionary = payload.get("debris", {})
+		for key in parsed_debris:
+			var s := String(key)
+			var parts := s.replace("(", "").replace(")", "").split(",")
+			if parts.size() >= 2:
+				var c = Vector2i(int(parts[0]), int(parts[1]))
+				debris[c] = parsed_debris[key]
+		GameState.debris = debris
+	else:
+		turn = player_faction
+		GameState.turn = turn
+		GameState.turn_count = global_turn
+		
 	turn_director.bind(self)
 
 	_spawn_squads()
+	
+	if payload.get("type", "") == "tactical_state":
+		for c in debris.keys():
+			_refresh_debris_visual(c)
 	_setup_action_router()
 	_setup_tutorial(payload)
 	WorldBuilderScript.scatter_weapons(self, mission_seed)
@@ -215,7 +248,22 @@ func _detect_motion_scale() -> float:
 # ==========================================================
 func _spawn_squads() -> void:
 	var payload = PayloadBridge.get_payload() if PayloadBridge.has_payload() else {}
-	SquadSpawn.spawn_into(self, player_faction, payload)
+	if payload.get("type", "") == "tactical_state":
+		var ulist = payload.get("units", [])
+		for data in ulist:
+			var cx := 0
+			var cy := 0
+			if data.has("cell") and data["cell"] is Array and data["cell"].size() >= 2:
+				cx = int(data["cell"][0])
+				cy = int(data["cell"][1])
+			var u = _make_unit(int(data.get("team", 0)), Vector2i(cx, cy))
+			u.apply_dict(data)
+			u.unit_id = int(data.get("unit_id", u.unit_id))
+			u.update_figure()
+			if not u.alive:
+				u.node.visible = false
+	else:
+		SquadSpawn.spawn_into(self, player_faction, payload)
 	GameState.units = units
 
 func _empty_counts() -> Dictionary:
@@ -2075,7 +2123,7 @@ func _cell_free(c: Vector2i) -> bool:
 ## Single authority for terrain damage: it changes the cell, rebuilds the tile so
 ## the world matches the simulation, and records the change in the ledger. Returns
 ## the recorded delta, or an empty dictionary when nothing changed.
-func damage_terrain(cell: Vector2i, damage: int, weapon: String = "", attacker = null) -> Dictionary:
+func damage_terrain(cell: Vector2i, damage: int, weapon: String = "", attacker = null, skip_ledger: bool = false) -> Dictionary:
 	if damage <= 0 or not cells.has(cell):
 		return {}
 	var before: Dictionary = cells[cell]
@@ -2123,7 +2171,8 @@ func damage_terrain(cell: Vector2i, damage: int, weapon: String = "", attacker =
 		"destroyed": cover_after == 0 and cover_before > 0
 	}
 	terrain_changes.append(delta)
-	GameState.record_event("terrain_damaged", delta)
+	if not skip_ledger:
+		GameState.record_event("terrain_damaged", delta)
 	if bool(delta["destroyed"]):
 		_hint("Cover destroyed at %d,%d." % [cell.x, cell.y])
 	# A unit committed to cover that no longer protects is released rather than

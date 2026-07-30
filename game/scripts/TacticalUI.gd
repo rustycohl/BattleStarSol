@@ -543,6 +543,41 @@ func _build_ui() -> void:
 	btn_export.pressed.connect(_export_bug)
 	left_vbox.add_child(btn_export)
 
+	left_vbox.add_child(HSeparator.new())
+	left_vbox.add_child(_mk_label("NETWORK / PBEM", 11, Color(0.7, 0.7, 0.9)))
+
+	var btn_export_pbem = Button.new()
+	btn_export_pbem.text = "EXPORT TURN (PBEM)"
+	_enable_keyboard_focus(btn_export_pbem)
+	btn_export_pbem.custom_minimum_size = Vector2(0, 24)
+	btn_export_pbem.add_theme_font_size_override("font_size", 10)
+	btn_export_pbem.pressed.connect(_export_pbem)
+	left_vbox.add_child(btn_export_pbem)
+
+	var btn_import_pbem = Button.new()
+	btn_import_pbem.text = "IMPORT TURN (PBEM)"
+	_enable_keyboard_focus(btn_import_pbem)
+	btn_import_pbem.custom_minimum_size = Vector2(0, 24)
+	btn_import_pbem.add_theme_font_size_override("font_size", 10)
+	btn_import_pbem.pressed.connect(_import_pbem)
+	left_vbox.add_child(btn_import_pbem)
+
+	var btn_webrtc_host = Button.new()
+	btn_webrtc_host.text = "HOST (WEBRTC)"
+	_enable_keyboard_focus(btn_webrtc_host)
+	btn_webrtc_host.custom_minimum_size = Vector2(0, 24)
+	btn_webrtc_host.add_theme_font_size_override("font_size", 10)
+	btn_webrtc_host.pressed.connect(func(): if Engine.get_main_loop().root.has_node("NetworkSync"): Engine.get_main_loop().root.get_node("NetworkSync").host_game())
+	left_vbox.add_child(btn_webrtc_host)
+
+	var btn_webrtc_join = Button.new()
+	btn_webrtc_join.text = "JOIN (WEBRTC)"
+	_enable_keyboard_focus(btn_webrtc_join)
+	btn_webrtc_join.custom_minimum_size = Vector2(0, 24)
+	btn_webrtc_join.add_theme_font_size_override("font_size", 10)
+	btn_webrtc_join.pressed.connect(func(): if Engine.get_main_loop().root.has_node("NetworkSync"): Engine.get_main_loop().root.get_node("NetworkSync").join_game())
+	left_vbox.add_child(btn_webrtc_join)
+
 	hint_label = _mk_label("", 12, Color(0.7, 0.85, 1.0), true)
 	hint_label.custom_minimum_size = Vector2(205, 0)
 
@@ -1806,3 +1841,17 @@ func _export_bug() -> void:
 	if Narrative: logs = Narrative.log_entries.duplicate()
 	var path = PayloadBridge.export_bug_report({"units": state}, logs)
 	hint("Bug Report Exported: " + path)
+
+func _export_pbem() -> void:
+	var path = PayloadBridge._payload_dir() + "/tactical_state.json"
+	if PayloadBridge.export_tactical_state(path):
+		hint("PBeM State Exported: " + path)
+	else:
+		hint("Export failed.")
+
+func _import_pbem() -> void:
+	var path = PayloadBridge._payload_dir() + "/tactical_state.json"
+	if PayloadBridge.import_tactical_state(path):
+		hint("Importing PBeM state...")
+	else:
+		hint("Failed to import state.")

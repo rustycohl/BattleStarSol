@@ -32,6 +32,7 @@ Economy="*res://scripts/Economy.gd"
 Narrative="*res://scripts/Narrative.gd"
 ItemDB="*res://scripts/ItemDB.gd"
 AudioSystem="*res://scripts/AudioSystem.gd"
+NetworkSync="*res://scripts/NetworkSync.gd"
 
 [display]
 

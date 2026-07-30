@@ -85,7 +85,8 @@ const EVENT_PAYLOAD_KEYS = Object.freeze({
   loot_collected: ["actor", "ap_spent", "cell", "items"],
   unit_killed: ["attacker", "cell", "target", "weapon"],
   // Area detonation. A blast is one event with an aggregate outcome; the terrain it
-  // breaks is recorded separately as terrain_damaged, on the same terms.
+  // breaks is recorded separately as terrain_damaged (for projectiles) or
+  // terrain_blast_damaged (for explosions), on the same terms.
   blast_resolved: [
     "attacker",
     "cell",
@@ -96,9 +97,7 @@ const EVENT_PAYLOAD_KEYS = Object.freeze({
     "units_shielded",
     "weapon",
   ],
-  // Terrain destruction. Carried on the same terms as unit_killed: a bounded grid
-  // cell, the acting unit id, and the material transition — no real-world
-  // coordinate, no browser or profile surface.
+  // Terrain destruction from direct fire (one cell).
   terrain_damaged: [
     "attacker",
     "cell",
@@ -109,6 +108,14 @@ const EVENT_PAYLOAD_KEYS = Object.freeze({
     "integrity_before",
     "material_after",
     "material_before",
+    "weapon",
+  ],
+  // Grouped terrain destruction from a blast.
+  terrain_blast_damaged: [
+    "attacker",
+    "cells",
+    "centre",
+    "radius",
     "weapon",
   ],
   turn_started: ["active_team", "round"],

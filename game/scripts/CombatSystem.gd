@@ -196,12 +196,24 @@ func _detonate(attacker: Unit, centre: Vector2i, kind: String, dmg: int, radius:
 				return a.x < b.x
 			return a.y < b.y
 		)
+		var blast_terrain_deltas: Array[Dictionary] = []
 		for cell in cells_in_blast:
 			var falloff := maxi(radius - maxi(absi(cell.x - centre.x), absi(cell.y - centre.y)) + 1, 1)
 			var terrain_damage := maxi(int(round(float(dmg) * float(falloff) * 1.5)), 1)
-			var delta: Dictionary = main.damage_terrain(cell, terrain_damage, kind, attacker)
-			if not delta.is_empty() and bool(delta.get("destroyed", false)):
-				terrain_broken += 1
+			var delta: Dictionary = main.damage_terrain(cell, terrain_damage, kind, attacker, true)
+			if not delta.is_empty():
+				blast_terrain_deltas.append(delta)
+				if bool(delta.get("destroyed", false)):
+					terrain_broken += 1
+
+		if not blast_terrain_deltas.is_empty():
+			GameState.record_event("terrain_blast_damaged", {
+				"attacker": attacker.unit_id if attacker != null else 0,
+				"weapon": kind,
+				"centre": {"x": centre.x, "y": centre.y, "z": int(main.cells.get(centre, {}).get("z", 0))},
+				"radius": radius,
+				"cells": blast_terrain_deltas
+			})
 
 	var total_dealt := 0
 	var shielded := 0

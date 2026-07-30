@@ -225,8 +225,38 @@ func load_payload(kind: String) -> Dictionary:
 func export_payload(data: Dictionary, dest_path: String) -> bool:
 	var f = FileAccess.open(dest_path, FileAccess.WRITE)
 	if f == null: return false
-	f.store_string(JSON.stringify(data))
+	f.store_string(JSON.stringify(data, "\t"))
 	f.close()
+	return true
+
+func export_tactical_state(dest_path: String) -> bool:
+	var game_state = Engine.get_main_loop().root.get_node_or_null("GameState")
+	var main = Engine.get_main_loop().root.get_node_or_null("Main")
+	if game_state == null or main == null: return false
+
+	var state := {
+		"schema": "gzg.battlestar.tactical_state/1.0",
+		"type": "tactical_state",
+		"turn": game_state.turn,
+		"global_turn": main.get("global_turn", 1) if main else 1,
+		"seed": get_seed(),
+		"generator_version": 1,
+		"rules_version": "alpha-1",
+		"units": main.serialize_units() if main.has_method("serialize_units") else [],
+		"cells": main.cells.duplicate(true) if main else {},
+		"debris": game_state.debris.duplicate(true),
+		"actions": game_state.action_records.duplicate(true),
+		"events": game_state.event_records.duplicate(true)
+	}
+	return export_payload(state, dest_path)
+
+func import_tactical_state(src_path: String) -> bool:
+	var payload = import_payload(src_path)
+	if payload.is_empty() or payload.get("type", "") != "tactical_state":
+		return false
+	_payload = payload
+	# Change scene to trigger reload, Main._ready will intercept type: tactical_state
+	Engine.get_main_loop().root.get_node("Main").get_tree().change_scene_to_file("res://Main.tscn")
 	return true
 
 func export_bug_report(tactical_state: Dictionary, log_lines: Array) -> String:
