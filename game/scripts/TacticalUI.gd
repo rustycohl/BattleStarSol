@@ -4,6 +4,7 @@ extends CanvasLayer
 const Config = preload("res://scripts/GameConfig.gd")
 const Maneuvers = preload("res://scripts/ManeuverState.gd")
 const HudLayout = preload("res://scripts/HudLayout.gd")
+const Ballistics = preload("res://scripts/Ballistics.gd")
 
 # The layout and contrast model lives in `HudLayout` so headless checks and the
 # M05-B evidence emitter can read it without a viewport or the autoloads.
@@ -1679,9 +1680,16 @@ func _update_weapons_bar() -> void:
 				else:
 					var item_cost := ActionEconomy.weapon_cost(itm) if not itm.is_empty() else 0
 					var dmg_type = String(itm.get("damage_type", "kinetic"))
-					var apierce = int(itm.get("armor_pierce", 0))
+					# Ask the authority for penetration rather than showing the raw `armor_pierce`
+					# field. They are not the same number: penetration_for_item is armor_pierce *
+					# PIERCE_PER_POINT plus a damage-type bonus, clamped to 100, and a cover-piercing
+					# weapon reads as 100 outright. The raw field displayed 5 where the model used 55,
+					# and labelled it "AP" -- which in this game means action points.
 					var pierce_str = ""
-					if apierce > 0: pierce_str = " (AP: %d)" % apierce
+					if not itm.is_empty():
+						var penetration := Ballistics.penetration_for_item(itm)
+						if penetration > 0:
+							pierce_str = " | Penetration %d/100" % penetration
 					b.tooltip_text = "Ready %s (%d AP). Attack: %d AP.\nType: %s%s" % [display_name, Config.EQUIP_COST, item_cost, dmg_type.capitalize(), pierce_str]
 
 				b.custom_minimum_size = Vector2(72, 22)

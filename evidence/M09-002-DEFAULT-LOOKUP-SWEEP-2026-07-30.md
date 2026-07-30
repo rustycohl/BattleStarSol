@@ -118,3 +118,80 @@ predicate on the same pattern as `cell_shape_error` is the obvious next module t
 **Not attempted:** removing any default. The sweep's conclusion is that the defaults are right
 and the missing thing was a shape assertion. That is a narrower result than "found bugs", and it
 is what the evidence supports.
+
+---
+
+## Addendum — the consumers, swept
+
+The scope section above named four consumers plus `PayloadContract` as unswept. Done here, so the
+gap is closed rather than carried.
+
+**82 further defaulted lookups, 33 on model keys:** `PayloadContract` 36 sites (19 model),
+`CombatSystem` 24 (11), `TacticalUI` 19 (3), `InventorySystem` 3 (0), `StratLayer` **0**.
+
+### Finding 1 — the weapons bar displayed a number the model does not use
+
+`TacticalUI` built its weapon tooltip from the raw `armor_pierce` field:
+
+```gdscript
+var apierce = int(itm.get("armor_pierce", 0))
+if apierce > 0: pierce_str = " (AP: %d)" % apierce
+```
+
+The model uses `Ballistics.penetration_for_item`, which is
+`armor_pierce × PIERCE_PER_POINT + damage_type bonus`, clamped to 100 — and **100 outright** for a
+weapon flagged `penetrates_cover`. So the tooltip read `AP: 5` where the game used 55, and a
+cover-piercing weapon advertised its raw field rather than total penetration.
+
+Two defects in one line. The number was wrong, and `AP` is the abbreviation this game uses for
+action points — the core economy — so even a correct number would have been read as a cost.
+
+Now `Penetration %d/100`, from the authority. Same species as the specials bug in M09-001: the
+interface re-derived something an authority already owns.
+
+### Finding 2 — a substituted payload was indistinguishable from a real one
+
+`normalize_deploy` fills in missing fields with plausible values: sector becomes
+`"Unknown Sector"`, faction `"HAD // VANGUARD-1"`, seed `FALLBACK_SEED`. That behaviour is right —
+a partial payload should still yield a playable mission. What was missing was any way to know it
+happened. A broken hand-off produced a mission that looked real, and because the fallback seed is
+a **constant**, it looked reproducible too.
+
+`PayloadContract.deploy_shape_report(raw)` (new) reports which fields were substituted and
+whether the squad is explicitly empty — pure, and reporting rather than rejecting. The
+substitution stays; the silence does not. Asserted both ways: a partial payload is reported
+incomplete **and** still normalises to a playable mission, so nothing starts crashing that
+previously played.
+
+### What was checked and found correct
+
+- `CombatSystem` reads `damage_type` / `armor_pierce` in two places (ranged and melee) and
+  `penetrates_cover` in two more. These feed damage resolution and cover-ignoring targeting
+  respectively, which are different questions; not a duplicate authority.
+- `InventorySystem`'s three defaults touch no model keys.
+- **`StratLayer` has none at all.**
+
+### An overstated claim, corrected
+
+`_test_consumer_defaults` asserts the authority's penetration is on the 0–100 scale, is not the
+raw field passed through, and reads as total for a cover-piercing weapon. **It does not observe
+the tooltip.** Reverting `TacticalUI` to the raw field leaves every assertion passing — verified by
+running that negative control, which did not fire.
+
+The test comment now says so explicitly. Closing it means reaching the weapons-bar button and
+reading its tooltip, the way `_test_specials_stay_visible_in_god_mode` reaches `action_btns`. That
+is a further module. This is the third time in this session that a plausible assertion turned out
+not to test what it appeared to; the pattern is that asserting *near* a value is not asserting
+*the thing that consumes* it, and only the negative control tells them apart.
+
+### Gates
+
+`npm test` **60/60**; Godot `TestRunner` **PASS, 1492 checks**; `PlaytestRunner` **PASS, 312**.
+Runtime re-exported then `MANIFEST.sha256` regenerated, normalized to LF, verified `i/lf w/lf`.
+
+### Remaining, named
+
+A payload-shape gate is reported but not yet *enforced* anywhere — nothing fails a mission for
+launching on a substituted payload, and nothing surfaces the report to the player or the
+extraction. Wiring `deploy_shape_report` into the launcher and the extraction envelope is the
+obvious next step, and is the payload analogue of Option E.

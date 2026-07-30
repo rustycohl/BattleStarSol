@@ -91,3 +91,42 @@ static func validate_deploy(payload: Dictionary) -> Array[String]:
 	if not (payload.get("resources", null) is Dictionary):
 		errors.append("resources must be an object")
 	return errors
+
+## Which fields of a deploy payload were absent and had to be filled in.
+##
+## `normalize_deploy` substitutes plausible values for anything missing — sector becomes
+## "Unknown Sector", faction becomes "HAD // VANGUARD-1", seed becomes FALLBACK_SEED. That is
+## correct behaviour: a partial payload should still produce a playable mission rather than a
+## crash. What was missing is any way to tell that it happened.
+##
+## The same failure shape as the terrain cell built by hand: a default absorbed a malformed
+## input and the result behaved plausibly, so nothing reported it. A hand-off that silently
+## became "Unknown Sector // HAD VANGUARD-1 // seed 84021" is a broken hand-off that looks like
+## a real mission, and the seed being a constant means it looks like a *reproducible* one.
+##
+## Pure, and reports rather than rejects: the substitution stays, the silence does not.
+const DEPLOY_SUBSTITUTED_FIELDS := [
+	"sector", "faction", "seed", "squad", "objectives", "resources", "cell_size"
+]
+
+static func deploy_shape_report(raw: Dictionary) -> Dictionary:
+	var source: Dictionary = raw
+	if raw.has("payload") and raw["payload"] is Dictionary:
+		source = raw["payload"]
+	var substituted: Array = []
+	for field in DEPLOY_SUBSTITUTED_FIELDS:
+		if not source.has(field):
+			substituted.append(field)
+	# A squad of zero is not a mission. Distinguished from an absent squad, because an explicit
+	# empty array is a different mistake from a missing key and the caller may want to know which.
+	var empty_squad := source.has("squad") and source["squad"] is Array and (source["squad"] as Array).is_empty()
+	return {
+		"complete": substituted.is_empty() and not empty_squad,
+		"substituted": substituted,
+		"empty_squad": empty_squad,
+		"summary": (
+			"complete"
+			if substituted.is_empty() and not empty_squad
+			else "substituted %s%s" % [str(substituted), " and the squad is empty" if empty_squad else ""]
+		)
+	}

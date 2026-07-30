@@ -17,7 +17,7 @@ var failures: Array[String] = []
 var checks := 0
 
 ## Assertion floor. Raise this when tests are added; never lower it to make a run pass.
-const MIN_CHECKS := 1472
+const MIN_CHECKS := 1492
 
 func _init() -> void:
 	call_deferred("_run")
@@ -30,6 +30,7 @@ func _run() -> void:
 	_test_tier_shedding_and_conservation()
 	_test_ledger_budget_readout()
 	_test_cell_shape_authority()
+	_test_consumer_defaults()
 	_test_payload_contract()
 	_test_faction_vocabulary()
 	_test_action_economy()
@@ -771,6 +772,82 @@ func _test_cell_shape_authority() -> void:
 			if first.is_empty():
 				first = "%s: %s" % [str(cell), generated_problem]
 	_expect(bad == 0, "%d generated cell(s) do not satisfy the cell shape; first %s" % [bad, first])
+
+## A number the player reads must be the number the model uses, and a substituted payload must
+## say so.
+##
+## Both halves come from the same sweep as the cell shape check, over the consumers that are not
+## registered authorities: TacticalUI, StratLayer, CombatSystem, InventorySystem, PayloadContract.
+## 82 defaulted lookups, 33 on model keys.
+func _test_consumer_defaults() -> void:
+	# The weapons bar showed the raw `armor_pierce` field. The model uses
+	# `Ballistics.penetration_for_item`, which is that field times PIERCE_PER_POINT plus a
+	# damage-type bonus, clamped to 100 -- and 100 outright for a cover-piercing weapon. So the
+	# tooltip displayed 5 where the game used 55, under a label that reads as action points.
+	#
+	# WHAT THIS COVERS, EXACTLY: that the authority's penetration is on the shared 0-100 scale,
+	# that it is not merely the raw field passed through, and that a cover-piercing weapon reads
+	# as total. It does NOT observe the tooltip, so it does not prove the interface asks the
+	# authority -- reverting TacticalUI to the raw field leaves these assertions passing. Verified
+	# by running that negative control; it did not fire. Closing it means reaching the weapons-bar
+	# button and reading its tooltip, the way _test_specials_stay_visible_in_god_mode reaches
+	# action_btns. Named rather than implied, because a test that appears to guard a fix and does
+	# not is worse than no test.
+	var item_db = root.get_node_or_null("/root/ItemDB")
+	_expect(item_db != null, "ItemDB autoload is unavailable")
+	if item_db == null:
+		return
+	var checked := 0
+	for kind in Config.KINDS:
+		var item = item_db.get_item(String(kind))
+		if not (item is Dictionary) or (item as Dictionary).is_empty():
+			continue
+		checked += 1
+		var authoritative := Ballistics.penetration_for_item(item)
+		var raw := int((item as Dictionary).get("armor_pierce", 0))
+		_expect(
+			authoritative >= 0 and authoritative <= 100,
+			"%s: penetration %d is outside the shared 0-100 scale" % [String(kind), authoritative]
+		)
+		# The two must not be conflated. Where they differ, the authority is the one to show.
+		if raw > 0:
+			_expect(
+				authoritative != raw or raw == 0,
+				"%s: penetration equals the raw armor_pierce (%d), so PIERCE_PER_POINT is not being applied" % [String(kind), raw]
+			)
+		if bool((item as Dictionary).get("penetrates_cover", false)):
+			_expect(
+				authoritative == 100,
+				"%s ignores cover but does not read as total penetration (%d)" % [String(kind), authoritative]
+			)
+	_expect(checked >= 5, "fewer weapons were checked than expected (%d)" % checked)
+
+	# A payload that had to be filled in must report that it was.
+	var complete := {
+		"type": "deploy", "sector": "Test", "faction": "HAD", "seed": 4242,
+		"squad": [{"name": "A"}], "objectives": ["x"], "resources": {}, "cell_size": 2.0
+	}
+	var full_report: Dictionary = Contract.deploy_shape_report(complete)
+	_expect(bool(full_report["complete"]), "a complete payload was reported as substituted: %s" % String(full_report["summary"]))
+
+	var partial := {"type": "deploy", "squad": [{"name": "A"}]}
+	var partial_report: Dictionary = Contract.deploy_shape_report(partial)
+	_expect(not bool(partial_report["complete"]), "a payload missing sector, faction, and seed reported as complete")
+	for expected_field in ["sector", "faction", "seed"]:
+		_expect(
+			(partial_report["substituted"] as Array).has(expected_field),
+			"the shape report does not name '%s' as substituted" % expected_field
+		)
+	# And the substitution itself must still happen -- reporting replaces the silence, not the
+	# fallback, or a partial hand-off would start crashing instead of playing.
+	var normalized: Dictionary = Contract.normalize_deploy(partial)
+	_expect(int(normalized["seed"]) == Contract.FALLBACK_SEED, "a missing seed is no longer filled in")
+	_expect(String(normalized["sector"]) != "", "a missing sector is no longer filled in")
+
+	var hollow := {"type": "deploy", "sector": "T", "faction": "HAD", "seed": 1, "squad": [], "objectives": [], "resources": {}, "cell_size": 2.0}
+	var hollow_report: Dictionary = Contract.deploy_shape_report(hollow)
+	_expect(bool(hollow_report["empty_squad"]), "an explicitly empty squad was not reported")
+	_expect(not bool(hollow_report["complete"]), "a payload with no squad reported as complete")
 
 func _load_json(res_path: String) -> Dictionary:
 	if not FileAccess.file_exists(res_path):
