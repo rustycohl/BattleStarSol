@@ -81,7 +81,7 @@ Current bounded state:
   M06-001 under owner approval, and no longer the pre-M01 build;
 - Git and the public Page: unchanged. Nothing was committed, pushed, or published.
 
-**Release:** `0.1.2-prealpha.2`
+**Release:** `0.1.2-prealpha.3`
 **Date:** 2026-07-30
 **Channel:** public playable pre-alpha
 **Page:** <https://rustycohl.github.io/BattleStarSol/>

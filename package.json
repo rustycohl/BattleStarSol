@@ -1,6 +1,6 @@
 {
   "name": "battlestar-sol",
-  "version": "0.1.2-prealpha.2",
+  "version": "0.1.2-prealpha.3",
   "description": "Playable Battle/Star.SOL strategic-to-tactical Godot pre-alpha.",
   "private": true,
   "type": "module",

@@ -1,12 +1,14 @@
 # Changelog
 
-## 0.1.2-prealpha.2 — 2026-07-30
+## 0.1.2-prealpha.3 — 2026-07-30
 
 ### Fixed
-- Continuous integration: the Windows browser-discovery test composed its expected
-  path from a Windows literal while the resolver uses `path.join`, so it passed on
-  Windows and failed on a Linux runner. It now composes the path the same way the
-  resolver does. No runtime change.
+- Continuous integration: the Windows browser-discovery test asserted a hardcoded
+  Windows path while the resolver composes candidates with `path.join`, so it passed
+  on Windows and failed on a Linux runner. It now approves the first candidate the
+  resolver offers, asserting precedence rather than the host's path separator.
+  The 0.1.2-prealpha.2 attempt at this fix did not apply and is superseded.
+  No runtime change.
 
 ## 0.1.2-prealpha.1 — 2026-07-30
 

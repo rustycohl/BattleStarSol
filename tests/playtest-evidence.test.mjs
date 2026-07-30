@@ -151,11 +151,19 @@ test("PW_CHROMIUM is authoritative and missing explicit paths fail closed", () =
 });
 
 test("Windows browser discovery is a fallback only when PW_CHROMIUM is unset", () => {
-  const expected = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+  // The resolver composes candidates with `path.join`, so a hardcoded Windows
+  // literal made this assertion depend on the host's separator: it passed on
+  // Windows and failed on a Linux runner where join produces forward slashes.
+  // Approving the first candidate offered keeps the assertion about precedence,
+  // which is the actual behaviour under test.
+  let expected = null;
   const result = resolveChromiumExecutable({
     env: { ProgramFiles: "C:\\Program Files" },
     platform: "win32",
-    exists: (candidate) => candidate === expected,
+    exists: (candidate) => {
+      if (expected === null) expected = candidate;
+      return candidate === expected;
+    },
   });
   assert.deepEqual(result, { path: expected, source: "windows-chrome" });
 });
