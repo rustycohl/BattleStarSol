@@ -1,5 +1,78 @@
 # Battle/Star.SOL status
 
+## 2026-07-30 current state — read this section first
+
+Everything below this section is retained history: the 2026-07-29 SOL recovery addendum and
+the original 2026-07-28 `.02` record. They are accurate as records of their moment and are
+**not** the current position.
+
+**Working tree:** `C:\CLAUDE\7-30-2026-Claude\BattleStarSol`, at `e3b1685` — six commits on
+published HEAD `7a8c04f`. Not pushed.
+
+**Published:** `0.1.3-prealpha.1` at <https://rustycohl.github.io/BattleStarSol/>. The six
+commits here are **not** in that release.
+
+**Gates:**
+
+| Gate | Result |
+|---|---|
+| `npm test` | **PASS**, 56/56 |
+| Godot headless `TestRunner.gd` | **PASS** |
+| Godot headless `PlaytestRunner.gd` | **PASS**, 312 checks |
+| Web runtime matches source | **PASS** — re-exported, `MANIFEST.sha256` regenerated from it |
+
+**What changed in this run:**
+
+- **Loop 6 closed (M08-002).** The d10SRD rules are distributed into this repository at
+  `vendor/d10srd/` under their own licence, with `PROVENANCE.json` recording upstream commit
+  `c77005b20d74d25a426e6b7620e63d49b0778105` and a SHA-256 per file.
+  `tests/d10srd-conformance.test.mjs` **executes** them against all six published conformance
+  vectors. Previously the only check was a transcription of the rule numbers into a test,
+  which asserts a copy against itself and cannot fail for the right reason. Diagnosed by the
+  principal as an orphan — stripped scaffolding — not a documentation gap.
+- **Conformance and balance separated (M08-001).** The SRD forbids deriving health, damage,
+  movement, and action counts from d10 scaling. Seventeen authored balance numbers had been
+  pinned under a "d10SRD Conformance" label, which would make a deliberate tuning change read
+  as a rules violation. They now live in `_test_balance_baseline()`. Conformance vectors 1–4
+  do not apply to this port (no check resolution exists here) and that claim is verified by
+  absence: a forbidden check-resolution symbol appearing in `GameConfig` fails the build.
+- **Standoff cover derived, not authored (M03-007).** The new Standoff sector injected a bare
+  `{"type": COVER, "z": 3}` cell, bypassing `WorldBuilder.material_cell`. It behaved
+  correctly — `Ballistics.density_of` falls back to the type's implied material — so no
+  behavioural test could catch it. It cost ledger fidelity: `material_before` recorded `""`,
+  and the reproduction schema types that field loosely enough to validate, so the artifact did
+  not fail closed either. Now caught structurally by `_test_scene_cover_is_material()`.
+- **Evidence promotion gated.** `.partial` runs are unpromoted by definition;
+  `tests/evidence-hygiene.test.mjs` asserts none is tracked, that every promoted pack carries
+  `SHA256SUMS`, and that no promoted pack contains `HARNESS-ERROR.json`.
+- **An inherited red gate cleared.** `npm test` was failing before this run: five
+  manifest-listed scripts had been edited without regenerating `game/MANIFEST.sha256`, and the
+  committed Web runtime predated those edits. Re-exported first, then regenerated — the
+  reverse order binds a stale runtime to new source and passes green.
+- **Upstream work versioned.** The 98 uncommitted lines found in the leading-edge tree
+  (ORACLE/DEALER payload ingestion, the Standoff sector, a d10 conformance test) are recorded
+  verbatim in `60faf3c`, credited to their author, so the corrections can be reverted
+  independently of the feature.
+
+**Open, and named:**
+
+- This repository conforms to vendored d10SRD commit `c77005b`. If upstream publishes a rules
+  change, `vendor/d10srd/PROVENANCE.json` carries the update procedure; the digest assertions
+  make running it a visible act rather than an optional one.
+- Terrain events can exhaust the reproduction ledger at roughly 18 worst-case grenades per
+  mission, bounded by artifact bytes rather than event count. Full fidelity is retained and the
+  artifact fails closed. Unchanged this run.
+- The strategic layer is a working bridge, not yet a campaign.
+- Destruction is modelled but not visible: material, density, and integrity are all tracked
+  and none of it is shown to the player.
+- Promoted evidence packs under `evidence/playtests/` remain untracked.
+
+**Evidence for this run:** `evidence/M08-001-D10SRD-CONFORMANCE-2026-07-30.md`,
+`evidence/M08-002-D10SRD-VENDORED-2026-07-30.md`,
+`evidence/M03-007-STANDOFF-COVER-DERIVED-2026-07-30.md`.
+
+---
+
 ## 2026-07-29 SOL recovery addendum
 
 This file retains the 2026-07-28 public and original `.02` record below. For

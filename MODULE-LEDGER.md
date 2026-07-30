@@ -688,6 +688,62 @@ re-earned.
 - `game/tests/TestRunner.gd` SHA-256:
   `5d24ad03c71470ac6453369dcf9af3b3fd9a0b68d12257e91c7fb9e50722941c`
 
+## 2026-07-30 second run — module cards
+
+### M08-001 conformance authority
+
+- **Query:** does an authority for the d10 rules already exist? Yes — `rustycohl/d10SRD`,
+  its own repository, executable rules, licence permitting distribution. Nothing in
+  BattleStarSol consumed it.
+- **Smallest reversible module:** replace the transcribed literals with a pin that names the
+  authority and is asserted for identity.
+- **Observable result:** three negative controls fail — AP maximum broken, forbidden
+  check-resolution symbol appearing, pin version drift.
+- **Outcome:** PASS. Recorded a PARTIAL limit, which M08-002 superseded.
+- **Evidence:** `evidence/M08-001-D10SRD-CONFORMANCE-2026-07-30.md`
+
+### M08-002 rules distributed and executed — Loop 6 closed
+
+- **Query:** is the authority genuinely unreachable, or merely disconnected? Merely
+  disconnected. Reclassified by the principal from documentation gap to orphan.
+- **Module:** distribute `d10.mjs`, `core.mjs`, `SRD.md` to `vendor/d10srd/` with their
+  licences and a digested `PROVENANCE.json`; execute them against all six published
+  conformance vectors.
+- **Observable result:** vectors 1-4 exercised against the real implementation; vector 5
+  cross-checked across the document, `GameConfig.MAX_AP`, and the pin; vector 6 asserts the
+  authority-boundary sentence is still present. Negative controls: an out-of-band edit to a
+  vendored file, and re-pinning one side alone.
+- **Outcome:** PASS. Loop 6 PARTIAL -> PASS.
+- **Evidence:** `evidence/M08-002-D10SRD-VENDORED-2026-07-30.md`
+
+### M03-007 Standoff cover derived from material
+
+- **Query:** does an authority for cover material exist? Yes — `WorldBuilder.material_cell`,
+  registered since M03-004. The Standoff sector bypassed it.
+- **Why it was invisible:** `Ballistics.density_of`'s back-compat path for pre-material
+  golden fixtures reaches the identical density, so behaviour was correct and no behavioural
+  test could catch it.
+- **Observable result:** a structural check walks the live Standoff grid and rejects any
+  cover cell lacking `density`/`integrity`/`material`, naming the coordinate and its keys.
+  Observed failing against the prior behaviour first.
+- **Outcome:** PASS.
+- **Evidence:** `evidence/M03-007-STANDOFF-COVER-DERIVED-2026-07-30.md`
+
+### Build integrity — inherited red gate
+
+- `npm test` was RED on the leading-edge tree before this run. Five manifest-listed scripts
+  had been edited without regenerating `game/MANIFEST.sha256`. Confirmed inherited:
+  `git show HEAD:game/scripts/Main.gd` hashes to the manifest's expectation exactly.
+- The committed Web runtime was stale too, predating those edits. Re-exported **before**
+  regenerating the manifest; the reverse order binds a stale runtime to new source and passes.
+- `index.pck` 298,012 -> 304,096 bytes. Manifest 134 -> 140 entries, normalized to LF.
+
+### Gates at `e3b1685`
+
+- `npm test`: PASS, 56/56 (was 43 at `7a8c04f`)
+- Godot headless `TestRunner.gd`: PASS
+- Godot headless `PlaytestRunner.gd`: PASS, 312 checks
+
 ## Original dependency order and current position
 
 1. M00 baseline checks and provenance — complete
@@ -698,7 +754,15 @@ re-earned.
    an armed sector and identified the guided scenario's AP-0 dummies as the
    reason it could never appear there
 6. M04 bounded reproduction artifact — complete for declared supported portion
-7. M05 viewport/accessibility — M05-A source/live desktop increment and M05-B
-   broader matrix complete; compact HUD mode and assistive-technology behavior
-   remain open
-8. M06 local release-candidate preparation — gated
+7. M05 viewport/accessibility — complete through M05-004: adaptive HUD with
+   per-surface opacity, slide, and park; keyboard traversal; contrast checked on
+   every build at every supported viewport; reduced-motion respected. Screen-reader
+   and other assistive-technology behavior remains open
+8. M06 local release-candidate preparation — complete (M06-001)
+9. M07 public release — complete (M07-001), `0.1.3-prealpha.1` live
+10. M08 external conformance — complete (M08-001, M08-002); the d10SRD rules are
+    distributed and executed, Loop 6 closed. Conforms to vendored commit `c77005b`;
+    a future upstream rules change requires running the documented update procedure
+
+**Position as of 2026-07-30, second run:** six commits ahead of the published release,
+all gates green, nothing pushed. The package is `C:\CLAUDE\Opus5-work-7302026.zip`.
