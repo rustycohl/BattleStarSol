@@ -66,6 +66,8 @@ func set_payload(p: Dictionary) -> bool:
 		push_error("[PayloadBridge] Invalid deployment payload: %s" % str(errors))
 		return false
 	_payload = normalized
+	_payload["_shape_report"] = Contract.deploy_shape_report(p)
+
 	var config = get_node_or_null("/root/GameConfig")
 	if config:
 		config.cell_size = float(_payload.get("cell_size", 2.0))
@@ -136,7 +138,10 @@ func push_extraction(result: Dictionary) -> bool:
 		var budget: Dictionary = game_state.ledger_budget()
 		if not budget.is_empty():
 			result["repro_budget"] = budget
+	if _payload.has("_shape_report"):
+		result["_shape_report"] = _payload["_shape_report"]
 	var extraction_message := _build_extraction_message(result)
+
 
 	print("[PayloadBridge] PUSHING EXTRACTION RESULT: ", result)
 

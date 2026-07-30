@@ -78,6 +78,7 @@ var weapon_btns: Dictionary = {}
 var action_btns: Dictionary = {}
 var action_groups: Dictionary = {}
 var hint_label: Label
+var shape_warning_label: Label
 var tutorial_panel: PanelContainer
 var tutorial_title_label: Label
 var tutorial_body_label: Label
@@ -544,6 +545,21 @@ func _build_ui() -> void:
 
 	hint_label = _mk_label("", 12, Color(0.7, 0.85, 1.0), true)
 	hint_label.custom_minimum_size = Vector2(205, 0)
+
+	shape_warning_label = _mk_label("", 10, Color(1.0, 0.4, 0.4), true)
+	shape_warning_label.custom_minimum_size = Vector2(205, 0)
+	left_vbox.add_child(shape_warning_label)
+	
+	if PayloadBridge.has_payload():
+		var p = PayloadBridge.get_payload()
+		if p.has("_shape_report") and typeof(p["_shape_report"]) == TYPE_DICTIONARY:
+			var report = p["_shape_report"]
+			var substituted = report.get("substituted_fields", [])
+			if not substituted.is_empty():
+				shape_warning_label.text = "PAYLOAD WARNING:\nMissing fields substituted:\n" + ", ".join(substituted)
+			elif report.get("empty_squad", false):
+				shape_warning_label.text = "PAYLOAD WARNING:\nSquad explicitly empty."
+
 
 	roster_box = VBoxContainer.new()
 	roster_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
