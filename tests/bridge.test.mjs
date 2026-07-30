@@ -86,6 +86,13 @@ test("deployment is deterministic, versioned, and Base-10 compatible", () => {
   assert.equal(first.target.capability, "tactical.deploy");
   assert.equal(first.payload.deploy.squad.length, 3);
   assert.equal(first.payload.deploy.seed, second.payload.deploy.seed);
+  assert.deepEqual([...first.payload.deploy.objectives], [
+    "Select the Commander",
+    "Move and practice defense",
+    "Complete a basic attack",
+    "End turn and observe the phases",
+    "Extract to strategy",
+  ]);
 });
 
 test("envelope validation rejects unsupported major versions", () => {
@@ -155,6 +162,66 @@ test("profile storage is bounded and recoverable", () => {
 
   assert.equal(restored.missions.length, 50);
   assert.equal(restored.applied_extractions.length, 100);
+});
+
+test("adaptive HUD preferences round-trip through the Commander profile", () => {
+  const bridge = loadBridge();
+  const storage = memoryStorage();
+
+  // A fresh profile carries the authored HUD: every surface open and opaque.
+  const fresh = bridge.readHudPreferences(storage);
+  assert.equal(fresh.schema, "gzg.battlestar.hud/1.0");
+  for (const key of ["status", "feed", "tutorial", "dock"]) {
+    assert.equal(fresh.surfaces[key].opacity, 1);
+    assert.equal(fresh.surfaces[key].parked, false);
+  }
+
+  const written = bridge.writeHudPreferences({
+    surfaces: {
+      status: { opacity: 0.5, parked: true },
+      feed: { opacity: 0.75, parked: false },
+    },
+  }, storage);
+  assert.equal(written.surfaces.status.opacity, 0.5);
+  assert.equal(written.surfaces.status.parked, true);
+  assert.equal(written.surfaces.feed.opacity, 0.75);
+
+  // Preferences survive a reload and do not disturb the rest of the profile.
+  const reloaded = bridge.loadProfile(storage);
+  assert.equal(reloaded.hud.surfaces.status.parked, true);
+  assert.equal(reloaded.callsign, bridge.defaultProfile().callsign);
+  assert.equal(reloaded.deployment_count, 0);
+});
+
+test("adaptive HUD preferences fail closed on hostile or absent values", () => {
+  const bridge = loadBridge();
+
+  // Out-of-range, non-finite, unknown, and wrong-typed values all fall back to
+  // the authored HUD rather than reaching the runtime.
+  const clamped = bridge.normalizeHudPreferences({
+    surfaces: {
+      status: { opacity: 99, parked: "yes" },
+      feed: { opacity: -5, parked: 1 },
+      tutorial: { opacity: Number.NaN, parked: true },
+      dock: "not-an-object",
+      injected: { opacity: 0.2, parked: true },
+    },
+  });
+  assert.equal(clamped.surfaces.status.opacity, 1);
+  // Only a real boolean true parks a surface.
+  assert.equal(clamped.surfaces.status.parked, false);
+  assert.equal(clamped.surfaces.feed.opacity, 0.15);
+  assert.equal(clamped.surfaces.feed.parked, false);
+  assert.equal(clamped.surfaces.tutorial.opacity, 1);
+  assert.equal(clamped.surfaces.tutorial.parked, true);
+  assert.equal(clamped.surfaces.dock.opacity, 1);
+  assert.equal(Object.hasOwn(clamped.surfaces, "injected"), false);
+
+  for (const hostile of [null, undefined, 42, "surfaces", [], { surfaces: [] }]) {
+    const fallback = bridge.normalizeHudPreferences(hostile);
+    assert.equal(Object.keys(fallback.surfaces).length, 4);
+    assert.equal(fallback.surfaces.dock.opacity, 1);
+  }
 });
 
 test("deployment sanitizes A.T.L.A.S. context and bounds return state", () => {

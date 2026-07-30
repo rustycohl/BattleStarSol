@@ -1,10 +1,11 @@
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
-import { extname, join, normalize, relative } from "node:path";
+import { extname, join, normalize, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = fileURLToPath(new URL("../game/web/", import.meta.url));
+const defaultRoot = fileURLToPath(new URL("../game/web/", import.meta.url));
+const root = resolve(process.env.BSS_WEB_ROOT ?? defaultRoot);
 const port = Number.parseInt(process.env.PORT ?? "8781", 10);
 const mimeTypes = new Map([
   [".css", "text/css; charset=utf-8"],
@@ -72,5 +73,5 @@ createServer(async (request, response) => {
     response.end("Not found.\n");
   }
 }).listen(port, "127.0.0.1", () => {
-  console.log(`Battle/Star.SOL available at http://127.0.0.1:${port}/`);
+  console.log(`Battle/Star.SOL available at http://127.0.0.1:${port}/ from ${root}`);
 });

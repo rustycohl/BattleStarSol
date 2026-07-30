@@ -8,6 +8,7 @@ class_name MovementContext
 ## becoming unrelated buttons that only spend AP and toggle a flag.
 
 const Config = preload("res://scripts/GameConfig.gd")
+const Ballistics = preload("res://scripts/Ballistics.gd")
 const Maneuvers = preload("res://scripts/ManeuverState.gd")
 
 const CARDINAL_DIRECTIONS: Array[Vector2i] = [
@@ -17,6 +18,26 @@ const CARDINAL_DIRECTIONS: Array[Vector2i] = [
 	Vector2i(0, -1)
 ]
 
+## Commitable cover faces beside a cell. A face qualifies on the strength of the
+## material still standing there, so a wall shot down to rubble stops offering
+## cover without a separate rule.
+static func cover_faces_at(
+	cell: Vector2i,
+	cells: Dictionary,
+	actor_z: int = 0
+) -> Array[Vector2i]:
+	var options: Array[Vector2i] = []
+	for direction in CARDINAL_DIRECTIONS:
+		var candidate: Vector2i = cell + direction
+		var data: Dictionary = cells.get(candidate, {})
+		# A face has to be taller than the actor to be worth committing to.
+		if (
+			Ballistics.effective_cover_level(data) >= 2
+			and int(data.get("z", 0)) > actor_z
+		):
+			options.append(candidate)
+	return options
+
 static func cover_options(unit, cells: Dictionary) -> Array[Vector2i]:
 	var options: Array[Vector2i] = []
 	if unit == null or not bool(unit.alive) or bool(unit.taking_cover):
@@ -25,12 +46,7 @@ static func cover_options(unit, cells: Dictionary) -> Array[Vector2i]:
 		return options
 	if Maneuvers.is_committed(unit.maneuver):
 		return options
-	for direction in CARDINAL_DIRECTIONS:
-		var candidate: Vector2i = Vector2i(unit.cell) + direction
-		var data: Dictionary = cells.get(candidate, {})
-		if int(data.get("type", Config.FLOOR)) == Config.COVER:
-			options.append(candidate)
-	return options
+	return cover_faces_at(Vector2i(unit.cell), cells, int(unit.z))
 
 static func can_take_cover(unit, target: Vector2i, cells: Dictionary) -> bool:
 	return target != Config.INVALID_CELL and cover_options(unit, cells).has(target)

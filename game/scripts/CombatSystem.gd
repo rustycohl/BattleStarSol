@@ -2,6 +2,7 @@ extends Node
 class_name CombatSystem
 
 const Config = preload("res://scripts/GameConfig.gd")
+const Ballistics = preload("res://scripts/Ballistics.gd")
 
 var main: Node
 
@@ -136,6 +137,16 @@ func _do_generic_ranged(attacker: Unit, target: Unit, kind: String, cost: int, d
 	await tw.finished
 	proj.queue_free()
 
+	var blast_radius := int(ItemDB.get_item(kind).get("blast_radius", 0))
+	if blast_radius > 0:
+		# A blast resolves on the landing cell, not on one target: everything in
+		# radius takes it, terrain included. This is the mechanic that makes
+		# destruction testable by hand.
+		await _detonate(attacker, landing, kind, dmg, blast_radius)
+		main._update_ui()
+		main._check_end()
+		main.set_action_busy(false)
+		return
 	var dealt := apply_damage(target, dmg, true, attacker.cell, kind, attacker)
 	if is_thrown:
 		main._add_debris(landing, kind, 1)
@@ -143,6 +154,96 @@ func _do_generic_ranged(attacker: Unit, target: Unit, kind: String, cost: int, d
 	main._update_ui()
 	main._check_end()
 	main.set_action_busy(false)
+
+## Area detonation. Falls off with distance, applies to every living unit in radius
+## including the thrower's own squad, and works the terrain through the same single
+## authority ordinary fire uses.
+func _detonate(attacker: Unit, centre: Vector2i, kind: String, dmg: int, radius: int) -> void:
+	var item: Dictionary = ItemDB.get_item(kind)
+	var hits_terrain := bool(item.get("blast_terrain", false))
+	var affected: Array[Dictionary] = []
+	for unit in main.units:
+		if unit == null or not bool(unit.alive):
+			continue
+		var distance: int = Pathfinder.cheb(centre, Vector2i(unit.cell))
+		if distance > radius:
+			continue
+		affected.append({"unit": unit, "distance": distance})
+	# Deterministic order so a replay resolves identically.
+	affected.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
+		if int(left["distance"]) != int(right["distance"]):
+			return int(left["distance"]) < int(right["distance"])
+		return int(left["unit"].unit_id) < int(right["unit"].unit_id)
+	)
+
+	var terrain_broken := 0
+	if hits_terrain:
+		var cells_in_blast: Array[Vector2i] = []
+		for dy in range(-radius, radius + 1):
+			for dx in range(-radius, radius + 1):
+				var cell := centre + Vector2i(dx, dy)
+				if maxi(absi(dx), absi(dy)) > radius:
+					continue
+				if main.cells.has(cell):
+					cells_in_blast.append(cell)
+		cells_in_blast.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+			if a.x != b.x:
+				return a.x < b.x
+			return a.y < b.y
+		)
+		for cell in cells_in_blast:
+			var falloff := maxi(radius - maxi(absi(cell.x - centre.x), absi(cell.y - centre.y)) + 1, 1)
+			var terrain_damage := maxi(int(round(float(dmg) * float(falloff) * 1.5)), 1)
+			var delta: Dictionary = main.damage_terrain(cell, terrain_damage, kind, attacker)
+			if not delta.is_empty() and bool(delta.get("destroyed", false)):
+				terrain_broken += 1
+
+	var total_dealt := 0
+	for entry in affected:
+		var unit = entry["unit"]
+		var distance := int(entry["distance"])
+		# Full damage at the centre, halving outward, never below one.
+		var blast_damage := maxi(int(round(float(dmg) / pow(2.0, float(distance)))), 1)
+		total_dealt += apply_damage(unit, blast_damage, true, centre, kind, attacker)
+
+	GameState.record_event("blast_resolved", {
+		"attacker": attacker.unit_id if attacker != null else 0,
+		"weapon": kind,
+		"cell": {"x": centre.x, "y": centre.y, "z": int(main.cells.get(centre, {}).get("z", 0))},
+		"radius": radius,
+		"units_hit": affected.size(),
+		"damage_dealt": total_dealt,
+		"terrain_destroyed": terrain_broken
+	})
+	main._hint("%s detonates: %d hit, %d damage, %d cover broken." % [
+		kind.capitalize(),
+		affected.size(),
+		total_dealt,
+		terrain_broken
+	])
+	await _blast_flash(centre, radius)
+
+## Visual feedback for a detonation, and the first visible destruction the game has.
+func _blast_flash(centre: Vector2i, radius: int) -> void:
+	var flash := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = float(radius) * 0.6
+	sphere.height = float(radius) * 1.2
+	var flash_material := StandardMaterial3D.new()
+	flash_material.albedo_color = Color(1.0, 0.65, 0.2, 0.55)
+	flash_material.emission_enabled = true
+	flash_material.emission = Color(1.0, 0.5, 0.1)
+	flash_material.emission_energy_multiplier = 6.0
+	flash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	sphere.material = flash_material
+	flash.mesh = sphere
+	flash.position = main._cell_to_world(centre) + Vector3(0.0, 0.8, 0.0)
+	main.add_child(flash)
+	var flash_tween := create_tween().set_parallel(true)
+	flash_tween.tween_property(flash, "scale", Vector3(2.2, 2.2, 2.2), 0.28)
+	flash_tween.tween_property(flash_material, "albedo_color:a", 0.0, 0.28)
+	await flash_tween.finished
+	flash.queue_free()
 
 func _try_spear_click(attacker: Unit, target: Unit, cost: int, dmg: int, rng: int) -> void:
 	if attacker.ap < cost or Pathfinder.cheb(attacker.cell, target.cell) > rng:
@@ -344,14 +445,37 @@ func apply_damage(target: Unit, base_dmg: int, is_ranged: bool, from_c: Vector2i
 		a_pierce = int(weapon_item.get("armor_pierce", 0))
 		is_kinetic = (dmg_type == "kinetic")
 
-		var cover_state: int = main._in_cover(from_c, target.cell)
+		var shooter_z := int(attacker.z) if attacker != null else 0
+		var cover_state: int = main._in_cover(from_c, target.cell, shooter_z, int(target.z))
 		if target.stance == "crouch" and cover_state == 1:
 			cover_state = 2 # Crouching behind half-cover gives full-cover benefit
 
+		# The round meets the material that was protecting the target. What gets
+		# through is decided by penetration against that cell's integrity, and the
+		# material takes its share of the hit either way.
+		var lane_cell = Ballistics.lane_cover_cell(from_c, target.cell, main.cells)
+		var cover_scale := 1.0
+		if lane_cell != null and not penetrates_cover:
+			var shot: Dictionary = Ballistics.resolve_item_penetration(
+				main.cells.get(lane_cell, {}),
+				weapon_item,
+				100
+			)
+			if String(shot["outcome"]) == "penetrated":
+				# Cover still helps, but only as much as it took out of the round.
+				cover_scale = 1.0 - clampf(float(shot["power_through"]) / 100.0, 0.0, 1.0)
+			if main.has_method("damage_terrain"):
+				main.damage_terrain(
+					lane_cell,
+					int(shot["damage_to_cover"]),
+					weapon,
+					attacker
+				)
+
 		if cover_state == 2 and not penetrates_cover:
-			dmg_f -= Config.COVER_REDUCTION
+			dmg_f -= Config.COVER_REDUCTION * cover_scale
 		elif cover_state == 1 and not penetrates_cover:
-			dmg_f -= Config.HALF_COVER_REDUCTION
+			dmg_f -= Config.HALF_COVER_REDUCTION * cover_scale
 
 		if target.stance == "crouch":
 			dmg_f *= 0.75
@@ -375,9 +499,18 @@ func apply_damage(target: Unit, base_dmg: int, is_ranged: bool, from_c: Vector2i
 	if attacker != null and attacker.z > target.z:
 		dmg_f += float(Config.HIGH_GROUND_BONUS * (attacker.z - target.z))
 
-	# Armor Mitigation & Degradation
+	# Armor Mitigation & Degradation.
+	#
+	# Armor is resolved on the same penetration scale as terrain, so "can this round
+	# get through that" is one question with one answer whether the obstacle is a
+	# wall or a breastplate. The authored `armor_pierce` still supplies the
+	# penetration; what it now buys is proportional, not a flat subtraction.
 	var armor_before := target.armor
-	var eff_armor = maxi(target.armor - a_pierce, 0)
+	var armor_item: Dictionary = ItemDB.get_item(weapon)
+	if armor_item.is_empty():
+		armor_item = {"armor_pierce": a_pierce, "damage_type": dmg_type}
+	var armor_shot: Dictionary = Ballistics.resolve_armor(target.armor, armor_item, 100)
+	var eff_armor = int(round(float(target.armor) * float(armor_shot["mitigation_scale"])))
 	if is_kinetic:
 		if eff_armor > 0:
 			dmg_f = maxf(dmg_f - float(eff_armor), 1.0)

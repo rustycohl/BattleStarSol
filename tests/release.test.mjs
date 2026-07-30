@@ -61,18 +61,26 @@ test("the embedded A.T.L.A.S. fallback is complete and static", async () => {
 });
 
 test("release claims are tied to source and deployment configuration", async () => {
-  const [config, main, workflow, status, galaxy] = await Promise.all([
+  const [config, main, workflow, status, galaxy, packageJson] = await Promise.all([
     text("game/scripts/GameConfig.gd"),
     text("game/scripts/Main.gd"),
     text(".github/workflows/pages.yml"),
     text("STATUS.md"),
     text("docs/GALAXY.md"),
+    text("package.json"),
   ]);
+  // Derived from the package rather than pinned to a literal, so the release claim
+  // and the released artifact cannot drift apart at the next version bump.
+  const version = JSON.parse(packageJson).version;
 
   assert.match(config, /const MAX_AP := 10/);
   assert.match(main, /"emergency_evac": \[KEY_F8\]/);
   assert.match(workflow, /path: game\/web/);
-  assert.match(status, /0\.1\.1-prealpha\.1/);
+  assert.ok(version.length > 0, "package.json declares no version");
+  assert.ok(
+    status.includes(version),
+    `STATUS.md does not claim the released version ${version}`,
+  );
   assert.match(galaxy, /one repository = one Page = one galaxy/);
   await access(new URL("archive/launch-surface-alpha.1/README.md", root));
 });

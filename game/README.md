@@ -75,6 +75,13 @@ The candidate keeps the proven three-part shape:
 - The tactical HUD separates persistent squad state from transient activity;
   its compact bottom action dock wraps and hides empty contextual groups, and
   the runtime exposes a fullscreen toggle.
+- The `.02` status layer makes the current faction, active pilot, AP, core
+  costs, End Turn phase sequence, and F8 extraction route persistent; F1/Tab
+  opens the matching in-game help, and developer mobility stays outside the
+  core dock until explicitly enabled.
+- The `.02` Proving Ground uses accepted actions and resolved events to guide
+  the real six-step tactical loop with nearby inert hostile targets for every
+  player faction.
 
 ## Run it
 
@@ -122,8 +129,8 @@ smoke is still required.
 These are not complete yet: authenticated account persistence, persistent
 soldiers/permadeath, ghost retention rules,
 hotseats/rank/shards, Discord flow, real multiplayer coordination, remote feed
-polling, full tutorial scripting, controller support, RL adapters, and complete
-mobility semantics. See `docs/STATUS.md`.
+polling, freeform/branching tutorial scripting, controller support, RL
+adapters, and complete mobility semantics. See `docs/STATUS.md`.
 
 ## Project map
 

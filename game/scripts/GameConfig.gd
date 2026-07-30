@@ -81,9 +81,9 @@ const FACTION_TIME := 2
 ## Default fireteam size for non-tutorial deploys (1 Commander + 2 Agents).
 const STANDARD_SQUAD_SIZE := 3
 
-const KINDS = ["rock", "spear", "club", "bow", "string", "arrow", "stringedbow"]
+const KINDS = ["rock", "spear", "club", "bow", "string", "arrow", "stringedbow", "grenade"]
 const ENEMY_WEAPONS = ["rock", "spear", "club"]
-const CODES = {"rock": "R", "spear": "S", "club": "C", "bow": "Bw", "string": "St", "arrow": "Ar", "stringedbow": "SB"}
+const CODES = {"rock": "R", "spear": "S", "club": "C", "bow": "Bw", "string": "St", "arrow": "Ar", "stringedbow": "SB", "grenade": "G"}
 const INVALID_CELL = Vector2i(-999, -999)
 
 # All systems that draw or pick the voxel grid must use the same transform.
@@ -119,12 +119,13 @@ const MAX_GRID_SIZE := 1000
 const HIGH_GROUND_BONUS := 1
 
 # ---------- Faction canon (the three hotseats) ----------
-# The three team slots map to the shipping factions + their signature colours.
+# Player-facing names pair current canon with accepted historical aliases.
+# Integer team IDs and serialized deploy aliases remain unchanged.
 static func faction_name(team: int) -> String:
 	match team:
-		FACTION_HAD:  return "EFD"
-		FACTION_SYND: return "Metropoli"
-		FACTION_TIME: return "Kaiju/Aliens"
+		FACTION_HAD:  return "HAD // EFD"
+		FACTION_SYND: return "SYNDICATE // METROPOLI"
+		FACTION_TIME: return "TIMECORPS // KAIJU/ALIENS"
 	return "Unknown"
 
 ## Static so call sites can use GameConfig.faction_color without relying on the

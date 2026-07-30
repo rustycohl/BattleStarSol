@@ -13,6 +13,10 @@ const MovementRules = preload("res://scripts/MovementContext.gd")
 const Maneuvers = preload("res://scripts/ManeuverState.gd")
 const UnitScript = preload("res://scripts/Unit.gd")
 const PathScript = preload("res://scripts/Pathfinder.gd")
+const Tactics = preload("res://scripts/AITactics.gd")
+const TutorialGuide = preload("res://scripts/TutorialDirector.gd")
+const SquadSpawn = preload("res://scripts/SquadSpawner.gd")
+const Ballistics = preload("res://scripts/Ballistics.gd")
 
 var failures: Array[String] = []
 var passed: int = 0
@@ -30,10 +34,13 @@ func _run() -> void:
 	_test_cover_and_los()
 	await _test_login_and_launcher()
 	await _test_faction_deploy_matrix()
+	await _test_guided_proving_ground()
+	await _test_terrain_destruction()
 	await _test_full_combat_micro()
 	await _test_extraction_paths()
 	await _test_turn_cycle_integrity()
 	await _test_busy_lock_during_ai()
+	_test_ai_cover_and_flank()
 	var elapsed = Time.get_ticks_msec() - started_ms
 	if failures.is_empty():
 		print("PASS: PlaytestRunner %d checks in %d ms" % [passed, elapsed])
@@ -246,6 +253,15 @@ func _test_faction_deploy_matrix() -> void:
 		await process_frame
 		_expect(main.player_faction == int(fac["expect"]), "faction map failed for %s" % fac["faction"])
 		_expect(main.units.size() == 9, "9 units for %s" % fac["faction"])
+		_expect(
+			main.tactical_ui.turn_label.text.contains(Config.faction_name(int(fac["expect"]))),
+			"turn banner vocabulary failed for %s" % fac["faction"]
+		)
+		_expect(
+			main.tactical_ui.phase_help_label.text.contains("END TURN")
+			and main.tactical_ui.phase_help_label.text.contains("EXTRACT/F8"),
+			"first-turn consequence line failed for %s" % fac["faction"]
+		)
 		var player_alive = 0
 		var bots = 0
 		var pilots = 0
@@ -272,8 +288,504 @@ func _test_faction_deploy_matrix() -> void:
 		if router:
 			router.bind(null)
 
+func _test_guided_proving_ground() -> void:
+	print("  [7] guided Proving Ground")
+	var bridge = root.get_node_or_null("PayloadBridge")
+	var router = root.get_node_or_null("ActionRouter")
+	var game_state = root.get_node_or_null("GameState")
+	_expect(bridge != null and router != null and game_state != null, "tutorial autoloads present")
+	if bridge == null or router == null or game_state == null:
+		return
+
+	var recovery_tutorial = TutorialGuide.new()
+	_expect(
+		recovery_tutorial.begin(
+			{"sector": "Proving Ground"},
+			Config.FACTION_HAD,
+			4
+		),
+		"AP-recovery tutorial fixture activates (M01-004)"
+	)
+	recovery_tutorial.step = TutorialGuide.Step.DEFENSE
+	recovery_tutorial.set_cover_available(false)
+	recovery_tutorial.set_defense_affordable(false)
+	var recovery_snapshot: Dictionary = recovery_tutorial.current_snapshot()
+	_expect(
+		not bool(recovery_snapshot.get("defense_affordable", true))
+		and String(recovery_snapshot.get("body", "")).contains("END TURN"),
+		"0 AP defense guidance names the recovery action (M01-004)"
+	)
+	var recovery_commander := {
+		"alive": true,
+		"is_commander": true,
+		"team": Config.FACTION_HAD
+	}
+	_expect(
+		not recovery_tutorial.observe_action("endturn", recovery_commander)
+		and recovery_tutorial.step == TutorialGuide.Step.DEFENSE,
+		"End Turn retains the DEFENSE checkpoint (M01-004)"
+	)
+	_expect(
+		not recovery_tutorial.observe_record({
+			"record_type": "event",
+			"event": "turn_started",
+			"payload": {"active_team": Config.FACTION_HAD, "round": 5}
+		})
+		and recovery_tutorial.step == TutorialGuide.Step.DEFENSE,
+		"the recovery turn returns to the retained DEFENSE checkpoint (M01-004)"
+	)
+	recovery_tutorial.set_defense_affordable(true)
+	_expect(
+		bool(recovery_tutorial.current_snapshot().get("defense_affordable", false)),
+		"refreshed AP restores affordable defense guidance (M01-004)"
+	)
+	_expect(
+		recovery_tutorial.observe_action("brace", recovery_commander)
+		and recovery_tutorial.step == TutorialGuide.Step.ATTACK,
+		"accepted Brace advances the recovered tutorial (M01-004)"
+	)
+
+	var factions = [
+		{"name": "HAD", "team": Config.FACTION_HAD},
+		{"name": "SYND", "team": Config.FACTION_SYND},
+		{"name": "TIMECORPS", "team": Config.FACTION_TIME}
+	]
+	for faction in factions:
+		bridge.set_payload({
+			"type": "deploy",
+			"sector": "Proving Ground",
+			"faction": faction["name"],
+			"seed": 999999,
+			"squad": [{"name": "Recruit-1", "cls": "Scout"}],
+			"objectives": ["Complete Guided Proving Ground"],
+			"resources": {"neural": 0, "capital": 0}
+		})
+		var main = (load("res://Main.tscn") as PackedScene).instantiate()
+		root.add_child(main)
+		await process_frame
+		await process_frame
+		_expect(main.player_faction == int(faction["team"]), "tutorial faction map for %s" % faction["name"])
+		_expect(
+			main.units.size() == 4,
+			"tutorial has one Commander, two targets, and Haili for %s" % faction["name"]
+		)
+		_expect(main.tutorial != null and bool(main.tutorial.active), "tutorial director active for %s" % faction["name"])
+		_expect(main.tactical_ui.tutorial_panel.visible, "tutorial panel visible for %s" % faction["name"])
+
+		var commander = null
+		var targets: Array = []
+		var instructor = null
+		for unit in main.units:
+			if unit.team == main.player_faction:
+				commander = unit
+			elif String(unit.name) == SquadSpawn.INSTRUCTOR_NAME:
+				instructor = unit
+			else:
+				targets.append(unit)
+		_expect(commander != null and bool(commander.is_commander), "tutorial Commander exists for %s" % faction["name"])
+		_expect(targets.size() == 2, "tutorial targets are hostile for %s" % faction["name"])
+		if commander != null:
+			for target in targets:
+				var distance := absi(target.cell.x - commander.cell.x) + absi(target.cell.y - commander.cell.y)
+				_expect(distance <= 3, "tutorial target is reachable for %s" % faction["name"])
+
+		# The armed instructor is the only tutorial agent with a real action pool.
+		# The dummies teach the action surface; Haili makes positional play
+		# observable in the guided scenario instead of headless-only.
+		_expect(instructor != null, "guided tutorial provides the armed instructor for %s" % faction["name"])
+		if instructor != null:
+			_expect(
+				int(instructor.team) != int(main.player_faction),
+				"the instructor is not hostile for %s" % faction["name"]
+			)
+			_expect(
+				int(instructor.max_ap) == Config.MAX_AP and int(instructor.ap) == Config.MAX_AP,
+				"the instructor has no Base-10 action pool for %s" % faction["name"]
+			)
+			_expect(
+				(instructor.skills as Array).size() > 1,
+				"the instructor is unarmed for %s" % faction["name"]
+			)
+			for dummy in targets:
+				_expect(
+					int(dummy.max_ap) == 0,
+					"a target dummy gained an action pool for %s" % faction["name"]
+				)
+			if commander != null:
+				var instructor_distance := absi(instructor.cell.x - commander.cell.x) + absi(
+					instructor.cell.y - commander.cell.y
+				)
+				_expect(
+					instructor_distance > 3,
+					"the instructor crowds the one-turn melee lane for %s" % faction["name"]
+				)
+
+		if int(faction["team"]) == Config.FACTION_HAD and commander != null and targets.size() == 2:
+			_expect(
+				main.tutorial.current_snapshot()["step_key"] == "select_commander",
+				"tutorial begins at selection"
+			)
+			var commander_row: Dictionary = {}
+			for row in main.tactical_ui.roster_rows:
+				if row.get("unit") == commander:
+					commander_row = row
+					break
+			_expect(not commander_row.is_empty(), "Commander roster row exists (M01-001)")
+			var actions_before_select: int = game_state.action_records.size()
+			if not commander_row.is_empty():
+				commander_row["btn"].pressed.emit()
+				await process_frame
+			_expect(main.selected == commander, "roster row selects the Commander (M01-001)")
+			_expect(
+				main.tutorial.current_snapshot()["step_key"] == "move",
+				"roster row press advances the guided tutorial (M01-001)"
+			)
+			var routed_select := false
+			var routed_select_actor := false
+			for record in game_state.action_records.slice(actions_before_select):
+				if String(record.get("action", "")) == "select" and bool(record.get("accepted", false)):
+					routed_select = true
+					var actor_ref: Dictionary = record.get("actor", {})
+					routed_select_actor = int(actor_ref.get("unit_id", -1)) == int(commander.unit_id)
+			_expect(routed_select, "select crosses the action boundary and reaches the ledger (M01-001)")
+			_expect(routed_select_actor, "routed select preserves Commander identity (M01-001)")
+
+			var observation: Dictionary = main._build_web_observation()
+			var tutorial_observation: Dictionary = observation.get("tutorial", {})
+			_expect(
+				String(observation.get("kind", "")) == "observation"
+				and String(tutorial_observation.get("step", "")) == "move"
+				and int(tutorial_observation.get("display_step", 0)) == 2,
+				"observation preserves guided step fields (M01-003)"
+			)
+			var actor_observation: Dictionary = observation.get("actor", {})
+			var actor_cell: Dictionary = actor_observation.get("cell", {})
+			_expect(
+				int(actor_observation.get("unit_id", -1)) == int(commander.unit_id)
+				and int(actor_cell.get("x", -1)) == commander.cell.x
+				and int(actor_cell.get("y", -1)) == commander.cell.y,
+				"observation actor matches the selected Commander (M01-003)"
+			)
+			_expect(
+				int(actor_observation.get("ap", -1)) == int(commander.ap),
+				"observation actor AP matches simulation authority (M01-003)"
+			)
+			var viewport_observation: Dictionary = observation.get("viewport", {})
+			_expect(
+				int(viewport_observation.get("w", 0)) > 0
+				and int(viewport_observation.get("h", 0)) > 0,
+				"observation publishes a positive viewport (M01-003)"
+			)
+			var camera: Camera3D = main.camera_controller.camera
+			var original_camera_transform := camera.global_transform
+			var view_signature: String = main._observation_view_signature()
+			_expect(
+				not view_signature.is_empty(),
+				"observation view signature tracks the live camera and viewport (M01-005)"
+			)
+			camera.global_position += Vector3(0.25, 0.0, 0.0)
+			var shifted_view_signature: String = main._observation_view_signature()
+			camera.global_transform = original_camera_transform
+			_expect(
+				shifted_view_signature != view_signature,
+				"camera motion invalidates published screen positions (M01-005)"
+			)
+			var move_observations: Array = observation.get("move_targets", [])
+			var chebyshev_only_target_published := false
+			for entry in move_observations:
+				var entry_cell: Dictionary = entry.get("cell", {})
+				var delta_x := absi(int(entry_cell.get("x", commander.cell.x)) - commander.cell.x)
+				var delta_y := absi(int(entry_cell.get("y", commander.cell.y)) - commander.cell.y)
+				if maxi(delta_x, delta_y) <= main.OBSERVATION_RADIUS and delta_x + delta_y > main.OBSERVATION_RADIUS:
+					chebyshev_only_target_published = true
+			_expect(
+				not move_observations.is_empty()
+				and move_observations.size() <= main.OBSERVATION_MOVE_CAP
+				and chebyshev_only_target_published,
+				"observation publishes a bounded legal move list (M01-003)"
+			)
+			var move_costs_valid := true
+			var move_screens_valid := true
+			var move_order_valid := true
+			var previous_move := Vector2i(-1, -1)
+			var has_previous_move := false
+			for entry in move_observations:
+				var entry_cost := int(entry.get("ap", -1))
+				if entry_cost <= 0 or entry_cost > int(commander.ap):
+					move_costs_valid = false
+				var entry_cell: Dictionary = entry.get("cell", {})
+				var current_move := Vector2i(
+					int(entry_cell.get("x", -1)),
+					int(entry_cell.get("y", -1))
+				)
+				if (
+					has_previous_move
+					and (
+						current_move.y < previous_move.y
+						or (
+							current_move.y == previous_move.y
+							and current_move.x < previous_move.x
+						)
+					)
+				):
+					move_order_valid = false
+				previous_move = current_move
+				has_previous_move = true
+				var entry_screen = entry.get("screen", {})
+				if not (entry_screen is Dictionary) or not entry_screen.has("x") or not entry_screen.has("y"):
+					move_screens_valid = false
+			_expect(move_costs_valid, "published move costs fit the remaining AP pool (M01-003)")
+			_expect(
+				move_screens_valid and move_order_valid,
+				"published move targets include screen positions in row-major order (M01-003)"
+			)
+
+			var published_cover_cells: Array[Vector2i] = []
+			for entry in observation.get("cover_faces", []):
+				var cell_data: Dictionary = entry.get("cell", {})
+				published_cover_cells.append(Vector2i(
+					int(cell_data.get("x", -1)),
+					int(cell_data.get("y", -1))
+				))
+			var authoritative_cover_cells: Array[Vector2i] = main.cover_options(commander)
+			if authoritative_cover_cells.size() > main.OBSERVATION_COVER_CAP:
+				authoritative_cover_cells.resize(main.OBSERVATION_COVER_CAP)
+			_expect(
+				published_cover_cells.size() <= main.OBSERVATION_COVER_CAP
+				and published_cover_cells == authoritative_cover_cells,
+				"published cover faces match the UI authority and cap (M01-003)"
+			)
+
+			var attack_observations: Array = observation.get("attack_targets", [])
+			var attacks_valid: bool = attack_observations.size() <= main.OBSERVATION_ATTACK_CAP
+			var pathfinder = root.get_node("Pathfinder")
+			for entry in attack_observations:
+				var hostile = main.get_unit_by_id(int(entry.get("unit_id", -1)))
+				if (
+					hostile == null
+					or not hostile.alive
+					or hostile.team == commander.team
+					or hostile.node == null
+					or not is_instance_valid(hostile.node)
+					or not bool(hostile.node.visible)
+				):
+					attacks_valid = false
+					continue
+				var distance: int = pathfinder.cheb(hostile.cell, commander.cell)
+				if (
+					distance > main.OBSERVATION_RADIUS
+					or bool(entry.get("adjacent", false))
+					!= pathfinder.is_adjacent(hostile.cell, commander.cell)
+				):
+					attacks_valid = false
+			_expect(attacks_valid, "published attack targets are living hostiles with correct adjacency (M01-003)")
+			_expect(
+				JSON.stringify(observation).length() <= 16384,
+				"observation payload remains bounded (M01-003)"
+			)
+			var saved_ap := int(commander.ap)
+			commander.ap = 0
+			var zero_ap_observation: Dictionary = main._build_web_observation()
+			commander.ap = saved_ap
+			_expect(
+				Array(zero_ap_observation.get("move_targets", [])).is_empty(),
+				"0 AP publishes no legal move targets (M01-003)"
+			)
+
+			var move_target: Vector2i = World.spawn_cells(Config.FACTION_HAD)[1]
+			var published_preferred := false
+			for entry in move_observations:
+				var cell_data: Dictionary = entry.get("cell", {})
+				var candidate := Vector2i(
+					int(cell_data.get("x", -1)),
+					int(cell_data.get("y", -1))
+				)
+				if candidate == move_target:
+					published_preferred = true
+					break
+			if not published_preferred and not move_observations.is_empty():
+				var first_cell: Dictionary = move_observations[0].get("cell", {})
+				move_target = Vector2i(
+					int(first_cell.get("x", -1)),
+					int(first_cell.get("y", -1))
+				)
+			_expect(
+				router.request_action(commander, "move", move_target),
+				"a published move target is accepted by ActionRouter (M01-003)"
+			)
+			var move_guard := 0
+			while main.busy and move_guard < 120:
+				await process_frame
+				move_guard += 1
+			_expect(move_guard < 120, "tutorial move resolved")
+			_expect(main.tutorial.current_snapshot()["step_key"] == "defense", "movement advances to defense")
+			_expect(not bool(main.tutorial.cover_available), "clear training lane explains cover fallback")
+			var post_move_ap := int(commander.ap)
+			commander.ap = 0
+			main._update_ui()
+			var zero_ap_guidance: Dictionary = main.tutorial.current_snapshot()
+			_expect(
+				not bool(zero_ap_guidance.get("defense_affordable", true))
+				and String(zero_ap_guidance.get("body", "")).contains("END TURN"),
+				"live 0 AP state publishes recovery guidance (M01-004)"
+			)
+			commander.ap = post_move_ap
+			main._update_ui()
+			_expect(
+				bool(main.tutorial.current_snapshot().get("defense_affordable", false)),
+				"live AP restoration republishes affordable defense (M01-004)"
+			)
+
+			_expect(router.request_action(commander, "brace"), "tutorial Brace accepted")
+			_expect(main.tutorial.current_snapshot()["step_key"] == "attack", "defense advances to attack")
+			var adjacent_target = null
+			for target in targets:
+				if absi(commander.cell.x - target.cell.x) + absi(commander.cell.y - target.cell.y) == 1:
+					adjacent_target = target
+					break
+			_expect(adjacent_target != null, "tutorial provides adjacent basic-attack target")
+			if adjacent_target != null:
+				_expect(
+					router.request_action(commander, "melee", adjacent_target.cell),
+					"tutorial basic attack accepted"
+				)
+			var attack_guard := 0
+			while main.busy and attack_guard < 120:
+				await process_frame
+				attack_guard += 1
+			_expect(attack_guard < 120, "tutorial attack resolved")
+			_expect(main.tutorial.current_snapshot()["step_key"] == "end_turn", "attack advances to End Turn")
+
+			_expect(router.request_action(commander, "endturn"), "tutorial End Turn accepted")
+			_expect(
+				main.tutorial.current_snapshot()["step_key"] == "observe_phases",
+				"End Turn advances to phase observation"
+			)
+			# End Turn is intentionally deferred so the accepted action record is
+			# committed before autonomous phases begin.
+			await process_frame
+			await process_frame
+			var turn_guard := 0
+			while (main.turn != main.player_faction or main.busy) and turn_guard < 180:
+				await process_frame
+				turn_guard += 1
+			_expect(turn_guard < 180, "tutorial faction cycle returned control")
+			_expect(main.global_turn == 2, "tutorial returned on turn 2")
+			_expect(main.tutorial.current_snapshot()["step_key"] == "extract", "returned turn exposes extraction")
+
+			game_state.record_event("mission_resolved", {"outcome": "SUCCESS", "note": "test"})
+			_expect(bool(main.tutorial.current_snapshot()["complete"]), "mission result completes tutorial")
+			_expect(
+				main.tactical_ui.tutorial_title_label.text.contains("PROVING GROUND COMPLETE"),
+				"completion remains visible in the tutorial panel"
+			)
+
+		await process_frame
+		main.free()
+		await process_frame
+		router.bind(null)
+
+func _test_terrain_destruction() -> void:
+	print("  [8a] cover destruction under live fire (M03-005)")
+	var bridge = root.get_node_or_null("PayloadBridge")
+	if bridge:
+		bridge.set_payload({
+			"type": "deploy",
+			"sector": "Destruction Micro",
+			"faction": "HAD",
+			"seed": 84021,
+			"squad": [{"name": "Gunner"}, {"name": "B"}, {"name": "C"}],
+			"objectives": ["Break cover"],
+			"resources": {"neural": 0, "capital": 0}
+		})
+	var main = (load("res://Main.tscn") as PackedScene).instantiate()
+	root.add_child(main)
+	await process_frame
+	await process_frame
+
+	var shooter = main.selected
+	var hostile = null
+	for unit in main.units:
+		if unit != null and bool(unit.alive) and int(unit.team) != int(main.player_faction):
+			hostile = unit
+			break
+	_expect(shooter != null and hostile != null, "destruction micro has a shooter and a target")
+	if shooter == null or hostile == null:
+		main.free()
+		return
+
+	# Stand a wall between them, and put the target directly behind it.
+	var wall_cell: Vector2i = Vector2i(shooter.cell) + Vector2i(2, 0)
+	var target_cell: Vector2i = Vector2i(shooter.cell) + Vector2i(3, 0)
+	if not main.cells.has(wall_cell) or not main.cells.has(target_cell):
+		main.free()
+		return
+	main.cells[wall_cell] = World.material_cell(Config.COVER, 3)
+	main.cells[target_cell] = World.material_cell(Config.FLOOR, 0)
+	hostile.cell = target_cell
+	hostile.z = 0
+
+	_expect(
+		main._in_cover(Vector2i(shooter.cell), target_cell) == 2,
+		"the interposed wall does not read as full cover"
+	)
+	var integrity_before: int = Ballistics.density_of(main.cells[wall_cell])
+	var changes_before: int = main.terrain_changes.size()
+
+	# A rifle round works the material whether or not it gets through.
+	var delta: Dictionary = main.damage_terrain(wall_cell, 28, "rifle", shooter)
+	_expect(not delta.is_empty(), "live fire recorded no terrain change")
+	_expect(
+		Ballistics.density_of(main.cells[wall_cell]) < integrity_before,
+		"the wall did not lose integrity"
+	)
+	_expect(
+		main.terrain_changes.size() == changes_before + 1,
+		"the terrain change was not appended to the mission record"
+	)
+	var game_state = root.get_node_or_null("GameState")
+	_expect(game_state != null, "destruction micro has the ledger authority")
+	var recorded := 0
+	for record in (game_state.event_records if game_state != null else []):
+		if String(record.get("event", "")) == "terrain_damaged":
+			recorded += 1
+	_expect(recorded > 0, "terrain damage was not recorded in the ledger")
+
+	# Sustained fire destroys it, and cover scoring follows the material down.
+	var destroy_guard := 0
+	while Ballistics.effective_cover_level(main.cells[wall_cell]) > 0 and destroy_guard < 30:
+		main.damage_terrain(wall_cell, 28, "rifle", shooter)
+		destroy_guard += 1
+	_expect(destroy_guard < 30, "sustained fire never destroyed the wall")
+	_expect(
+		main._in_cover(Vector2i(shooter.cell), target_cell) == 0,
+		"destroyed cover still protects the target"
+	)
+	_expect(
+		int(main.cells[wall_cell]["type"]) == Config.FLOOR,
+		"destroyed cover is still a cover tile"
+	)
+	var destroyed_recorded := false
+	for record in (game_state.event_records if game_state != null else []):
+		if String(record.get("event", "")) == "terrain_damaged":
+			var payload = record.get("payload", {})
+			if payload is Dictionary and bool((payload as Dictionary).get("destroyed", false)):
+				destroyed_recorded = true
+	_expect(destroyed_recorded, "cover destruction was not recorded as destroyed")
+	# Nothing further to take from open ground.
+	_expect(
+		main.damage_terrain(wall_cell, 28, "rifle", shooter).is_empty(),
+		"open ground kept taking terrain damage"
+	)
+
+	main.free()
+	await process_frame
+	var router = root.get_node_or_null("ActionRouter")
+	if router != null:
+		router.bind(null)
+
 func _test_full_combat_micro() -> void:
-	print("  [7] combat micro-loop")
+	print("  [8] combat micro-loop")
 	var bridge = root.get_node_or_null("PayloadBridge")
 	if bridge:
 		bridge.set_payload({
@@ -373,7 +885,7 @@ func _test_full_combat_micro() -> void:
 		router.bind(null)
 
 func _test_extraction_paths() -> void:
-	print("  [8] extraction paths")
+	print("  [9] extraction paths")
 	var bridge = root.get_node_or_null("PayloadBridge")
 	if bridge:
 		bridge.set_payload({
@@ -433,7 +945,7 @@ func _test_extraction_paths() -> void:
 		router.bind(null)
 
 func _test_turn_cycle_integrity() -> void:
-	print("  [9] turn cycle integrity")
+	print("  [10] turn cycle integrity")
 	var bridge = root.get_node_or_null("PayloadBridge")
 	if bridge:
 		bridge.set_payload({
@@ -474,7 +986,7 @@ func _test_turn_cycle_integrity() -> void:
 		router.bind(null)
 
 func _test_busy_lock_during_ai() -> void:
-	print("  [10] busy lock during AI flag")
+	print("  [11] busy lock during AI flag")
 	var bridge = root.get_node_or_null("PayloadBridge")
 	if bridge:
 		bridge.set_payload({
@@ -508,3 +1020,359 @@ func _test_busy_lock_during_ai() -> void:
 	await process_frame
 	if router:
 		router.bind(null)
+
+func _test_ai_cover_and_flank() -> void:
+	print("  [12] AI cover + flank tactics (M03)")
+	var pathfinder = PathScript.new()
+
+	var cells := {}
+	for x in range(0, 8):
+		for y in range(0, 8):
+			cells[Vector2i(x, y)] = {"type": Config.FLOOR, "z": 0}
+	cells[Vector2i(4, 2)] = {"type": Config.COVER, "z": 3}
+	cells[Vector2i(4, 4)] = {"type": Config.HALF_COVER, "z": 1}
+	cells[Vector2i(1, 3)] = {"type": Config.COVER, "z": 3}
+
+	# cover_level reads the face between shooter and target cell
+	_expect(Tactics.cover_level(Vector2i(6, 2), Vector2i(3, 2), cells) == 2, "full cover face scores 2")
+	_expect(Tactics.cover_level(Vector2i(6, 4), Vector2i(3, 4), cells) == 1, "half cover face scores 1")
+	_expect(Tactics.cover_level(Vector2i(6, 6), Vector2i(3, 6), cells) == 0, "open ground scores 0")
+	_expect(Tactics.cover_level(Vector2i(1, 5), Vector2i(1, 2), cells) == 2, "cover face resolves on the y axis")
+
+	var defender = UnitScript.new()
+	defender.alive = true
+	defender.team = 0
+	defender.unit_id = 1
+	defender.cell = Vector2i(3, 6)
+	defender.z = 0
+	defender.hp = 10
+	defender.max_hp = 10
+	defender.ap = 8
+	defender.max_ap = 10
+	defender.stance = "stand"
+
+	var hostile = UnitScript.new()
+	hostile.alive = true
+	hostile.team = 1
+	hostile.unit_id = 2
+	hostile.cell = Vector2i(6, 6)
+	hostile.z = 0
+	hostile.hp = 10
+	hostile.max_hp = 10
+	hostile.ap = 8
+	hostile.max_ap = 10
+
+	var units: Array = [defender, hostile]
+
+	# exposure counts hostiles holding line of sight
+	_expect(Tactics.exposure_count(Vector2i(3, 6), defender, units, cells, pathfinder) == 1, "open cell exposed to one hostile")
+	cells[Vector2i(5, 6)] = {"type": Config.COVER, "z": 3}
+	_expect(Tactics.exposure_count(Vector2i(3, 6), defender, units, cells, pathfinder) == 0, "interposed cover removes exposure")
+	cells[Vector2i(5, 6)] = {"type": Config.FLOOR, "z": 0}
+
+	var corpse = UnitScript.new()
+	corpse.alive = false
+	corpse.team = 1
+	corpse.unit_id = 3
+	corpse.cell = Vector2i(3, 7)
+	corpse.z = 0
+	_expect(Tactics.exposure_count(Vector2i(3, 6), defender, [defender, hostile, corpse], cells, pathfinder) == 1, "dead hostiles do not contribute exposure")
+
+	# AP reserve gate — movement must never spend the attack away
+	defender.ap = 5
+	_expect(Tactics.can_afford_step_with_reserve(defender, Vector2i(4, 6), cells, 4), "step allowed when reserve is preserved")
+	_expect(not Tactics.can_afford_step_with_reserve(defender, Vector2i(4, 6), cells, 5), "step refused when it would break reserve")
+	_expect(not Tactics.can_afford_step_with_reserve(defender, Vector2i(99, 99), cells, 0), "step refused off-grid")
+	_expect(not Tactics.can_afford_step_with_reserve(null, Vector2i(4, 6), cells, 0), "step refused for null unit")
+
+	# positioning guards — states with their own movement grammar opt out
+	var melee_profile := {"cost": Config.MELEE_COST, "range": 1, "penetrates_cover": false}
+	var profile := {"cost": 2, "range": 6, "penetrates_cover": false}
+	defender.ap = 8
+	_expect(Tactics.positioning_candidates(defender, units, cells, pathfinder, melee_profile).is_empty(), "melee profile defers to the approach fallback")
+	defender.flying = true
+	_expect(Tactics.positioning_candidates(defender, units, cells, pathfinder, profile).is_empty(), "flying unit yields no positioning")
+	defender.flying = false
+	defender.hovering = true
+	_expect(Tactics.positioning_candidates(defender, units, cells, pathfinder, profile).is_empty(), "hovering unit yields no positioning")
+	defender.hovering = false
+	defender.stance = "prone"
+	_expect(Tactics.positioning_candidates(defender, units, cells, pathfinder, profile).is_empty(), "prone unit yields no positioning")
+	defender.stance = "stand"
+	_expect(Tactics.positioning_candidates(defender, [defender], cells, pathfinder, profile).is_empty(), "no hostile yields no positioning")
+	defender.alive = false
+	_expect(Tactics.positioning_candidates(defender, units, cells, pathfinder, profile).is_empty(), "dead unit yields no positioning")
+	defender.alive = true
+
+	# candidate shape and determinism — replay integrity depends on this
+	var first := Tactics.positioning_candidates(defender, units, cells, pathfinder, profile)
+	var second := Tactics.positioning_candidates(defender, units, cells, pathfinder, profile)
+	var stable := first.size() == second.size()
+	var keyed := true
+	var scored := true
+	for i in first.size():
+		var candidate: Dictionary = first[i]
+		if not candidate.has("score") or not candidate.has("tie"):
+			keyed = false
+		if not candidate.has("key"):
+			scored = false
+		if stable and String(candidate.get("tie", "")) != String(second[i].get("tie", "")):
+			stable = false
+	_expect(keyed, "every positioning candidate carries score and tie")
+	_expect(scored, "every positioning candidate carries an action key")
+	_expect(stable, "positioning candidates are deterministic across identical calls")
+
+	# scoring hierarchy: tactics must outrank AIBehavior approach (50) and step (35)
+	if not first.is_empty():
+		var top := -1.0
+		for candidate in first:
+			top = maxf(top, float(candidate.get("score", 0.0)))
+		_expect(top > 50.0, "tactical positioning outranks the approach fallback")
+	else:
+		_expect(false, "ranged engagement produced positioning candidates")
+
+	_test_m03_golden_standoff(pathfinder)
+
+func _test_m03_golden_standoff(pathfinder) -> void:
+	print("  [12a] seeded ranged standoff golden cases (M03-001)")
+	var scenario_seed := 1167583760
+	var layout_rng := RandomNumberGenerator.new()
+	layout_rng.seed = scenario_seed
+	var lane_y := layout_rng.randi_range(2, 4)
+	var item_db = root.get_node_or_null("ItemDB")
+	var behavior = root.get_node_or_null("AIBehavior")
+	_expect(
+		item_db != null and behavior != null,
+		"seeded standoff has ItemDB and AIBehavior authorities (M03-001)"
+	)
+	if item_db == null or behavior == null:
+		return
+
+	var standoff_cells := _m03_floor_cells(10, 8)
+	var ranger_cell := Vector2i(1, lane_y)
+	var target_cell := Vector2i(7, lane_y)
+	var cover_cell := Vector2i(3, lane_y + 1)
+	var cover_slot := Vector2i(2, lane_y + 1)
+	standoff_cells[cover_cell] = {"type": Config.COVER, "z": 3}
+
+	var ranger = _m03_unit(
+		"STANDOFF-RANGER",
+		1,
+		301,
+		ranger_cell,
+		10,
+		{"t1_pistol": 1}
+	)
+	var target = _m03_unit(
+		"STANDOFF-TARGET",
+		0,
+		101,
+		target_cell,
+		10,
+		{"t1_rifle": 1}
+	)
+	var standoff_units: Array = [ranger, target]
+	var pistol: Dictionary = item_db.get_item("t1_pistol")
+	var pistol_profile := {
+		"cost": ActionCosts.weapon_cost(pistol),
+		"range": int(pistol.get("range", 1)),
+		"penetrates_cover": bool(pistol.get("penetrates_cover", false))
+	}
+	_expect(
+		not pistol.is_empty()
+		and String(pistol.get("category", "")) == "ranged"
+		and pathfinder.cheb(ranger_cell, target_cell) > 1
+		and pathfinder.cheb(ranger_cell, target_cell) <= int(pistol_profile["range"]),
+		"seeded standoff arms a ranged Agent at legal standoff distance (M03-001)"
+	)
+
+	# Golden 1: open fire is legal, but a short route drops exposure while
+	# retaining both the Take Cover cost and the pistol's attack reserve.
+	var cover_candidates := Tactics.positioning_candidates(
+		ranger,
+		standoff_units,
+		standoff_cells,
+		pathfinder,
+		pistol_profile
+	)
+	var cover_winner: Dictionary = cover_candidates[0] if not cover_candidates.is_empty() else {}
+	var cover_value = cover_winner.get("value", {})
+	var cover_path: Array = (
+		cover_value.get("path", [])
+		if cover_value is Dictionary
+		else []
+	)
+	_expect(
+		String(cover_winner.get("key", "")) == "seek_cover",
+		"golden cover case chooses seek_cover over fire and approach (M03-001)"
+	)
+	_expect(
+		cover_path.size() >= 2
+		and Vector2i(cover_path.back()) == cover_slot
+		and Vector2i(cover_value.get("cover", Config.INVALID_CELL)) == cover_cell,
+		"golden cover route reaches the seeded protective face (M03-001)"
+	)
+	_expect(
+		is_equal_approx(float(cover_winner.get("score", 0.0)), 79.0)
+		and String(cover_winner.get("rationale", "")).contains("retain 7 AP"),
+		"golden cover score preserves deterministic exposure and AP math (M03-001)"
+	)
+
+	var decision_rng_a := RandomNumberGenerator.new()
+	decision_rng_a.seed = scenario_seed
+	var decision_a: Dictionary = behavior.score_actions(
+		ranger,
+		standoff_units,
+		standoff_cells,
+		{},
+		decision_rng_a
+	)
+	var decision_rng_b := RandomNumberGenerator.new()
+	decision_rng_b.seed = scenario_seed
+	var decision_b: Dictionary = behavior.score_actions(
+		ranger,
+		standoff_units,
+		standoff_cells,
+		{},
+		decision_rng_b
+	)
+	_expect(
+		String(decision_a.get("decision", "")) == "seek_cover"
+		and String(decision_a.get("rationale", "")).begins_with("cover route"),
+		"integrated AIBehavior emits the M03 cover signature in the seeded standoff (M03-001)"
+	)
+	_expect(
+		String(decision_a.get("decision", "")) == String(decision_b.get("decision", ""))
+		and String(decision_a.get("rationale", "")) == String(decision_b.get("rationale", ""))
+		and is_equal_approx(
+			float(decision_a.get("score", 0.0)),
+			float(decision_b.get("score", -1.0))
+		)
+		and decision_a.get("seek_cover", {}) == decision_b.get("seek_cover", {}),
+		"seeded standoff decision and route replay identically (M03-001)"
+	)
+
+	# Golden 2: a committed unit leans when its cover face opens a legal lane.
+	ranger.cell = cover_slot
+	ranger.taking_cover = true
+	ranger.cover_cell = cover_cell
+	ranger.lean = "none"
+	ranger.ap = 10
+	var committed := Tactics.positioning_candidates(
+		ranger,
+		standoff_units,
+		standoff_cells,
+		pathfinder,
+		pistol_profile
+	)
+	var committed_winner: Dictionary = committed[0] if not committed.is_empty() else {}
+	_expect(
+		String(committed_winner.get("key", "")) == "lean_cover"
+		and is_equal_approx(float(committed_winner.get("score", 0.0)), 96.0)
+		and String(committed_winner.get("rationale", "")).contains("retain 9 AP"),
+		"golden committed-cover case leans and retains attack AP (M03-001)"
+	)
+
+	# Golden 3: a second obstruction means leaning cannot create a lane, so
+	# committed cover is released instead of trapping the Agent indefinitely.
+	var lane_blocker := Vector2i(5, lane_y)
+	standoff_cells[lane_blocker] = {"type": Config.COVER, "z": 3}
+	var blocked := Tactics.positioning_candidates(
+		ranger,
+		standoff_units,
+		standoff_cells,
+		pathfinder,
+		pistol_profile
+	)
+	var blocked_winner: Dictionary = blocked[0] if not blocked.is_empty() else {}
+	_expect(
+		String(blocked_winner.get("key", "")) == "leave_cover"
+		and String(blocked_winner.get("rationale", "")).begins_with("cover has no legal attack lane"),
+		"golden blocked-lane case releases committed cover (M03-001)"
+	)
+
+	# Golden 4: when a central obstacle blocks the current lane and there is no
+	# immediate protective face, the deterministic winner is a simple flank.
+	var flank_cells := _m03_floor_cells(10, 8)
+	flank_cells[Vector2i(4, lane_y)] = {"type": Config.COVER, "z": 3}
+	ranger.cell = ranger_cell
+	ranger.taking_cover = false
+	ranger.cover_cell = Config.INVALID_CELL
+	ranger.lean = "none"
+	ranger.ap = 10
+	var flank_candidates := Tactics.positioning_candidates(
+		ranger,
+		standoff_units,
+		flank_cells,
+		pathfinder,
+		pistol_profile
+	)
+	var flank_winner: Dictionary = flank_candidates[0] if not flank_candidates.is_empty() else {}
+	var flank_path: Array = (
+		flank_winner.get("value", [])
+		if flank_winner.get("value", []) is Array
+		else []
+	)
+	_expect(
+		String(flank_winner.get("key", "")) == "flank"
+		and String(flank_winner.get("rationale", "")).begins_with("simple flank"),
+		"golden blocked-lane case chooses a simple flank (M03-001)"
+	)
+	_expect(
+		flank_path.size() >= 2
+		and pathfinder.has_los(
+			Vector2i(flank_path.back()),
+			target.cell,
+			flank_cells,
+			0,
+			target.z
+		)
+		and ranger.ap - ActionCosts.path_cost(ranger, flank_path, flank_cells)
+			>= int(pistol_profile["cost"]),
+		"golden flank opens LOS without spending the attack reserve (M03-001)"
+	)
+
+	var flank_rng := RandomNumberGenerator.new()
+	flank_rng.seed = scenario_seed + 1
+	var flank_decision: Dictionary = behavior.score_actions(
+		ranger,
+		standoff_units,
+		flank_cells,
+		{},
+		flank_rng
+	)
+	_expect(
+		String(flank_decision.get("decision", "")) == "flank"
+		and String(flank_decision.get("rationale", "")).begins_with("simple flank"),
+		"integrated AIBehavior emits the M03 flank signature in the seeded standoff (M03-001)"
+	)
+
+func _m03_floor_cells(width: int, height: int) -> Dictionary:
+	var cells: Dictionary = {}
+	for x in range(width):
+		for y in range(height):
+			cells[Vector2i(x, y)] = {"type": Config.FLOOR, "z": 0}
+	return cells
+
+func _m03_unit(
+	unit_name: String,
+	team: int,
+	unit_id: int,
+	cell: Vector2i,
+	ap: int,
+	inventory: Dictionary
+):
+	var unit = UnitScript.new()
+	unit.name = unit_name
+	unit.alive = true
+	unit.team = team
+	unit.unit_id = unit_id
+	unit.cell = cell
+	unit.z = 0
+	unit.hp = 10
+	unit.max_hp = 10
+	unit.ap = ap
+	unit.max_ap = 10
+	unit.stance = "stand"
+	unit.inv = inventory.duplicate(true)
+	return unit

@@ -4,7 +4,9 @@ This galaxy keeps tested local copies of every public contract it implements:
 
 - `galaxy-message.schema.json` — shared transport-neutral envelope `1.x`;
 - `battlestar-deploy.schema.json` — strategic deployment input;
-- `xcommand-extraction.schema.json` — tactical mission-result output; and
+- `xcommand-extraction.schema.json` — tactical mission-result output;
+- `battlestar-repro.schema.json` — privacy-bounded reproduction/import
+  artifact; and
 - `examples/` — canonical messages at the actual browser/Godot boundary.
 
 The shared envelope copy is pinned from the GZG-NOW contract module. A later

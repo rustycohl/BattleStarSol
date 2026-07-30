@@ -8,6 +8,10 @@ const MovementRules = preload("res://scripts/MovementContext.gd")
 const Maneuvers = preload("res://scripts/ManeuverState.gd")
 const PathScript = preload("res://scripts/Pathfinder.gd")
 const UnitScript = preload("res://scripts/Unit.gd")
+const SquadSpawn = preload("res://scripts/SquadSpawner.gd")
+const Ballistics = preload("res://scripts/Ballistics.gd")
+const Tactics = preload("res://scripts/AITactics.gd")
+const Tutorial = preload("res://scripts/TutorialDirector.gd")
 
 var failures: Array[String] = []
 
@@ -17,7 +21,9 @@ func _init() -> void:
 func _run() -> void:
 	_test_seeded_generation()
 	_test_payload_contract()
+	_test_faction_vocabulary()
 	_test_action_economy()
+	_test_tutorial_state_machine()
 	_test_contextual_movement()
 	_test_web_contract()
 	await _test_main_scene()
@@ -107,6 +113,28 @@ func _test_payload_contract() -> void:
 	invalid["sector"] = ""
 	_expect(not Contract.validate_deploy(invalid).is_empty(), "invalid deployment was accepted")
 
+func _test_faction_vocabulary() -> void:
+	_expect(Config.FACTION_HAD == 0, "HAD serialized faction ID drifted")
+	_expect(Config.FACTION_SYND == 1, "Syndicate serialized faction ID drifted")
+	_expect(Config.FACTION_TIME == 2, "Timecorps serialized faction ID drifted")
+	_expect(Config.faction_name(Config.FACTION_HAD) == "HAD // EFD", "HAD visible alias set drifted")
+	_expect(Config.faction_name(Config.FACTION_SYND) == "SYNDICATE // METROPOLI", "Syndicate visible alias set drifted")
+	_expect(Config.faction_name(Config.FACTION_TIME) == "TIMECORPS // KAIJU/ALIENS", "Timecorps visible alias set drifted")
+	var aliases := {
+		"HAD": Config.FACTION_HAD,
+		"EFD Defense": Config.FACTION_HAD,
+		"SYNDICATE": Config.FACTION_SYND,
+		"Metropoli Alpha": Config.FACTION_SYND,
+		"Timecorps": Config.FACTION_TIME,
+		"Kaiju/Aliens": Config.FACTION_TIME,
+		"Aliens": Config.FACTION_TIME
+	}
+	for label in aliases:
+		_expect(
+			SquadSpawn.faction_from_payload_string(label) == int(aliases[label]),
+			"faction parser no longer accepts canonical/legacy alias %s" % label
+		)
+
 func _test_action_economy() -> void:
 	_expect(Config.MAX_AP == 10, "granular action economy does not expose the 10 AP budget")
 	_expect(Config.AP_DISPLAY_SEGMENTS == 10, "AP display no longer preserves the compact 10-segment HUD")
@@ -140,6 +168,627 @@ func _test_action_economy() -> void:
 	_expect(not bool(rifle.get("penetrates_cover", false)), "ordinary rifle unexpectedly penetrates cover")
 	_expect(bool(items.get("t3_railgun", {}).get("penetrates_cover", false)), "railgun is not marked as cover-penetrating")
 
+func _test_tutorial_state_machine() -> void:
+	var director = Tutorial.new()
+	_expect(
+		not director.begin({"sector": "Ordinary Mission"}, Config.FACTION_HAD, 1),
+		"tutorial activated outside the Proving Ground"
+	)
+	_expect(
+		director.begin({"sector": "Proving Ground"}, Config.FACTION_HAD, 1),
+		"Proving Ground did not activate the tutorial"
+	)
+	_expect(
+		director.current_snapshot()["step_key"] == "select_commander",
+		"tutorial did not begin at Commander selection"
+	)
+
+	var commander := UnitScript.new()
+	commander.alive = true
+	commander.team = Config.FACTION_HAD
+	commander.is_commander = true
+	_expect(director.observe_action("select", commander), "Commander selection did not advance tutorial")
+	_expect(director.current_snapshot()["step_key"] == "move", "tutorial skipped the move step")
+	_expect(
+		director.observe_record({
+			"record_type": "event",
+			"event": "movement_resolved",
+			"payload": {"actor": 1}
+		}),
+		"resolved movement did not advance tutorial"
+	)
+	director.set_cover_available(false)
+	_expect(director.observe_action("brace", commander), "clear-lane Brace did not satisfy defense instruction")
+	_expect(director.observe_action("melee", commander), "basic attack did not advance tutorial")
+	_expect(director.observe_action("endturn", commander), "End Turn did not start observation step")
+	_expect(
+		not director.observe_record({
+			"record_type": "event",
+			"event": "turn_started",
+			"payload": {"active_team": Config.FACTION_SYND, "round": 1}
+		}),
+		"hostile phase incorrectly completed turn observation"
+	)
+	_expect(
+		director.observe_record({
+			"record_type": "event",
+			"event": "turn_started",
+			"payload": {"active_team": Config.FACTION_HAD, "round": 2}
+		}),
+		"returned player turn did not expose extraction step"
+	)
+	_expect(
+		director.observe_record({
+			"record_type": "event",
+			"event": "mission_resolved",
+			"payload": {"outcome": "SUCCESS"}
+		}),
+		"mission resolution did not complete tutorial"
+	)
+	_expect(director.current_snapshot()["complete"], "tutorial completion flag is false")
+	_expect(director.transition_history.size() == 7, "tutorial transition count drifted")
+
+	# Cover as material: penetration, destruction, and the cover level that follows
+	# from what a cell is actually made of.
+	var hard_cell := World.material_cell(Config.COVER, 5)
+	var soft_cell := World.material_cell(Config.HALF_COVER, 2)
+	var open_cell := World.material_cell(Config.FLOOR, 0)
+	_expect(
+		int(hard_cell["density"]) > int(soft_cell["density"])
+		and int(soft_cell["density"]) > int(open_cell["density"]),
+		"terrain material does not scale density with cover class"
+	)
+	_expect(
+		int(hard_cell["integrity"]) == int(hard_cell["density"]),
+		"fresh terrain does not start at full integrity"
+	)
+	_expect(
+		String(hard_cell["material"]) == "hard" and String(soft_cell["material"]) == "soft",
+		"terrain material class is not recorded"
+	)
+	# A taller column is thicker, so it stops more.
+	_expect(
+		int(World.material_cell(Config.COVER, 6)["density"])
+		> int(World.material_cell(Config.COVER, 3)["density"]),
+		"column height does not inform density"
+	)
+	# Primitive weapons cannot beat hard cover; a sniper round can.
+	var stopped: Dictionary = Ballistics.resolve_penetration(hard_cell, "primitive", 100)
+	_expect(String(stopped["outcome"]) == "stopped", "primitive fire penetrated hard cover")
+	_expect(int(stopped["power_through"]) == 0, "stopped fire delivered power through cover")
+	_expect(
+		int(stopped["damage_to_cover"]) > 0,
+		"stopped fire did not work the material at all"
+	)
+	var through: Dictionary = Ballistics.resolve_penetration(hard_cell, "sniper", 100)
+	_expect(String(through["outcome"]) == "penetrated", "sniper fire failed to penetrate hard cover")
+	_expect(
+		int(through["power_through"]) > 0 and int(through["power_through"]) < 100,
+		"penetrating fire did not lose power to the material"
+	)
+	_expect(
+		int(through["integrity_after"]) < int(through["integrity_before"]),
+		"penetration left the material untouched"
+	)
+	# Sustained fire degrades cover through its material classes.
+	var worked = hard_cell
+	var degrade_guard := 0
+	while Ballistics.effective_cover_level(worked) == 2 and degrade_guard < 20:
+		var hit: Dictionary = Ballistics.resolve_penetration(worked, "rifle", 100)
+		worked = Ballistics.degrade_cell(worked, int(hit["damage_to_cover"]))
+		degrade_guard += 1
+	_expect(degrade_guard > 0 and degrade_guard < 20, "hard cover never degraded under fire")
+	_expect(
+		Ballistics.effective_cover_level(worked) < 2,
+		"degraded cover still scores as full cover"
+	)
+	while Ballistics.effective_cover_level(worked) > 0 and degrade_guard < 40:
+		worked = Ballistics.degrade_cell(worked, 20)
+		degrade_guard += 1
+	_expect(
+		int(worked["type"]) == Config.FLOOR and String(worked["material"]) == "rubble",
+		"destroyed cover did not become open rubble"
+	)
+	# Weapon penetration is derived from the fields weapons already carry, so the
+	# ordering follows the authored armour-piercing values rather than a second
+	# table that could drift from them.
+	var pistol_item: Dictionary = {"armor_pierce": 1, "damage_type": "kinetic"}
+	var rifle_item: Dictionary = {"armor_pierce": 2, "damage_type": "kinetic"}
+	var rail_item: Dictionary = {"armor_pierce": 5, "damage_type": "rail"}
+	var flagged_item: Dictionary = {"armor_pierce": 0, "penetrates_cover": true}
+	_expect(
+		Ballistics.penetration_for_item(pistol_item)
+		< Ballistics.penetration_for_item(rifle_item),
+		"penetration does not follow armour-piercing order"
+	)
+	_expect(
+		Ballistics.penetration_for_item(rail_item)
+		> Ballistics.penetration_for_item(rifle_item),
+		"a rail penetrator does not out-penetrate a kinetic rifle"
+	)
+	_expect(
+		Ballistics.penetration_for_item({"armor_pierce": 2, "damage_type": "thermal"})
+		> Ballistics.penetration_for_item(rifle_item),
+		"damage type does not inform penetration"
+	)
+	_expect(
+		Ballistics.penetration_for_item(flagged_item) == 100,
+		"an authored cover-penetrating weapon is not treated as total penetration"
+	)
+	_expect(
+		Ballistics.penetration_for_item("not-an-item") == Ballistics.PENETRATION["unarmed"],
+		"a missing weapon is not unarmed"
+	)
+	# A light weapon is stopped by the thickest cover; the heaviest authored round
+	# is not. Balance is asserted as an ordering, not as a magic number.
+	var thickest := World.material_cell(Config.COVER, 6)
+	_expect(
+		String(Ballistics.resolve_item_penetration(thickest, pistol_item)["outcome"]) == "stopped",
+		"a pistol defeats the thickest cover in the game"
+	)
+	_expect(
+		String(Ballistics.resolve_item_penetration(thickest, flagged_item)["outcome"])
+		== "penetrated",
+		"an authored cover-penetrating weapon is stopped by cover"
+	)
+	# Balance is asserted as a shape, not as magic numbers: the weapon set must form
+	# a real ladder against terrain rather than collapsing into "nothing gets
+	# through" or "everything does".
+	var weapon_data = JSON.parse_string(FileAccess.get_file_as_string("res://data/items.json"))
+	_expect(weapon_data is Dictionary, "weapon data did not load for the balance check")
+	if weapon_data is Dictionary:
+		var thinnest_hard := World.material_cell(Config.COVER, 3)
+		var thickest_hard := World.material_cell(Config.COVER, 6)
+		var soft := World.material_cell(Config.HALF_COVER, 1)
+		var tiers := {}
+		var stopped_by_thickest := 0
+		var through_thinnest_hard := 0
+		var through_everything := 0
+		var ranged_count := 0
+		for weapon_key in (weapon_data as Dictionary):
+			var weapon = (weapon_data as Dictionary)[weapon_key]
+			if not (weapon is Dictionary):
+				continue
+			if String((weapon as Dictionary).get("category", "")) != "ranged":
+				continue
+			ranged_count += 1
+			var pen: int = Ballistics.penetration_for_item(weapon)
+			tiers[pen] = true
+			_expect(
+				pen >= 0 and pen <= 100,
+				"%s penetration is off the density scale" % String(weapon_key)
+			)
+			if String(Ballistics.resolve_item_penetration(thickest_hard, weapon)["outcome"]) == "stopped":
+				stopped_by_thickest += 1
+			if String(Ballistics.resolve_item_penetration(thinnest_hard, weapon)["outcome"]) == "penetrated":
+				through_thinnest_hard += 1
+			if String(Ballistics.resolve_item_penetration(soft, weapon)["outcome"]) == "penetrated":
+				through_everything += 1
+			# Every weapon must be able to break cover eventually, or cover becomes
+			# an absolute wall for that weapon and flanking is the only answer.
+			var breaking = soft.duplicate(true)
+			var break_guard := 0
+			while Ballistics.effective_cover_level(breaking) > 0 and break_guard < 200:
+				var work: Dictionary = Ballistics.resolve_item_penetration(breaking, weapon)
+				breaking = Ballistics.degrade_cell(breaking, int(work["damage_to_cover"]))
+				break_guard += 1
+			_expect(
+				break_guard < 200,
+				"%s can never break even soft cover" % String(weapon_key)
+			)
+		_expect(ranged_count >= 8, "too few ranged weapons to judge the ladder")
+		_expect(tiers.size() >= 4, "the weapon set has fewer than four penetration tiers")
+		_expect(
+			stopped_by_thickest > 0,
+			"no weapon is stopped by the thickest cover in the game"
+		)
+		_expect(
+			through_thinnest_hard > 0,
+			"no weapon can shoot through the thinnest hard cover"
+		)
+		_expect(
+			stopped_by_thickest < ranged_count,
+			"every weapon is stopped by the thickest cover"
+		)
+		_expect(
+			through_everything < ranged_count,
+			"every weapon penetrates soft cover, so soft cover means nothing"
+		)
+	# The lane cell is the material that was actually protecting the target.
+	var firing_lane := {
+		Vector2i(2, 2): World.material_cell(Config.FLOOR, 0),
+		Vector2i(3, 2): World.material_cell(Config.COVER, 4),
+		Vector2i(4, 2): World.material_cell(Config.FLOOR, 0)
+	}
+	_expect(
+		Ballistics.lane_cover_cell(Vector2i(5, 2), Vector2i(2, 2), firing_lane) == Vector2i(3, 2),
+		"the firing lane does not resolve to the protecting cell"
+	)
+	_expect(
+		Ballistics.lane_cover_cell(Vector2i(0, 2), Vector2i(2, 2), firing_lane) == null,
+		"an unprotected lane reports cover"
+	)
+	# Single-authority checks. These exist because the recurring failure in this
+	# project is building a second authority for something that already has one.
+	# See .agents/08-CAPABILITY-REGISTER.md.
+	var script_sources := {}
+	for script_name in [
+		"WorldBuilder", "Ballistics", "AITactics", "MovementContext",
+		"CombatSystem", "Main", "SquadSpawner"
+	]:
+		script_sources[script_name] = FileAccess.get_file_as_string(
+			"res://scripts/%s.gd" % script_name
+		)
+	# Exactly one place assigns terrain material.
+	var material_assigners := 0
+	for script_name in script_sources:
+		if String(script_sources[script_name]).contains("\"integrity\": density"):
+			material_assigners += 1
+	_expect(
+		material_assigners == 1,
+		"terrain material is assigned in %d places; it must have one authority" % material_assigners
+	)
+	# Cover strength is derived from Ballistics, never re-derived from tile type.
+	for script_name in ["AITactics", "MovementContext", "Main"]:
+		var body := String(script_sources[script_name])
+		_expect(
+			not body.contains("== Config.COVER: return 2"),
+			"%s re-derives cover level from tile type instead of material" % script_name
+		)
+	_expect(
+		String(script_sources["AITactics"]).contains("Ballistics.effective_cover_level"),
+		"cover scoring no longer reads the material authority"
+	)
+	_expect(
+		String(script_sources["MovementContext"]).contains("Ballistics.effective_cover_level"),
+		"commitable cover faces no longer read the material authority"
+	)
+	# Armor and terrain share one penetration scale.
+	_expect(
+		String(script_sources["Ballistics"]).contains("resolve_with_penetration"),
+		"penetration no longer has a single resolver"
+	)
+	_expect(
+		String(script_sources["CombatSystem"]).contains("Ballistics.resolve_armor"),
+		"armor mitigation does not use the shared penetration scale"
+	)
+	# Weapon behaviour derives from item fields rather than a name-keyed table.
+	_expect(
+		String(script_sources["CombatSystem"]).contains("Ballistics.resolve_item_penetration"),
+		"combat resolves penetration by weapon name instead of by item fields"
+	)
+	# Terrain changes go through the one authority that also records them.
+	var terrain_mutators := 0
+	for script_name in script_sources:
+		if String(script_sources[script_name]).contains("Ballistics.degrade_cell"):
+			terrain_mutators += 1
+	_expect(
+		terrain_mutators == 1,
+		"terrain is degraded in %d places; it must have one authority" % terrain_mutators
+	)
+	_expect(
+		String(script_sources["Main"]).contains("func damage_terrain"),
+		"the terrain damage authority is missing"
+	)
+
+	# Vertical cover: a wall only protects while it actually stands between the
+	# shooter and the target.
+	var tall_wall := World.material_cell(Config.COVER, 4)
+	_expect(
+		Ballistics.cover_stands_between(tall_wall, 0, 0),
+		"a tall wall does not protect two ground-level units"
+	)
+	_expect(
+		not Ballistics.cover_stands_between(tall_wall, 5, 0),
+		"a shooter above the wall is still blocked by it"
+	)
+	_expect(
+		not Ballistics.cover_stands_between(tall_wall, 0, 4),
+		"a target standing as high as the wall is still protected by it"
+	)
+	_expect(
+		Ballistics.cover_stands_between(tall_wall, 3, 3),
+		"a wall taller than both units stops protecting them"
+	)
+	var vertical_cells := {
+		Vector2i(2, 2): World.material_cell(Config.FLOOR, 0),
+		Vector2i(3, 2): World.material_cell(Config.COVER, 3),
+		Vector2i(6, 2): World.material_cell(Config.FLOOR, 0)
+	}
+	_expect(
+		Tactics.cover_level(Vector2i(6, 2), Vector2i(2, 2), vertical_cells, 0, 0) == 2,
+		"ground-level fire ignores an interposed wall"
+	)
+	_expect(
+		Tactics.cover_level(Vector2i(6, 2), Vector2i(2, 2), vertical_cells, 4, 0) == 0,
+		"fire from above the wall is still reduced by it"
+	)
+	# Committing to cover also requires the face to be taller than the actor.
+	var high_actor := UnitScript.new()
+	high_actor.alive = true
+	high_actor.stance = "stand"
+	high_actor.cell = Vector2i(2, 2)
+	high_actor.z = 4
+	high_actor.taking_cover = false
+	_expect(
+		MovementRules.cover_options(high_actor, vertical_cells).is_empty(),
+		"a unit standing above a wall can still commit to it as cover"
+	)
+	high_actor.z = 0
+	_expect(
+		MovementRules.cover_options(high_actor, vertical_cells) == [Vector2i(3, 2)],
+		"a ground-level unit cannot commit to the adjacent wall"
+	)
+
+	# Armor resolves on the same penetration scale as terrain.
+	_expect(
+		Ballistics.armor_density(0) == 0 and Ballistics.armor_density(10) == 100,
+		"armor is not expressed on the density scale"
+	)
+	var heavy_armor := 6
+	var weak_round: Dictionary = {"armor_pierce": 1, "damage_type": "kinetic"}
+	var heavy_round: Dictionary = {"armor_pierce": 9, "damage_type": "rail"}
+	var stopped_by_armor: Dictionary = Ballistics.resolve_armor(heavy_armor, weak_round)
+	var through_armor: Dictionary = Ballistics.resolve_armor(heavy_armor, heavy_round)
+	_expect(
+		bool(stopped_by_armor["stopped"]),
+		"a weak round defeats heavy armor"
+	)
+	_expect(
+		is_equal_approx(float(stopped_by_armor["mitigation_scale"]), 1.0),
+		"armor that stops a round does not mitigate fully"
+	)
+	_expect(
+		not bool(through_armor["stopped"]),
+		"heavy armor stops a rail penetrator"
+	)
+	_expect(
+		float(through_armor["mitigation_scale"]) < 1.0,
+		"a penetrating round loses nothing to armor"
+	)
+	_expect(
+		float(through_armor["mitigation_scale"]) >= 0.0,
+		"armor mitigation went negative"
+	)
+	# More armor is never worse against the same round.
+	_expect(
+		float(Ballistics.resolve_armor(8, heavy_round)["mitigation_scale"])
+		>= float(Ballistics.resolve_armor(4, heavy_round)["mitigation_scale"]),
+		"heavier armor mitigates less than lighter armor"
+	)
+
+	# The grenade: a thrown object whose blast is authored in its own item data.
+	var item_db = root.get_node_or_null("ItemDB")
+	var grenade_item = item_db.get_item("grenade") if item_db != null else {}
+	_expect(grenade_item is Dictionary and not (grenade_item as Dictionary).is_empty(), "the grenade item is missing")
+	if grenade_item is Dictionary and not (grenade_item as Dictionary).is_empty():
+		var grenade: Dictionary = grenade_item
+		_expect(
+			int(grenade.get("blast_radius", 0)) >= 1,
+			"the grenade has no blast radius"
+		)
+		_expect(
+			bool(grenade.get("blast_terrain", false)),
+			"the grenade does not affect terrain"
+		)
+		_expect(
+			int(grenade.get("range", 0)) > 1,
+			"the grenade cannot be thrown"
+		)
+		_expect(
+			Config.KINDS.has("grenade") and Config.CODES.has("grenade"),
+			"the grenade is not a registered carryable kind"
+		)
+		# Its blast must be able to break the hard cover it is meant to test.
+		var blast_cell := World.material_cell(Config.COVER, 3)
+		var blast_damage := maxi(int(round(float(int(grenade.get("dmg", 0))) * 3.0 * 1.5)), 1)
+		_expect(
+			Ballistics.effective_cover_level(
+				Ballistics.degrade_cell(blast_cell, blast_damage)
+			) < 2,
+			"a point-blank grenade does not break hard cover"
+		)
+	# Cells authored before materials existed still read as the cover they implied.
+	_expect(
+		Ballistics.effective_cover_level({"type": Config.COVER, "z": 3}) == 2,
+		"a legacy cover cell lost its protection"
+	)
+	_expect(
+		Ballistics.effective_cover_level({"type": Config.FLOOR, "z": 0}) == 0,
+		"open ground scores as cover"
+	)
+	# Whether a wall protects you depends on who is shooting at it.
+	_expect(
+		Ballistics.protects_against(hard_cell, ["primitive"]),
+		"hard cover does not protect against primitive fire"
+	)
+	_expect(
+		not Ballistics.protects_against(hard_cell, ["primitive", "plasma"]),
+		"hard cover still protects against plasma"
+	)
+	_expect(
+		Ballistics.best_penetration(["primitive", "rifle", "sniper"])
+		== Ballistics.penetration_of("sniper"),
+		"a unit does not bring its best penetration"
+	)
+	# Cover beside a spawn is read out of the generated terrain, not painted in.
+	var natural_cover_seeds := 0
+	for probe_seed in [84021, 1167583760, 999999, 555, 12345]:
+		var probe_cells := World.generate_cells(probe_seed)
+		for probe_faction in [Config.FACTION_HAD, Config.FACTION_SYND, Config.FACTION_TIME]:
+			for spawn_cell in World.spawn_cells(probe_faction):
+				_expect(
+					int((probe_cells[spawn_cell] as Dictionary)["z"]) == 0,
+					"an insertion cell is not level for seed %d" % probe_seed
+				)
+		if World.cover_near_spawn(probe_cells, Config.FACTION_HAD).size() > 0:
+			natural_cover_seeds += 1
+	_expect(
+		natural_cover_seeds > 0,
+		"no seed generates natural cover near the insertion point"
+	)
+
+	# The guided lane now has cover and an instructor who uses it, so the tutorial
+	# teaches Take Cover as its own step rather than as alternate DEFENSE prose.
+	var cover_director := Tutorial.new()
+	_expect(
+		cover_director.begin({"sector": "Proving Ground"}, Config.FACTION_HAD, 1),
+		"the cover tutorial did not activate"
+	)
+	_expect(
+		int(cover_director.current_snapshot()["total_steps"]) == 7,
+		"the guided tutorial does not advertise seven steps"
+	)
+	cover_director.set_cover_available(true)
+	_expect(cover_director.observe_action("select", commander), "cover run did not select")
+	_expect(
+		cover_director.observe_record({
+			"record_type": "event",
+			"event": "movement_resolved",
+			"payload": {}
+		}),
+		"cover run did not resolve movement"
+	)
+	_expect(
+		String(cover_director.current_snapshot()["step_key"]) == "defense",
+		"cover run is not at the defense step"
+	)
+	_expect(cover_director.observe_action("brace", commander), "Brace did not satisfy defense")
+	var cover_snapshot: Dictionary = cover_director.current_snapshot()
+	_expect(
+		String(cover_snapshot["step_key"]) == "cover",
+		"Brace beside cover did not advance to the cover step"
+	)
+	_expect(
+		int(cover_snapshot["display_step"]) == 4,
+		"the cover step is not the fourth guided step"
+	)
+	_expect(
+		String(cover_snapshot["title"]).contains("COVER")
+		and String(cover_snapshot["body"]).contains("Take Cover"),
+		"the cover step does not instruct Take Cover"
+	)
+	_expect(
+		not cover_director.observe_action("melee", commander),
+		"an attack skipped the cover instruction"
+	)
+	_expect(
+		cover_director.observe_action("take_cover", commander),
+		"Take Cover did not satisfy the cover step"
+	)
+	_expect(
+		String(cover_director.current_snapshot()["step_key"]) == "attack",
+		"the cover step did not advance to the attack step"
+	)
+	_expect(
+		int(cover_director.current_snapshot()["display_step"]) == 5,
+		"the attack step did not renumber after the cover step"
+	)
+	# Reaching for the stronger option first is never treated as a mistake.
+	var direct_cover := Tutorial.new()
+	direct_cover.begin({"sector": "Proving Ground"}, Config.FACTION_HAD, 1)
+	direct_cover.set_cover_available(true)
+	direct_cover.observe_action("select", commander)
+	direct_cover.observe_record({
+		"record_type": "event",
+		"event": "movement_resolved",
+		"payload": {}
+	})
+	_expect(
+		direct_cover.observe_action("take_cover", commander),
+		"Take Cover at the defense step was rejected"
+	)
+	_expect(
+		String(direct_cover.current_snapshot()["step_key"]) == "attack",
+		"taking cover first did not satisfy both defense and cover"
+	)
+	# Cover that disappears must not strand the player on the cover step.
+	var lost_cover := Tutorial.new()
+	lost_cover.begin({"sector": "Proving Ground"}, Config.FACTION_HAD, 1)
+	lost_cover.set_cover_available(true)
+	lost_cover.observe_action("select", commander)
+	lost_cover.observe_record({
+		"record_type": "event",
+		"event": "movement_resolved",
+		"payload": {}
+	})
+	lost_cover.observe_action("brace", commander)
+	_expect(
+		String(lost_cover.current_snapshot()["step_key"]) == "cover",
+		"the lost-cover run is not at the cover step"
+	)
+	lost_cover.set_cover_available(false)
+	_expect(
+		String(lost_cover.current_snapshot()["step_key"]) == "attack",
+		"losing cover stranded the player on the cover step"
+	)
+	# A lane without cover still runs the six-step path.
+	var clear_lane := Tutorial.new()
+	clear_lane.begin({"sector": "Proving Ground"}, Config.FACTION_HAD, 1)
+	clear_lane.set_cover_available(false)
+	clear_lane.observe_action("select", commander)
+	clear_lane.observe_record({
+		"record_type": "event",
+		"event": "movement_resolved",
+		"payload": {}
+	})
+	_expect(clear_lane.observe_action("brace", commander), "clear-lane Brace was rejected")
+	_expect(
+		String(clear_lane.current_snapshot()["step_key"]) == "attack",
+		"a clear lane did not skip the cover step"
+	)
+
+	for faction in [Config.FACTION_HAD, Config.FACTION_SYND, Config.FACTION_TIME]:
+		var player_cells := World.spawn_cells(faction)
+		# The training lane's cover is whatever the environment generated there.
+		# It is never painted in, so the assertion is that the insertion footprint
+		# stays level and that cover, when present, is real terrain beside it.
+		var lane_cells := World.generate_cells(999999)
+		for spawn_cell in player_cells:
+			_expect(
+				int((lane_cells[spawn_cell] as Dictionary)["z"]) == 0,
+				"an insertion cell is not level for faction %d" % faction
+			)
+		var natural_cover: Array = World.cover_near_spawn(lane_cells, faction)
+		for cover_cell in natural_cover:
+			_expect(
+				lane_cells.has(cover_cell),
+				"reported natural cover is outside the map for faction %d" % faction
+			)
+			_expect(
+				not player_cells.has(cover_cell),
+				"natural cover sits on a player insertion cell for faction %d" % faction
+			)
+			_expect(
+				Ballistics.effective_cover_level(lane_cells[cover_cell]) > 0,
+				"reported natural cover offers no protection for faction %d" % faction
+			)
+		# Haili stands beyond the melee lane but inside the observation radius.
+		var instructor_cell := SquadSpawn.tutorial_instructor_cell(faction)
+		_expect(
+			lane_cells.has(instructor_cell),
+			"the instructor post is outside the map for faction %d" % faction
+		)
+		_expect(
+			not player_cells.has(instructor_cell),
+			"the instructor post overlaps a player insertion cell for faction %d" % faction
+		)
+		var instructor_distance := absi(instructor_cell.x - player_cells[0].x) + absi(
+			instructor_cell.y - player_cells[0].y
+		)
+		_expect(
+			instructor_distance > 3 and instructor_distance <= 10,
+			"the instructor post is not a standoff for faction %d" % faction
+		)
+		var dummy_cells := SquadSpawn.tutorial_dummy_cells(faction)
+		_expect(dummy_cells.size() == 2, "tutorial did not provide two targets for faction %d" % faction)
+		for cell in dummy_cells:
+			_expect(World.generate_cells(999999).has(cell), "tutorial target is outside the map")
+			_expect(not player_cells.has(cell), "tutorial target overlaps a player insertion cell")
+			_expect(
+				absi(cell.x - player_cells[0].x) + absi(cell.y - player_cells[0].y) <= 3,
+				"tutorial target is outside the one-turn training lane"
+			)
 func _test_contextual_movement() -> void:
 	var unit := UnitScript.new()
 	unit.name = "Context Test"
@@ -308,8 +957,534 @@ func _test_main_scene() -> void:
 		"emergency extraction is not bound to F8"
 	)
 	_expect(main.tactical_ui.get_node_or_null("ViewModeBox/btn_full") != null, "tactical fullscreen control is missing")
+	_expect(main.tactical_ui.get_node_or_null("ViewModeBox/btn_help") != null, "tactical help control is missing")
 	_expect(main.tactical_ui.get_node_or_null("EventPanel") != null, "ephemeral tactical feed is not separated from persistent squad status")
 	_expect(main.tactical_ui.get_node_or_null("ActionDock") != null, "responsive bottom action dock is missing")
+	var status_panel := main.tactical_ui.get_node_or_null("StatusPanel") as Control
+	var tutorial_panel := main.tactical_ui.get_node_or_null("TutorialPanel") as Control
+	var event_panel := main.tactical_ui.get_node_or_null("EventPanel") as Control
+	var action_dock := main.tactical_ui.get_node_or_null("ActionDock") as Control
+	_expect(status_panel != null, "persistent tactical status rail is not addressable")
+	if status_panel != null and tutorial_panel != null:
+		var status_clearance := status_panel.position.x + status_panel.size.x + 14.0
+		_expect(
+			tutorial_panel.position.x >= status_clearance,
+			"tutorial panel overlaps the persistent tactical status rail"
+		)
+	if event_panel != null and action_dock != null:
+		var event_clearance := event_panel.position.x + event_panel.size.x + 14.0
+		_expect(
+			action_dock.position.x >= event_clearance,
+			"action dock overlaps the lower tactical-feed rail"
+		)
+	var compact_layout: Dictionary = main.tactical_ui.layout_metrics_for_width(768.0)
+	_expect(
+		is_equal_approx(float(compact_layout.get("tutorial_left", 0.0)), 244.0),
+		"compact tutorial layout does not preserve status-rail clearance"
+	)
+	_expect(
+		is_equal_approx(float(compact_layout.get("action_dock_left", 0.0)), 244.0),
+		"compact action-dock layout does not preserve tactical-feed clearance"
+	)
+	var evidence_view_layout: Dictionary = main.tactical_ui.layout_metrics_for_width(1112.0)
+	_expect(
+		float(evidence_view_layout.get("tutorial_left", 0.0))
+		>= float(evidence_view_layout.get("tutorial_clearance", 0.0)),
+		"1112-wide evidence viewport lets the tutorial enter the status rail"
+	)
+	_expect(
+		float(evidence_view_layout.get("action_dock_left", 0.0))
+		>= float(evidence_view_layout.get("action_dock_clearance", 0.0)),
+		"1112-wide evidence viewport lets the action dock enter the tactical-feed rail"
+	)
+	var expanded_rail_layout: Dictionary = main.tactical_ui.layout_metrics_for_width(
+		768.0,
+		330.0,
+		260.0
+	)
+	_expect(
+		is_equal_approx(float(expanded_rail_layout.get("tutorial_left", 0.0)), 344.0),
+		"tutorial layout ignores a status rail expanded by its content"
+	)
+	_expect(
+		is_equal_approx(float(expanded_rail_layout.get("action_dock_left", 0.0)), 274.0),
+		"action-dock layout ignores an expanded tactical-feed rail"
+	)
+	# M05-B: the supported viewport matrix. Width decides rail clearance and
+	# height decides tutorial/action-dock/tactical-feed clearance.
+	for supported_viewport in main.tactical_ui.SUPPORTED_VIEWPORTS:
+		var matrix_layout: Dictionary = main.tactical_ui.layout_metrics_for_viewport(
+			float(supported_viewport.x),
+			float(supported_viewport.y)
+		)
+		var viewport_label := "%dx%d" % [supported_viewport.x, supported_viewport.y]
+		_expect(
+			float(matrix_layout.get("tutorial_left", 0.0))
+			>= float(matrix_layout.get("tutorial_clearance", 0.0)),
+			"%s lets the tutorial enter the status rail" % viewport_label
+		)
+		_expect(
+			float(matrix_layout.get("action_dock_left", 0.0))
+			>= float(matrix_layout.get("action_dock_clearance", 0.0)),
+			"%s lets the action dock enter the tactical-feed rail" % viewport_label
+		)
+		_expect(
+			bool(matrix_layout.get("tutorial_dock_clear", false)),
+			"%s lets the action dock reach the tutorial callout" % viewport_label
+		)
+		_expect(
+			bool(matrix_layout.get("event_rail_visible", false)),
+			"%s leaves no usable tactical-feed rail" % viewport_label
+		)
+		_expect(
+			not bool(matrix_layout.get("constrained", true)),
+			"%s is reported as a constrained layout" % viewport_label
+		)
+	# A cramped-but-disjoint tactical feed must stay reported rather than pass
+	# silently: the shortest supported canvas leaves very little feed history.
+	var shortest_supported: Vector2i = main.tactical_ui.SUPPORTED_VIEWPORTS[
+		main.tactical_ui.SUPPORTED_VIEWPORTS.size() - 1
+	]
+	var shortest_layout: Dictionary = main.tactical_ui.layout_metrics_for_viewport(
+		float(shortest_supported.x),
+		float(shortest_supported.y)
+	)
+	_expect(
+		shortest_layout.has("event_rail_cramped"),
+		"the layout no longer reports tactical-feed crowding"
+	)
+	_expect(
+		float(shortest_layout.get("event_rail_height", 0.0)) > 0.0,
+		"the shortest supported canvas leaves no tactical-feed rail"
+	)
+	_expect(
+		bool(shortest_layout.get("event_rail_cramped", false)),
+		"the shortest supported canvas no longer reports a cramped tactical feed"
+	)
+	# Canvases the HUD cannot serve must be detected, never silently overlapped.
+	for short_canvas in main.tactical_ui.HudLayout.UNSUPPORTED_SHORT_CANVASES:
+		var short_layout: Dictionary = main.tactical_ui.layout_metrics_for_viewport(
+			float(short_canvas.x),
+			float(short_canvas.y)
+		)
+		_expect(
+			bool(short_layout.get("constrained", false)),
+			"%dx%d is not reported as a constrained canvas" % [short_canvas.x, short_canvas.y]
+		)
+	# A wrapped multi-row dock must push the bottom-anchored feed rail up rather
+	# than keeping the historical single-row -112 assumption.
+	var wrapped_dock_layout: Dictionary = main.tactical_ui.layout_metrics_for_viewport(
+		1366.0,
+		768.0,
+		main.tactical_ui.STATUS_RAIL_RIGHT,
+		main.tactical_ui.STATUS_RAIL_RIGHT,
+		main.tactical_ui.TUTORIAL_HEIGHT,
+		212.0
+	)
+	_expect(
+		is_equal_approx(float(wrapped_dock_layout.get("action_dock_top", 0.0)), 544.0),
+		"wrapped action dock does not grow upward from the bottom margin"
+	)
+	_expect(
+		is_equal_approx(float(wrapped_dock_layout.get("event_rail_bottom_offset", 0.0)), -238.0),
+		"wrapped action dock does not push the tactical-feed rail clear"
+	)
+	_expect(
+		float(wrapped_dock_layout.get("event_rail_bottom_offset", 0.0)) < -112.0,
+		"wrapped action dock keeps the historical single-row feed-rail offset"
+	)
+	_expect(
+		not bool(wrapped_dock_layout.get("constrained", true)),
+		"a wrapped dock at 1366x768 is misreported as constrained"
+	)
+	# Known open case: the 1112x626 embedded tactical canvas with a wrapped dock
+	# leaves no usable tactical-feed rail. The remedy is a dock-compaction pass;
+	# until then the condition must be detected rather than silently overlapped.
+	var embedded_wrapped_layout: Dictionary = main.tactical_ui.layout_metrics_for_viewport(
+		1112.0,
+		626.0,
+		main.tactical_ui.STATUS_RAIL_RIGHT,
+		main.tactical_ui.STATUS_RAIL_RIGHT,
+		main.tactical_ui.TUTORIAL_HEIGHT,
+		212.0
+	)
+	_expect(
+		bool(embedded_wrapped_layout.get("tutorial_dock_clear", false)),
+		"the embedded wrapped dock reaches the tutorial callout"
+	)
+	_expect(
+		not bool(embedded_wrapped_layout.get("event_rail_visible", true)),
+		"the embedded wrapped-dock feed-rail regression is no longer detected"
+	)
+	_expect(
+		bool(embedded_wrapped_layout.get("constrained", false)),
+		"the embedded wrapped dock is not reported as a constrained layout"
+	)
+	# A viewport too short for both surfaces must be reported, not silently
+	# overlapped.
+	var constrained_layout: Dictionary = main.tactical_ui.layout_metrics_for_viewport(
+		1024.0,
+		360.0,
+		main.tactical_ui.STATUS_RAIL_RIGHT,
+		main.tactical_ui.STATUS_RAIL_RIGHT,
+		main.tactical_ui.TUTORIAL_HEIGHT,
+		320.0
+	)
+	_expect(
+		bool(constrained_layout.get("constrained", false)),
+		"an unusably short viewport is not reported as constrained"
+	)
+	_expect(
+		not bool(constrained_layout.get("tutorial_dock_clear", true)),
+		"an unusably short viewport claims tutorial/dock clearance"
+	)
+	# The live pass must publish the same metrics it applied.
+	var applied_layout: Dictionary = main.tactical_ui.last_layout_metrics
+	_expect(
+		not applied_layout.is_empty(),
+		"the responsive layout pass did not record its metrics"
+	)
+	if event_panel != null and not applied_layout.is_empty():
+		if bool(applied_layout.get("event_rail_visible", false)):
+			_expect(
+				is_equal_approx(
+					event_panel.offset_bottom,
+					float(applied_layout.get("event_rail_bottom_offset", 0.0))
+				),
+				"the tactical-feed rail offset does not match the applied layout metric"
+			)
+	# M05-C: adaptive HUD surfaces — transparency, slide, scroll, adaptation.
+	var surface_keys: Array = main.tactical_ui.surface_keys()
+	_expect(surface_keys.size() == 4, "the HUD does not expose four adaptive surfaces")
+	for surface_key in surface_keys:
+		var surface: Dictionary = main.tactical_ui.surface_state(String(surface_key))
+		_expect(
+			surface.get("node") != null,
+			"adaptive surface %s has no control" % String(surface_key)
+		)
+		# Transparency is continuous and never fully invisible, so a surface can
+		# always be found again.
+		var faded: float = main.tactical_ui.set_surface_opacity(String(surface_key), 0.0)
+		_expect(
+			is_equal_approx(faded, main.tactical_ui.HudLayout.OPACITY_MIN),
+			"adaptive surface %s can be made fully invisible" % String(surface_key)
+		)
+		var node := main.tactical_ui.surface_state(String(surface_key))["node"] as Control
+		_expect(
+			is_equal_approx(node.modulate.a, main.tactical_ui.HudLayout.OPACITY_MIN),
+			"adaptive surface %s did not apply its opacity" % String(surface_key)
+		)
+		var restored: float = main.tactical_ui.set_surface_opacity(String(surface_key), 1.0)
+		_expect(
+			is_equal_approx(restored, main.tactical_ui.HudLayout.OPACITY_MAX),
+			"adaptive surface %s cannot return to full opacity" % String(surface_key)
+		)
+	# Pointer affordance: every surface has a visible slide grip and an opacity
+	# grip, and the slide grip stays reachable when the surface is parked.
+	_expect(
+		main.tactical_ui.get_node_or_null("HudGrips") != null,
+		"the adaptive HUD has no pointer affordance"
+	)
+	for grip_key in surface_keys:
+		var grip_surface: Dictionary = main.tactical_ui.surface_state(String(grip_key))
+		var slide_grip := grip_surface.get("slide_grip") as Button
+		var fade_grip := grip_surface.get("fade_grip") as Button
+		_expect(slide_grip != null, "surface %s has no slide grip" % String(grip_key))
+		_expect(fade_grip != null, "surface %s has no opacity grip" % String(grip_key))
+		if slide_grip == null or fade_grip == null:
+			continue
+		_expect(
+			not String(slide_grip.tooltip_text).is_empty()
+			and not String(fade_grip.tooltip_text).is_empty(),
+			"surface %s grips carry no tooltip" % String(grip_key)
+		)
+		# The grips are pointer affordances; the keyboard path is F2/F3/F4, so they
+		# must not lengthen the action traversal order.
+		_expect(
+			slide_grip.focus_mode == Control.FOCUS_NONE
+			and fade_grip.focus_mode == Control.FOCUS_NONE,
+			"surface %s grips joined the keyboard action order" % String(grip_key)
+		)
+		var grip_parked_before: bool = main.tactical_ui.is_surface_parked(String(grip_key))
+		slide_grip.pressed.emit()
+		_expect(
+			main.tactical_ui.is_surface_parked(String(grip_key)) != grip_parked_before
+			or String(grip_key) == "status" or String(grip_key) == "feed",
+			"the slide grip for %s did not change its state" % String(grip_key)
+		)
+		slide_grip.pressed.emit()
+		var grip_opacity_before: float = float(
+			main.tactical_ui.surface_state(String(grip_key))["opacity"]
+		)
+		fade_grip.pressed.emit()
+		_expect(
+			not is_equal_approx(
+				float(main.tactical_ui.surface_state(String(grip_key))["opacity"]),
+				grip_opacity_before
+			),
+			"the opacity grip for %s did nothing" % String(grip_key)
+		)
+		main.tactical_ui.set_surface_opacity(String(grip_key), 1.0)
+	# A parked surface keeps its slide grip on screen, inside the handle.
+	main.tactical_ui.set_surface_parked("tutorial", true)
+	var parked_grip := main.tactical_ui.surface_state("tutorial")["slide_grip"] as Button
+	_expect(
+		parked_grip.position.y >= 0.0,
+		"a parked surface's slide grip left the screen"
+	)
+	main.tactical_ui.set_surface_parked("tutorial", false)
+	# The opacity cycle wraps, so repeated presses always come back to full.
+	var cycle_value := 1.0
+	var cycle_returned := false
+	for _cycle_step in range(main.tactical_ui.HudLayout.OPACITY_STEPS.size()):
+		cycle_value = main.tactical_ui.HudLayout.next_opacity(cycle_value)
+		if is_equal_approx(cycle_value, main.tactical_ui.HudLayout.OPACITY_MAX):
+			cycle_returned = true
+	_expect(cycle_returned, "the opacity cycle never returns to full")
+	# Sliding a surface away leaves a handle and is reversible.
+	# The tutorial callout is never auto-parked, so a manual slide there is always
+	# honoured. Sliding a surface that adaptation is currently forcing open or shut
+	# is correctly overridden on the next layout pass, which is why this uses the
+	# one surface adaptation never touches.
+	var slide_key := "tutorial"
+	var slide_node := main.tactical_ui.surface_state(slide_key)["node"] as Control
+	var started_parked: bool = main.tactical_ui.is_surface_parked(slide_key)
+	# The tutorial parks upward, so its slide axis is vertical.
+	var start_left: float = slide_node.offset_top
+	_expect(
+		main.tactical_ui.toggle_surface_parked(slide_key) == not started_parked,
+		"the surface slide toggle did not invert its state"
+	)
+	_expect(
+		main.tactical_ui.is_surface_parked(slide_key) == not started_parked,
+		"the slid surface does not report its new state"
+	)
+	var toggled_left: float = slide_node.offset_top
+	_expect(
+		not is_equal_approx(toggled_left, start_left),
+		"the slid surface did not move off or back onto its edge"
+	)
+	_expect(
+		(toggled_left < start_left) == (not started_parked),
+		"the surface slid the wrong way"
+	)
+	_expect(
+		main.tactical_ui.toggle_surface_parked(slide_key) == started_parked,
+		"the surface slide toggle is not reversible"
+	)
+	_expect(
+		is_equal_approx(slide_node.offset_top, start_left),
+		"the restored surface did not return to its previous position"
+	)
+	# Scrolling: content taller than a surface scrolls rather than spilling.
+	_expect(
+		main.tactical_ui.get_node_or_null("StatusPanel/StatusScroll") != null,
+		"the status rail does not scroll its content"
+	)
+	_expect(
+		main.tactical_ui.get_node_or_null("ActionDock/ActionDockScroll") != null,
+		"the action dock does not scroll its content"
+	)
+	# Adaptation: a canvas that cannot host the open layout parks the feed rather
+	# than reporting a broken layout, and never parks the actions or instructions.
+	for short_canvas in main.tactical_ui.HudLayout.UNSUPPORTED_SHORT_CANVASES:
+		var adaptive: Dictionary = main.tactical_ui.HudLayout.adaptive_metrics(
+			float(short_canvas.x),
+			float(short_canvas.y)
+		)
+		var canvas_label := "%dx%d" % [short_canvas.x, short_canvas.y]
+		_expect(
+			not bool(adaptive.get("constrained", true)),
+			"%s is not resolved by adaptation" % canvas_label
+		)
+		var parked_list: Array = adaptive.get("auto_parked", [])
+		_expect(
+			parked_list.has("feed"),
+			"%s did not park the tactical feed to fit" % canvas_label
+		)
+		_expect(
+			not parked_list.has("dock") and not parked_list.has("tutorial"),
+			"%s auto-parked the actions or the instructions" % canvas_label
+		)
+	# A supported canvas needs no adaptation at all.
+	for supported_canvas in main.tactical_ui.SUPPORTED_VIEWPORTS:
+		var open_metrics: Dictionary = main.tactical_ui.HudLayout.adaptive_metrics(
+			float(supported_canvas.x),
+			float(supported_canvas.y)
+		)
+		_expect(
+			(open_metrics.get("auto_parked", []) as Array).is_empty(),
+			"%dx%d parked a surface it did not need to" % [supported_canvas.x, supported_canvas.y]
+		)
+	# Player intent survives adaptation: a surface the player slid away stays away.
+	var intent_metrics: Dictionary = main.tactical_ui.HudLayout.adaptive_metrics(
+		1172.0,
+		659.0,
+		{"status": {"slide": main.tactical_ui.HudLayout.Slide.PARKED}}
+	)
+	var intent_surfaces: Dictionary = intent_metrics.get("surfaces", {})
+	_expect(
+		int((intent_surfaces.get("status", {}) as Dictionary).get("slide", -1))
+		== main.tactical_ui.HudLayout.Slide.PARKED,
+		"adaptation discarded the player's slid surface"
+	)
+	# M05-B: reduced motion. Camera transitions are presentation only, so a
+	# reduced-motion host must land on the destination immediately.
+	var camera = main.camera_controller
+	_expect(camera != null, "tactical camera controller is not addressable")
+	if camera != null:
+		_expect(
+			is_equal_approx(float(camera.motion_scale), 1.0),
+			"authored camera motion is not the default"
+		)
+		_expect(not bool(camera.is_reduced_motion()), "default state claims reduced motion")
+		var authored_focus := Vector3(4.0, 0.0, 6.0)
+		camera.focus_position(authored_focus)
+		_expect(
+			not camera.global_position.is_equal_approx(authored_focus),
+			"authored camera motion skipped its focus transition"
+		)
+		camera.set_motion_scale(0.0)
+		_expect(bool(camera.is_reduced_motion()), "reduced motion did not engage")
+		var reduced_focus := Vector3(-3.0, 0.0, 9.0)
+		camera.focus_position(reduced_focus)
+		_expect(
+			camera.global_position.is_equal_approx(reduced_focus),
+			"reduced motion did not apply the camera focus immediately"
+		)
+		_expect(
+			camera.desired_pivot_pos.is_equal_approx(reduced_focus),
+			"reduced-motion focus did not record the pivot target"
+		)
+		camera.set_mode(camera.Mode.OTS)
+		_expect(
+			is_equal_approx(float(camera.distance), 4.0),
+			"reduced motion did not apply the camera mode distance immediately"
+		)
+		camera.set_mode(camera.Mode.BEV)
+		_expect(
+			is_equal_approx(float(camera.distance), 30.0),
+			"reduced motion did not restore the tactical camera distance"
+		)
+		camera.set_motion_scale(1.0)
+		camera.global_position = authored_focus
+		camera.desired_pivot_pos = authored_focus
+	# M05-B: keyboard traversal must reach every core tactical control and must
+	# be repeatable, without stranding the non-core actions.
+	var traversal: Array = main.tactical_ui.keyboard_traversal_keys()
+	_expect(traversal.size() > 1, "keyboard traversal visits no controls")
+	_expect(
+		main.tactical_ui.keyboard_entry_control(true) != null
+		and String(traversal[0]) == main.tactical_ui._focus_key_for(
+			main.tactical_ui.keyboard_entry_control(true)
+		),
+		"keyboard traversal does not start at the keyboard entry control"
+	)
+	# Every action the current HUD state actually offers must be reachable.
+	# Disabled and hidden controls are excluded because traversal skips them.
+	var reachable_keys: Array = main.tactical_ui.keyboard_reachable_action_keys()
+	_expect(reachable_keys.size() >= 8, "the HUD offers too few enabled keyboard targets to judge")
+	for required_key in reachable_keys:
+		_expect(
+			traversal.has(String(required_key)),
+			"keyboard traversal strands the enabled %s control" % String(required_key)
+		)
+	var enabled_core := 0
+	for core_key in main.tactical_ui.FOCUS_ORDER_KEYS:
+		if reachable_keys.has(String(core_key)):
+			enabled_core += 1
+			_expect(
+				traversal.has(String(core_key)),
+				"keyboard traversal never reaches the enabled core control %s" % String(core_key)
+			)
+	_expect(enabled_core >= 2, "fewer than two core tactical controls are keyboard-reachable")
+	var repeat_traversal: Array = main.tactical_ui.keyboard_traversal_keys()
+	_expect(
+		repeat_traversal == traversal,
+		"keyboard traversal is not repeatable for the same HUD state"
+	)
+	# Tab belongs to focus traversal. Any gameplay action that claims it makes
+	# the tactical controls unreachable without a mouse.
+	for reserved_action in InputMap.get_actions():
+		var action_name := String(reserved_action)
+		if action_name.begins_with("ui_"):
+			continue
+		for reserved_event in InputMap.action_get_events(action_name):
+			if reserved_event is InputEventKey:
+				_expect(
+					reserved_event.keycode != KEY_TAB,
+					"gameplay action %s claims Tab from keyboard focus traversal" % action_name
+				)
+	_expect(
+		InputMap.has_action("toggle_legend")
+		and InputMap.action_get_events("toggle_legend").size() > 0,
+		"the tactical help overlay lost its keyboard binding"
+	)
+	# Live keyboard traversal must be observable, not inferred.
+	_expect(
+		String(main.tactical_ui.focused_control_key).is_empty(),
+		"a core control claims keyboard focus before any traversal"
+	)
+	var traversal_button := main.tactical_ui.action_btns["toggle_run"] as Button
+	traversal_button.focus_entered.emit()
+	_expect(
+		String(main.tactical_ui.focused_control_key) == "toggle_run",
+		"focusing a core control does not record the observable focus key"
+	)
+	# Keyboard-only entry: the first Tab must adopt the declared order because
+	# Godot advances focus only from a control that already holds it.
+	_expect(
+		main.tactical_ui.enter_keyboard_focus(true),
+		"forward keyboard entry found no focusable core control"
+	)
+	_expect(
+		main.tactical_ui.action_btns[main.tactical_ui.FOCUS_ORDER_KEYS[0]].has_focus(),
+		"forward keyboard entry does not start at the first control in the declared order"
+	)
+	_expect(
+		main.tactical_ui.enter_keyboard_focus(false),
+		"reverse keyboard entry found no focusable core control"
+	)
+	var last_focus_key: String = main.tactical_ui.FOCUS_ORDER_KEYS[
+		main.tactical_ui.FOCUS_ORDER_KEYS.size() - 1
+	]
+	_expect(
+		main.tactical_ui.action_btns[last_focus_key].has_focus(),
+		"reverse keyboard entry does not start at the last control in the declared order"
+	)
+	# M05-B: contrast of the core tactical text against its own panel.
+	for contrast_case in main.tactical_ui.contrast_report():
+		_expect(
+			bool(contrast_case.get("passes", false)),
+			"%s contrast is %.2f:1, below the %.1f:1 minimum" % [
+				String(contrast_case.get("label", "?")),
+				float(contrast_case.get("ratio", 0.0)),
+				float(contrast_case.get("minimum", 4.5))
+			]
+		)
+	_expect(main.tactical_ui.enemy_label.get_parent() == main.tactical_ui.roster_box, "hostile count is not mounted in the persistent roster")
+	_expect(main.tactical_ui.turn_label.text.contains(Config.faction_name(main.player_faction)), "turn banner omits the active faction vocabulary")
+	_expect(main.tactical_ui.pilot_label.text.contains("ACTIVE PILOT:"), "active-pilot status is missing")
+	_expect(main.tactical_ui.pilot_label.text.contains("[CMDR]"), "initial Commander pilot is not identified")
+	_expect(main.tactical_ui.pilot_label.text.contains("AP 10/10"), "active-pilot AP is not visible")
+	_expect(main.tactical_ui.phase_help_label.text.contains("END TURN"), "phase status omits End Turn consequence")
+	_expect(main.tactical_ui.phase_help_label.text.contains("EXTRACT/F8"), "phase status omits emergency extraction")
+	_expect(main.tactical_ui.core_costs_label.text.contains("Move %d/step" % Config.MOVE_COST), "persistent core-cost line is missing")
+	_expect(main.tactical_ui.action_btns["endturn"].text.contains("SPACE"), "End Turn button omits its shortcut")
+	_expect(main.tactical_ui.action_btns["evac"].text.contains("F8"), "Extract button omits its shortcut")
+	for focus_key in ["brace", "toggle_run", "endturn", "evac"]:
+		var focus_button := main.tactical_ui.action_btns[focus_key] as Button
+		_expect(focus_button.focus_mode == Control.FOCUS_ALL, "%s is missing keyboard focus" % focus_key)
+		_expect(
+			focus_button.has_theme_stylebox_override("focus"),
+			"%s is missing a visible keyboard-focus outline" % focus_key
+		)
+	_expect(not main.tactical_ui.is_help_visible(), "tactical help should start closed")
+	main.tactical_ui.set_help_visible(true)
+	_expect(main.tactical_ui.is_help_visible(), "tactical help did not open")
+	main.tactical_ui.set_help_visible(false)
+	_expect(not main.tactical_ui.is_help_visible(), "tactical help did not close")
+	_expect(not main.tactical_ui.action_groups["special"]["group"].visible, "developer mobility leaked into the core action dock")
 	var ordinary_action_keys := [
 		"endturn", "evac", "brace", "crouch", "prone", "toggle_orient",
 		"take_cover", "jump", "toggle_run", "dodge", "grab", "assemble"

@@ -20,6 +20,23 @@ const DEFAULT_NAMES := {
 	Config.FACTION_TIME: ["Commander", "Stalker (Agent)", "Titan (Agent)"]
 }
 
+## The guided Proving Ground's armed instructor. The target dummies teach the
+## action surface; Haili is the one agent in the tutorial with a real action-point
+## pool, so cover and flanking can actually be taught and observed rather than
+## only asserted in headless tests.
+##
+## Naming note (principal decision, 2026-07-29): "Haili" is a casual personal
+## name and is distinct in fact from the franchise property "H.A.I.L.I.", even
+## though lineage exists between them. Do not merge the two entries, and do not
+## expand this character's name into the acronym.
+const INSTRUCTOR_NAME := "Haili"
+
+## Every squad member carries one grenade, so the destructible-terrain mechanics are
+## testable by hand from the first turn.
+const GRENADE_KIND := "grenade"
+const STARTING_GRENADES := 1
+const INSTRUCTOR_STANDOFF := 5
+
 static func faction_from_payload_string(raw: String) -> int:
 	var fac := raw.to_lower()
 	if fac.begins_with("had") or fac.begins_with("efd"):
@@ -34,6 +51,46 @@ static func resolve_player_faction(payload: Dictionary, commander_faction: Strin
 	if not payload.is_empty():
 		return faction_from_payload_string(String(payload.get("faction", "")))
 	return faction_from_payload_string(commander_faction)
+
+static func tutorial_dummy_cells(
+	player_faction: int,
+	width: int = Config.GRID_W,
+	height: int = Config.GRID_H
+) -> Array[Vector2i]:
+	var player_cells := World.spawn_cells(player_faction, width, height)
+	if player_cells.is_empty():
+		return []
+	var start: Vector2i = player_cells[0]
+	var toward_center := Vector2i(
+		1 if start.x < int(width / 2.0) else -1,
+		1 if start.y < int(height / 2.0) else -1
+	)
+	return [
+		Vector2i(start.x + toward_center.x * 2, start.y),
+		Vector2i(start.x + toward_center.x * 2, start.y + toward_center.y)
+	]
+
+## Haili's instruction post. She stands beyond the one-turn melee lane so the
+## guided steps stay reachable, but close enough that the player's squad holds
+## line of sight on her — which is what lets her demonstrate cover and flanking
+## instead of standing still.
+static func tutorial_instructor_cell(
+	player_faction: int,
+	width: int = Config.GRID_W,
+	height: int = Config.GRID_H
+) -> Vector2i:
+	var player_cells := World.spawn_cells(player_faction, width, height)
+	if player_cells.is_empty():
+		return Vector2i.ZERO
+	var start: Vector2i = player_cells[0]
+	var toward_center := Vector2i(
+		1 if start.x < int(width / 2.0) else -1,
+		1 if start.y < int(height / 2.0) else -1
+	)
+	return Vector2i(
+		clampi(start.x + toward_center.x * INSTRUCTOR_STANDOFF, 0, width - 1),
+		clampi(start.y + toward_center.y * 2, 0, height - 1)
+	)
 
 static func spawn_into(main: Node, player_faction: int, payload: Dictionary) -> void:
 	var sector := String(payload.get("sector", ""))
@@ -63,12 +120,19 @@ static func spawn_into(main: Node, player_faction: int, payload: Dictionary) -> 
 		u.name = String(sq_data.get("name", player_names[mini(j, player_names.size() - 1)]))
 		u.skills = (skills[player_faction] as Array).duplicate()
 		Pilot.apply_default_squad_roles(u, j)
+		# One grenade each, so terrain destruction is reachable in the first turn of
+		# any mission rather than only after finding scattered loot.
+		u.inv[GRENADE_KIND] = int(u.inv.get(GRENADE_KIND, 0)) + STARTING_GRENADES
 
 	if sector == "Proving Ground":
-		var fac := Config.FACTION_SYND
-		var fac_corner: Array = corners[fac]
-		for j in range(mini(2, fac_corner.size())):
-			var dummy = main._make_unit(fac, fac_corner[j])
+		# Keep the deterministic training lane close enough for one move,
+		# Brace/cover instruction, and a basic attack inside the Base-10 pool.
+		# The opponent faction follows the player's choice instead of becoming
+		# friendly when the Commander selects Syndicate/Metropoli.
+		var fac := (player_faction + 1) % 3
+		var dummy_cells := tutorial_dummy_cells(player_faction)
+		for j in range(dummy_cells.size()):
+			var dummy = main._make_unit(fac, dummy_cells[j])
 			dummy.name = "Target Dummy"
 			dummy.skills = ["primitive"]
 			dummy.hp = 10
@@ -79,6 +143,17 @@ static func spawn_into(main: Node, player_faction: int, payload: Dictionary) -> 
 			dummy.is_commander = false
 			dummy.is_squad_bot = false
 			dummy.player_controlled = false
+		var instructor_cell := tutorial_instructor_cell(player_faction)
+		var instructor = main._make_unit(fac, instructor_cell)
+		instructor.name = INSTRUCTOR_NAME
+		instructor.skills = (skills[fac] as Array).duplicate()
+		instructor.hp = Config.UNIT_HP
+		instructor.max_hp = Config.UNIT_HP
+		instructor.ap = Config.MAX_AP
+		instructor.max_ap = Config.MAX_AP
+		instructor.is_commander = false
+		instructor.is_squad_bot = false
+		instructor.player_controlled = false
 	else:
 		for fac in [Config.FACTION_HAD, Config.FACTION_SYND, Config.FACTION_TIME]:
 			if fac == player_faction:

@@ -1,0 +1,1313 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://groundzerogames.net/contracts/battlestar-repro.schema.json",
+ "title": "BattleStarSol bounded reproduction artifact",
+ "description": "Privacy-bounded deterministic evidence for deployment, ordered replay ledger, declared result, and idempotent strategic import. It does not claim Godot mechanical re-simulation.",
+ "type": "object",
+ "required": [
+  "schema",
+  "privacy",
+  "product",
+  "build",
+  "mission",
+  "provenance",
+  "equivalence",
+  "integrity"
+ ],
+ "properties": {
+  "schema": {
+   "const": "gzg.battlestar.repro/1.0"
+  },
+  "privacy": {
+   "type": "object",
+   "required": [
+    "classification",
+    "direct_identifiers",
+    "excluded"
+   ],
+   "properties": {
+    "classification": {
+     "const": "pseudonymized-local-playtest"
+    },
+    "direct_identifiers": {
+     "const": "excluded"
+    },
+    "excluded": {
+     "type": "array",
+     "prefixItems": [
+      {
+       "const": "actor and squad names"
+      },
+      {
+       "const": "A.T.L.A.S. return state and map coordinates"
+      },
+      {
+       "const": "browser storage and profile data"
+      },
+      {
+       "const": "console lines, screenshots, URLs, and filesystem paths"
+      }
+     ],
+     "items": false,
+     "minItems": 4,
+     "maxItems": 4
+    }
+   },
+   "additionalProperties": false
+  },
+  "product": {
+   "type": "object",
+   "required": [
+    "galaxy",
+    "version",
+    "platform",
+    "harness"
+   ],
+   "properties": {
+    "galaxy": {
+     "const": "BattleStarSol"
+    },
+    "version": {
+     "$ref": "#/$defs/nonEmpty64"
+    },
+    "platform": {
+     "const": "godot-web"
+    },
+    "harness": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 120
+    }
+   },
+   "additionalProperties": false
+  },
+  "build": {
+   "type": "object",
+   "required": [
+    "tactical_pck",
+    "browser"
+   ],
+   "properties": {
+    "tactical_pck": {
+     "type": "object",
+     "required": [
+      "bytes",
+      "sha256"
+     ],
+     "properties": {
+      "bytes": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 1000000000
+      },
+      "sha256": {
+       "$ref": "#/$defs/sha256"
+      }
+     },
+     "additionalProperties": false
+    },
+    "browser": {
+     "type": "object",
+     "required": [
+      "family",
+      "version"
+     ],
+     "properties": {
+      "family": {
+       "const": "chromium"
+      },
+      "version": {
+       "$ref": "#/$defs/nonEmpty64"
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "mission": {
+   "type": "object",
+   "required": [
+    "deployment",
+    "replay",
+    "result"
+   ],
+   "properties": {
+    "deployment": {
+     "$ref": "#/$defs/deployment"
+    },
+    "replay": {
+     "$ref": "#/$defs/replay"
+    },
+    "result": {
+     "$ref": "#/$defs/result"
+    }
+   },
+   "additionalProperties": false
+  },
+  "provenance": {
+   "type": "object",
+   "required": [
+    "evidence_run_id",
+    "source_manifest_sha256",
+    "deployment_message_id",
+    "extraction_message_id",
+    "correlation_id",
+    "extracted_at",
+    "extracted_at_ms"
+   ],
+   "properties": {
+    "evidence_run_id": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 128
+    },
+    "source_manifest_sha256": {
+     "$ref": "#/$defs/sha256"
+    },
+    "deployment_message_id": {
+     "$ref": "#/$defs/messageId"
+    },
+    "extraction_message_id": {
+     "$ref": "#/$defs/messageId"
+    },
+    "correlation_id": {
+     "$ref": "#/$defs/messageId"
+    },
+    "extracted_at": {
+     "type": "string",
+     "format": "date-time",
+     "maxLength": 64
+    },
+    "extracted_at_ms": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 9007199254740991
+    }
+   },
+   "additionalProperties": false
+  },
+  "equivalence": {
+   "type": "object",
+   "required": [
+    "supported",
+    "not_claimed",
+    "mechanical_state_hash"
+   ],
+   "properties": {
+    "supported": {
+     "type": "array",
+     "prefixItems": [
+      {
+       "const": "validated deployment identity and normalized initial input"
+      },
+      {
+       "const": "ordered action/event ledger and canonical digest"
+      },
+      {
+       "const": "declared tactical result and strategic import delta"
+      },
+      {
+       "const": "duplicate extraction idempotence"
+      }
+     ],
+     "items": false,
+     "minItems": 4,
+     "maxItems": 4
+    },
+    "not_claimed": {
+     "type": "array",
+     "prefixItems": [
+      {
+       "const": "Godot mechanical re-simulation from the action ledger"
+      },
+      {
+       "const": "native/Web or cross-platform mechanical state-hash equivalence"
+      }
+     ],
+     "items": false,
+     "minItems": 2,
+     "maxItems": 2
+    },
+    "mechanical_state_hash": {
+     "type": "object",
+     "required": [
+      "available",
+      "reason"
+     ],
+     "properties": {
+      "available": {
+       "const": false
+      },
+      "reason": {
+       "const": "The current pre-alpha extraction does not emit an authoritative mechanical state hash."
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "integrity": {
+   "type": "object",
+   "required": [
+    "canonicalization",
+    "algorithm",
+    "mechanical_digest",
+    "artifact_digest"
+   ],
+   "properties": {
+    "canonicalization": {
+     "const": "gzg.canonical-json/1.0"
+    },
+    "algorithm": {
+     "const": "sha-256"
+    },
+    "mechanical_digest": {
+     "$ref": "#/$defs/sha256"
+    },
+    "artifact_digest": {
+     "$ref": "#/$defs/sha256"
+    }
+   },
+   "additionalProperties": false
+  }
+ },
+ "$defs": {
+  "sha256": {
+   "type": "string",
+   "pattern": "^[0-9a-f]{64}$"
+  },
+  "nonEmpty64": {
+   "type": "string",
+   "minLength": 1,
+   "maxLength": 64
+  },
+  "messageId": {
+   "type": "string",
+   "minLength": 1,
+   "maxLength": 256,
+   "pattern": "^[A-Za-z0-9][A-Za-z0-9:._-]*$"
+  },
+  "position": {
+   "type": "object",
+   "required": [
+    "x",
+    "y",
+    "z"
+   ],
+   "properties": {
+    "x": {
+     "type": "integer",
+     "minimum": -10000,
+     "maximum": 10000
+    },
+    "y": {
+     "type": "integer",
+     "minimum": -10000,
+     "maximum": 10000
+    },
+    "z": {
+     "type": "integer",
+     "minimum": -1000,
+     "maximum": 1000
+    }
+   },
+   "additionalProperties": false
+  },
+  "actor": {
+   "type": "object",
+   "required": [
+    "unit_id",
+    "team"
+   ],
+   "properties": {
+    "unit_id": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 10000
+    },
+    "team": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 32
+    }
+   },
+   "additionalProperties": false
+  },
+  "resources": {
+   "type": "object",
+   "required": [
+    "neural",
+    "capital",
+    "alloys"
+   ],
+   "properties": {
+    "neural": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 1000000000
+    },
+    "capital": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 1000000000
+    },
+    "alloys": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 1000000000
+    }
+   },
+   "additionalProperties": false
+  },
+  "gains": {
+   "type": "object",
+   "required": [
+    "neural",
+    "capital",
+    "alloys",
+    "loot"
+   ],
+   "properties": {
+    "neural": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 1000000000
+    },
+    "capital": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 1000000000
+    },
+    "alloys": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 1000000000
+    },
+    "loot": {
+     "type": "array",
+     "maxItems": 0
+    }
+   },
+   "additionalProperties": false
+  },
+  "deployment": {
+   "type": "object",
+   "required": [
+    "payload_contract_version",
+    "generator_version",
+    "rules_version",
+    "sector",
+    "faction",
+    "seed",
+    "squad",
+    "objectives",
+    "resources"
+   ],
+   "properties": {
+    "payload_contract_version": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 32
+    },
+    "generator_version": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "rules_version": {
+     "$ref": "#/$defs/nonEmpty64"
+    },
+    "sector": {
+     "const": "Proving Ground"
+    },
+    "faction": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 120
+    },
+    "seed": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 2147483647
+    },
+    "squad": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 100,
+     "items": {
+      "type": "object",
+      "required": [
+       "slot",
+       "class"
+      ],
+      "properties": {
+       "slot": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+       },
+       "class": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+       }
+      },
+      "additionalProperties": false
+     }
+    },
+    "objectives": {
+     "type": "array",
+     "maxItems": 100,
+     "items": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+     }
+    },
+    "resources": {
+     "$ref": "#/$defs/resources"
+    }
+   },
+   "additionalProperties": false
+  },
+  "action": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "round",
+    "active_team",
+    "actor",
+    "action",
+    "target",
+    "use_offhand",
+    "ap_before",
+    "ap_after_dispatch",
+    "accepted"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "action"
+    },
+    "round": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 100000
+    },
+    "active_team": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 32
+    },
+    "actor": {
+     "$ref": "#/$defs/actor"
+    },
+    "action": {
+     "type": "string",
+     "pattern": "^[a-z][a-z0-9_]{0,63}$"
+    },
+    "target": {
+     "$ref": "#/$defs/position"
+    },
+    "use_offhand": {
+     "type": "boolean"
+    },
+    "ap_before": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 10
+    },
+    "ap_after_dispatch": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 10
+    },
+    "accepted": {
+     "type": "boolean"
+    }
+   },
+   "additionalProperties": false
+  },
+  "eventBase": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    }
+   }
+  },
+  "event": {
+   "oneOf": [
+    {
+     "$ref": "#/$defs/tutorialEvent"
+    },
+    {
+     "$ref": "#/$defs/movementEvent"
+    },
+    {
+     "$ref": "#/$defs/damageEvent"
+    },
+    {
+     "$ref": "#/$defs/agentEvent"
+    },
+    {
+     "$ref": "#/$defs/lootEvent"
+    },
+    {
+     "$ref": "#/$defs/killedEvent"
+    },
+    {
+     "$ref": "#/$defs/terrainDamagedEvent"
+    },
+    {
+     "$ref": "#/$defs/turnEvent"
+    },
+    {
+     "$ref": "#/$defs/resolvedEvent"
+    },
+    {
+     "$ref": "#/$defs/blastEvent"
+    }
+   ]
+  },
+  "tutorialEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "tutorial_step_changed"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "complete",
+      "display_step",
+      "step",
+      "total_steps"
+     ],
+     "properties": {
+      "complete": {
+       "type": "boolean"
+      },
+      "display_step": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 100
+      },
+      "step": {
+       "type": "string",
+       "pattern": "^[a-z][a-z0-9_]{0,63}$"
+      },
+      "total_steps": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 100
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "movementEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "movement_resolved"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "actor",
+      "ap_spent",
+      "from",
+      "mode",
+      "to"
+     ],
+     "properties": {
+      "actor": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 10000
+      },
+      "ap_spent": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 10
+      },
+      "from": {
+       "$ref": "#/$defs/position"
+      },
+      "mode": {
+       "type": "string",
+       "pattern": "^[a-z][a-z0-9_]{0,63}$"
+      },
+      "to": {
+       "$ref": "#/$defs/position"
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "damageEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "damage_resolved"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "attacker",
+      "damage",
+      "hp_after",
+      "hp_before",
+      "ranged",
+      "target",
+      "weapon"
+     ],
+     "properties": {
+      "attacker": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 10000
+      },
+      "damage": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 1000
+      },
+      "hp_after": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100000
+      },
+      "hp_before": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100000
+      },
+      "ranged": {
+       "type": "boolean"
+      },
+      "target": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 10000
+      },
+      "weapon": {
+       "type": "string",
+       "maxLength": 80,
+       "pattern": "^(?:|[a-z][a-z0-9_]*)$"
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "agentEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "agent_decision"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "actor",
+      "ap_before",
+      "decision",
+      "position",
+      "rationale",
+      "round",
+      "score",
+      "team"
+     ],
+     "properties": {
+      "actor": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 10000
+      },
+      "ap_before": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 10
+      },
+      "decision": {
+       "type": "string",
+       "pattern": "^[a-z][a-z0-9_]{0,63}$"
+      },
+      "position": {
+       "$ref": "#/$defs/position"
+      },
+      "rationale": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 200
+      },
+      "round": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 100000
+      },
+      "score": {
+       "type": "number",
+       "minimum": -1000000,
+       "maximum": 1000000
+      },
+      "team": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 32
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "lootEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "loot_collected"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "actor",
+      "ap_spent",
+      "cell",
+      "items"
+     ],
+     "properties": {
+      "actor": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 10000
+      },
+      "ap_spent": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 10
+      },
+      "cell": {
+       "$ref": "#/$defs/position"
+      },
+      "items": {
+       "type": "array",
+       "maxItems": 32,
+       "items": {
+        "type": "object",
+        "required": [
+         "item",
+         "quantity"
+        ],
+        "properties": {
+         "item": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+         },
+         "quantity": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+         }
+        },
+        "additionalProperties": false
+       }
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "killedEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "unit_killed"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "attacker",
+      "cell",
+      "target",
+      "weapon"
+     ],
+     "properties": {
+      "attacker": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 10000
+      },
+      "cell": {
+       "$ref": "#/$defs/position"
+      },
+      "target": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 10000
+      },
+      "weapon": {
+       "type": "string",
+       "pattern": "^[a-z][a-z0-9_]{0,63}$"
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "turnEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "turn_started"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "active_team",
+      "round"
+     ],
+     "properties": {
+      "active_team": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 32
+      },
+      "round": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 100000
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "resolvedEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "mission_resolved"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "note",
+      "outcome",
+      "survivors"
+     ],
+     "properties": {
+      "note": {
+       "type": "string",
+       "pattern": "^[a-z][a-z0-9_]{0,63}$"
+      },
+      "outcome": {
+       "type": "string",
+       "pattern": "^[A-Z][A-Z0-9_-]{0,39}$"
+      },
+      "survivors": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "replay": {
+   "type": "object",
+   "required": [
+    "mission_seed",
+    "generator_version",
+    "rules_version",
+    "actions",
+    "events"
+   ],
+   "properties": {
+    "mission_seed": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 2147483647
+    },
+    "generator_version": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "rules_version": {
+     "$ref": "#/$defs/nonEmpty64"
+    },
+    "actions": {
+     "type": "array",
+     "maxItems": 256,
+     "items": {
+      "$ref": "#/$defs/action"
+     }
+    },
+    "events": {
+     "type": "array",
+     "maxItems": 1024,
+     "items": {
+      "$ref": "#/$defs/event"
+     }
+    }
+   },
+   "additionalProperties": false
+  },
+  "result": {
+   "type": "object",
+   "required": [
+    "type",
+    "payload_contract_version",
+    "generator_version",
+    "rules_version",
+    "sector",
+    "seed",
+    "outcome",
+    "survivors",
+    "gains",
+    "note"
+   ],
+   "properties": {
+    "type": {
+     "const": "extraction"
+    },
+    "payload_contract_version": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 32
+    },
+    "generator_version": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "rules_version": {
+     "$ref": "#/$defs/nonEmpty64"
+    },
+    "sector": {
+     "const": "Proving Ground"
+    },
+    "seed": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 2147483647
+    },
+    "outcome": {
+     "type": "string",
+     "pattern": "^[A-Z][A-Z0-9_-]{0,39}$"
+    },
+    "survivors": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 100
+    },
+    "gains": {
+     "$ref": "#/$defs/gains"
+    },
+    "note": {
+     "type": "string",
+     "pattern": "^[a-z][a-z0-9_]{0,63}$"
+    }
+   },
+   "additionalProperties": false
+  },
+  "terrainDamagedEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "terrain_damaged"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "attacker",
+      "cell",
+      "cover_after",
+      "cover_before",
+      "destroyed",
+      "integrity_after",
+      "integrity_before",
+      "material_after",
+      "material_before",
+      "weapon"
+     ],
+     "properties": {
+      "attacker": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 10000
+      },
+      "cell": {
+       "$ref": "#/$defs/position"
+      },
+      "cover_after": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 2
+      },
+      "cover_before": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 2
+      },
+      "destroyed": {
+       "type": "boolean"
+      },
+      "integrity_after": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "integrity_before": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "material_after": {
+       "type": "string",
+       "maxLength": 32
+      },
+      "material_before": {
+       "type": "string",
+       "maxLength": 32
+      },
+      "weapon": {
+       "type": "string",
+       "maxLength": 80
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  },
+  "blastEvent": {
+   "type": "object",
+   "required": [
+    "sequence",
+    "record_type",
+    "event",
+    "payload"
+   ],
+   "properties": {
+    "sequence": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 1000000
+    },
+    "record_type": {
+     "const": "event"
+    },
+    "event": {
+     "const": "blast_resolved"
+    },
+    "payload": {
+     "type": "object",
+     "required": [
+      "attacker",
+      "cell",
+      "damage_dealt",
+      "radius",
+      "terrain_destroyed",
+      "units_hit",
+      "weapon"
+     ],
+     "properties": {
+      "attacker": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 10000
+      },
+      "cell": {
+       "$ref": "#/$defs/position"
+      },
+      "damage_dealt": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100000
+      },
+      "radius": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 32
+      },
+      "terrain_destroyed": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 10000
+      },
+      "units_hit": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 1000
+      },
+      "weapon": {
+       "type": "string",
+       "maxLength": 80
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "additionalProperties": false
+  }
+ },
+ "additionalProperties": false
+}

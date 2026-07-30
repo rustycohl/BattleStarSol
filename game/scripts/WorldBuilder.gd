@@ -89,20 +89,40 @@ static func generate_cells(
 			elif noise_val > 0.50:
 				h = 1
 
-			# Every faction receives a deterministic, level insertion pad.
-			# This also keeps old seeds playable after the 10x10 -> 20x20
-			# expansion.
-			if _inside_spawn_pad(c, width, height):
+			# Every faction receives a level insertion footprint so units never
+			# spawn on a column. Flattening the whole four-deep pad also erased
+			# every cover face beside the insertion point, which is why the guided
+			# lane had nothing to take cover behind. Only the insertion cells and
+			# their step-off ring are levelled now; the rest of the pad keeps its
+			# generated terrain, so cover near a spawn occurs naturally.
+			if _inside_spawn_footprint(c, width, height):
 				h = 0
 
 			var t: int = Config.COVER if h >= 3 else (Config.HALF_COVER if h > 0 else Config.FLOOR)
-			cells[c] = {
-				"type": t,
-				"z": h,
-				"density": (100 if t == Config.COVER else 0),
-				"climbable": h > 0 and h <= 2
-			}
+			cells[c] = material_cell(t, h)
 	return cells
+
+## Terrain material. Cover is a consequence of what a cell is made of and how
+## thick it is, not a painted flag: `density` and `integrity` are what penetration
+## and destruction read, and what cover scoring is derived from.
+static func material_cell(cell_type: int, height: int) -> Dictionary:
+	var density := 0
+	var material := "open"
+	if cell_type == Config.COVER:
+		# Taller columns are thicker, so they stop more and last longer.
+		density = clampi(60 + (height - 3) * 12, 60, 100)
+		material = "hard"
+	elif cell_type == Config.HALF_COVER:
+		density = clampi(20 + (height - 1) * 10, 20, 45)
+		material = "soft"
+	return {
+		"type": cell_type,
+		"z": height,
+		"density": density,
+		"integrity": density,
+		"material": material,
+		"climbable": height > 0 and height <= 2
+	}
 
 static func spawn_cells(
 	team: int,
@@ -126,6 +146,17 @@ static func spawn_cells(
 			]
 	return []
 
+## Levels only the cells a squad actually stands on plus one step off each, so
+## nobody spawns on a column and nobody is walled in — while leaving the rest of
+## the old pad free to generate real terrain, and therefore real cover.
+static func _inside_spawn_footprint(c: Vector2i, width: int, height: int) -> bool:
+	for team in [Config.FACTION_HAD, Config.FACTION_SYND, Config.FACTION_TIME]:
+		for cell in spawn_cells(team, width, height):
+			if absi(c.x - cell.x) + absi(c.y - cell.y) <= 1:
+				return true
+	return false
+
+## Retained for reference: the historical four-deep flattened pad.
 static func _inside_spawn_pad(c: Vector2i, width: int, height: int) -> bool:
 	var left := c.x < SPAWN_PAD_DEPTH
 	var right := c.x >= width - SPAWN_PAD_DEPTH
@@ -133,7 +164,45 @@ static func _inside_spawn_pad(c: Vector2i, width: int, height: int) -> bool:
 	var bottom := c.y >= height - SPAWN_PAD_DEPTH
 	return (left and top) or (right and bottom) or (left and bottom)
 
-static func build_grid(parent: Node3D, tiles_root: Node3D, map_seed: int) -> Dictionary:
+## Naturally occurring cover near a faction's insertion point, read out of the
+## generated terrain rather than painted into it. Used for evidence and tests: the
+## tutorial teaches cover only because the environment provides it.
+static func cover_near_spawn(
+	cells: Dictionary,
+	player_faction: int,
+	radius: int = 3,
+	width: int = Config.GRID_W,
+	height: int = Config.GRID_H
+) -> Array[Vector2i]:
+	var found: Array[Vector2i] = []
+	var player_cells := spawn_cells(player_faction, width, height)
+	if player_cells.is_empty():
+		return found
+	var start: Vector2i = player_cells[0]
+	for dy in range(-radius, radius + 1):
+		for dx in range(-radius, radius + 1):
+			var candidate := start + Vector2i(dx, dy)
+			var data = cells.get(candidate, null)
+			if not (data is Dictionary):
+				continue
+			if int((data as Dictionary).get("type", -1)) == Config.COVER:
+				found.append(candidate)
+	found.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		var da := absi(a.x - start.x) + absi(a.y - start.y)
+		var db := absi(b.x - start.x) + absi(b.y - start.y)
+		if da != db:
+			return da < db
+		if a.x != b.x:
+			return a.x < b.x
+		return a.y < b.y
+	)
+	return found
+
+static func build_grid(
+	parent: Node3D,
+	tiles_root: Node3D,
+	map_seed: int
+) -> Dictionary:
 	var cells := generate_cells(map_seed)
 	for x in Config.GRID_W:
 		for y in Config.GRID_H:
@@ -145,6 +214,47 @@ static func build_grid(parent: Node3D, tiles_root: Node3D, map_seed: int) -> Dic
 	if game_state:
 		game_state.cells = cells
 	return cells
+
+## Public so a mid-mission terrain change can rebuild exactly one tile. `material`
+## lets a damaged cell read as damaged rather than as pristine terrain of the new
+## height — rubble is scorched and slumped, and a weakened wall is visibly cracked.
+static func spawn_tile(
+	tiles_root: Node3D,
+	c: Vector2i,
+	t: int,
+	h: int,
+	map_seed: int,
+	material_state: String = ""
+) -> void:
+	_spawn_tile(tiles_root, c, t, h, map_seed)
+	if material_state.is_empty():
+		return
+	var tile := tiles_root.get_node_or_null("Tile_%d_%d" % [c.x, c.y]) as MeshInstance3D
+	if tile == null:
+		return
+	var surface := tile.get_active_material(0) as StandardMaterial3D
+	if surface == null:
+		return
+	surface = surface.duplicate() as StandardMaterial3D
+	match material_state:
+		"rubble":
+			# Blast-scorched ground: dark, matte, faintly warm from the detonation.
+			surface.albedo_color = surface.albedo_color.darkened(0.55)
+			surface.roughness = 1.0
+			surface.metallic = 0.0
+			surface.emission_enabled = true
+			surface.emission = Color(0.35, 0.12, 0.05)
+			surface.emission_energy_multiplier = 0.25
+			tile.rotation_degrees.y = float(absi(c.x * 31 + c.y * 17) % 23) - 11.0
+		"soft":
+			# A wall worked down to soft material: cracked, dulled, leaning.
+			surface.albedo_color = surface.albedo_color.darkened(0.3)
+			surface.roughness = 1.0
+			surface.metallic = 0.0
+			tile.rotation_degrees.z = float(absi(c.x * 13 + c.y * 29) % 9) - 4.0
+		_:
+			pass
+	tile.material_override = surface
 
 static func _spawn_tile(tiles_root: Node3D, c: Vector2i, _t: int, h: int, map_seed: int) -> void:
 	var mi := MeshInstance3D.new()

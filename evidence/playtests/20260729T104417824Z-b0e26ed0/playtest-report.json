@@ -1,0 +1,692 @@
+{
+  "harness": "gzg.battlestar.autonomous-playtest/3.0",
+  "run_id": "20260729T104417824Z-b0e26ed0",
+  "started_at": "2026-07-29T10:44:17.825Z",
+  "config": {
+    "base": "http://127.0.0.1:8781/",
+    "rounds": 0,
+    "require_m03": false,
+    "callsign": "AUTOPILOT",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "browser": {
+    "resolver_source": "PW_CHROMIUM",
+    "headed": false,
+    "version": "150.0.4078.105"
+  },
+  "identity": {
+    "run_id": "20260729T104417824Z-b0e26ed0",
+    "deployment_message_id": "battlestar:1167583760:1",
+    "extraction_message_id": "xcommand:1167583760:1785321892146",
+    "extraction_id": "xcommand:1167583760:1785321892146",
+    "correlation_id": "battlestar:1167583760:1",
+    "seed": 1167583760,
+    "extracted_at": "2026-07-29 10:44:52Z"
+  },
+  "deployment": {
+    "gzg": "galaxy-message",
+    "version": "1.0",
+    "id": "battlestar:1167583760:1",
+    "type": "battlestar.deploy",
+    "source": {
+      "galaxy": "BattleStarSol",
+      "version": "0.1.1-prealpha.1",
+      "instance": "browser-local"
+    },
+    "target": {
+      "galaxy": "xCommand",
+      "capability": "tactical.deploy"
+    },
+    "created_at": "2026-07-29T10:44:23.486Z",
+    "payload": {
+      "schema": "gzg.battlestar.deploy/1.0",
+      "deploy": {
+        "type": "deploy",
+        "payload_contract_version": "1.0",
+        "generator_version": 1,
+        "rules_version": "alpha-1",
+        "sector": "Proving Ground",
+        "faction": "HAD // HEAVY ARMOR DIVISION",
+        "seed": 1167583760,
+        "atlas_state": "#%7B%22fps%22%3A15%2C%22mode%22%3A%22satellite%22%2C%22speed%22%3A0%2C%22layers%22%3A%5B%22dc%22%2C%22ixp%22%2C%22crisis%22%5D%2C%22cam%22%3A%7B%22x%22%3A0%2C%22y%22%3A10%2C%22z%22%3A22%2C%22tx%22%3A0%2C%22ty%22%3A0%2C%22tz%22%3A0%7D%7D",
+        "squad": [
+          {
+            "name": "AUTOPILOT",
+            "cls": "Heavy"
+          },
+          {
+            "name": "SCOUT-3",
+            "cls": "Recon"
+          },
+          {
+            "name": "MEDIC-2",
+            "cls": "Support"
+          }
+        ],
+        "objectives": [
+          "Select the Commander",
+          "Move and practice defense",
+          "Complete a basic attack",
+          "End turn and observe the phases",
+          "Extract to strategy"
+        ],
+        "map": {
+          "target": {
+            "type": "coordinate",
+            "name": "Proving Ground",
+            "latitude": 34.0522,
+            "longitude": -118.2437
+          }
+        },
+        "resources": {
+          "neural": 50,
+          "capital": 25000,
+          "alloys": 100
+        }
+      }
+    }
+  },
+  "steps": [
+    {
+      "name": "canonical development server responds",
+      "ok": true,
+      "detail": "http://127.0.0.1:8781/ marker=1",
+      "at": "2026-07-29T10:44:17.863Z"
+    },
+    {
+      "name": "served tactical package identified",
+      "ok": true,
+      "detail": "261268 bytes sha256:e5e312c0676f156ebd28ff564c40d6254104ab9808eb29127dd1c940aa00c5ca",
+      "at": "2026-07-29T10:44:17.863Z"
+    },
+    {
+      "name": "strategic console loads",
+      "ok": true,
+      "detail": "Battle/Star.SOL // Strategic Command",
+      "at": "2026-07-29T10:44:21.226Z"
+    },
+    {
+      "name": "commander callsign accepted",
+      "ok": true,
+      "detail": "AUTOPILOT",
+      "at": "2026-07-29T10:44:22.986Z"
+    },
+    {
+      "name": "quick deploy control present",
+      "ok": true,
+      "detail": "▶ QUICK DEPLOY: PROVING GROUND",
+      "at": "2026-07-29T10:44:23.058Z"
+    },
+    {
+      "name": "same-tab launch to tactical launcher",
+      "ok": true,
+      "detail": "battlestar.html",
+      "at": "2026-07-29T10:44:23.678Z"
+    },
+    {
+      "name": "deployment brief populated",
+      "ok": true,
+      "detail": "seed=1167583760 sector=Proving Ground",
+      "at": "2026-07-29T10:44:26.874Z"
+    },
+    {
+      "name": "godot tactical runtime booted",
+      "ok": true,
+      "detail": "4.2s",
+      "at": "2026-07-29T10:44:32.458Z"
+    },
+    {
+      "name": "roster select advances the guided tutorial",
+      "ok": true,
+      "detail": "step=2/6 move",
+      "at": "2026-07-29T10:44:35.558Z"
+    },
+    {
+      "name": "a completed move advances to defense",
+      "ok": true,
+      "detail": "step=3/6 defense; choice=brace-plus-melee-adjacent-visible-hostile",
+      "at": "2026-07-29T10:44:38.142Z"
+    },
+    {
+      "name": "defensive posture advances to attack",
+      "ok": true,
+      "detail": "step=4/6 attack",
+      "at": "2026-07-29T10:44:41.728Z"
+    },
+    {
+      "name": "basic attack advances to end turn",
+      "ok": true,
+      "detail": "step=5/6 end_turn",
+      "at": "2026-07-29T10:44:44.535Z"
+    },
+    {
+      "name": "end turn advances to phase observation",
+      "ok": true,
+      "detail": "step=6/6 extract",
+      "at": "2026-07-29T10:44:49.661Z"
+    },
+    {
+      "name": "returned player turn exposes extraction",
+      "ok": true,
+      "detail": "step=6/6 extract",
+      "at": "2026-07-29T10:44:50.572Z"
+    },
+    {
+      "name": "turn cycle survives full run",
+      "ok": true,
+      "detail": "0 free rounds",
+      "at": "2026-07-29T10:44:50.573Z"
+    },
+    {
+      "name": "one full extraction message captured",
+      "ok": true,
+      "detail": "7300 bytes",
+      "at": "2026-07-29T10:44:56.460Z"
+    },
+    {
+      "name": "strategic console shows a completed mission",
+      "ok": true,
+      "detail": "SUCCESS · Proving Ground · 3 survivors · seed 1167583760",
+      "at": "2026-07-29T10:44:56.896Z"
+    },
+    {
+      "name": "mission count is idempotent under forced reload",
+      "ok": true,
+      "detail": "1 -> 1",
+      "at": "2026-07-29T10:44:59.678Z"
+    }
+  ],
+  "console_lines": [
+    "[.WebGL-0x5904001a5400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x5904001a5400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "[.WebGL-0x5904001a5400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x5904001a5400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+    "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org",
+    "OpenGL API OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium)) - Compatibility - Using Device: WebKit - WebKit WebGL",
+    "Build configuration: Emscripten 4.0.20, single-threaded, no GDExtension support.",
+    "[PayloadBridge] Payload updated: Proving Ground seed=1167583760",
+    "[PayloadBridge] Loaded payload from Web URL!",
+    "ItemDB: Loaded 20 items.",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":541,\"y\":72},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":576,\"y\":90},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":560,\"y\":100},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":539,\"y\":55}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":556,\"y\":63}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":573,\"y\":71}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":591,\"y\":80}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":524,\"y\":64}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":508,\"y\":73}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":542,\"y\":91}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":491,\"y\":83}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":507,\"y\":92}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":525,\"y\":101}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":543,\"y\":111}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":552,\"y\":250},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":602,\"y\":283},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":580,\"y\":303},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":550,\"y\":218}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":573,\"y\":233}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":597,\"y\":248}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":622,\"y\":264}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":529,\"y\":234}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":252}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":554,\"y\":285}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":483,\"y\":270}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":507,\"y\":287}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":531,\"y\":305}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":557,\"y\":324}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":308},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":610,\"y\":347},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":587,\"y\":371},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":553,\"y\":270}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":578,\"y\":288}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":306}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":325}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":290}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":310}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":559,\"y\":350}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":481,\"y\":331}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":506,\"y\":352}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":533,\"y\":374}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":396}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":611,\"y\":351},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":587,\"y\":375},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":559,\"y\":353}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":506,\"y\":355}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":533,\"y\":377}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":400}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":1,\"step\":\"select_commander\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":1,\"y\":1,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":611,\"y\":351},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":587,\"y\":375},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":554,\"y\":273}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":579,\"y\":291}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":605,\"y\":309}},{\"ap\":3,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":633,\"y\":328}},{\"ap\":1,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":6,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":559,\"y\":353}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":3},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":3},\"screen\":{\"x\":506,\"y\":355}},{\"ap\":5,\"cell\":{\"x\":2,\"y\":3},\"screen\":{\"x\":533,\"y\":377}},{\"ap\":6,\"cell\":{\"x\":3,\"y\":3},\"screen\":{\"x\":562,\"y\":400}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":9,\"cell\":{\"x\":1,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":558,\"y\":309},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":589,\"y\":373},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":564,\"y\":398},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":533,\"y\":291}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":585,\"y\":328}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":613,\"y\":349}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":509,\"y\":311}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":534,\"y\":330}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":483,\"y\":333}},{\"ap\":7,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":536,\"y\":375}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":9,\"cell\":{\"x\":1,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":587,\"y\":375},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":561,\"y\":401},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":530,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":582,\"y\":331}},{\"ap\":2,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":611,\"y\":351}},{\"ap\":2,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":506,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":481,\"y\":335}},{\"ap\":7,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":533,\"y\":378}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":8,\"cell\":{\"x\":2,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":561,\"y\":314},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":564,\"y\":357},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":538,\"y\":381},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":511,\"y\":278}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":535,\"y\":296}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":588,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":619,\"y\":338}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":487,\"y\":298}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":511,\"y\":316}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":594,\"y\":363}},{\"ap\":4,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":461,\"y\":319}},{\"ap\":8,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":511,\"y\":359}},{\"ap\":5,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":568,\"y\":390}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":8,\"cell\":{\"x\":2,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":555,\"y\":310},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":558,\"y\":352},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":532,\"y\":377},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":0,\"y\":0},\"screen\":{\"x\":506,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":530,\"y\":292}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":0},\"screen\":{\"x\":582,\"y\":330}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":0,\"y\":1},\"screen\":{\"x\":482,\"y\":294}},{\"ap\":2,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":506,\"y\":312}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":588,\"y\":358}},{\"ap\":4,\"cell\":{\"x\":0,\"y\":2},\"screen\":{\"x\":456,\"y\":315}},{\"ap\":8,\"cell\":{\"x\":2,\"y\":2},\"screen\":{\"x\":506,\"y\":355}},{\"ap\":5,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":561,\"y\":385}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":559,\"y\":313},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":534,\"y\":334},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":509,\"y\":357},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":509,\"y\":277}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":533,\"y\":294}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":587,\"y\":315}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":616,\"y\":336}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":485,\"y\":296}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":562,\"y\":339}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":592,\"y\":361}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":535,\"y\":364}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":565,\"y\":388}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":2,\"step\":\"move\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":559,\"y\":313},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":534,\"y\":334},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":509,\"y\":357},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":509,\"y\":277}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":533,\"y\":294}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":587,\"y\":315}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":616,\"y\":336}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":485,\"y\":296}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":562,\"y\":339}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":592,\"y\":361}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":535,\"y\":364}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":565,\"y\":388}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":555,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":531,\"y\":332},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":506,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":530,\"y\":292}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":583,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":294}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":558,\"y\":336}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":588,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":361}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":385}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":314}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":614,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":483,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":332},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":7,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":5,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":3,\"step\":\"defense\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":5,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":4,\"step\":\"attack\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":561,\"y\":306},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":537,\"y\":328},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":512,\"y\":350},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":536,\"y\":288}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":555,\"y\":312},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":531,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":505,\"y\":356},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":530,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":332},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":507,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":292}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"end_turn\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":true,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333},\"unit_id\":4},{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"observe_phases\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"observe_phases\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":1,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"observe_phases\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":2,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":1,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":5,\"step\":\"observe_phases\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":1,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":false,\"display_step\":6,\"step\":\"extract\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":457,\"y\":315}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":2,\"tutorial\":{\"complete\":false,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":6,\"step\":\"extract\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[GZG-OBS] {\"active_team\":0,\"actor\":{\"ap\":10,\"cell\":{\"x\":3,\"y\":0,\"z\":0},\"is_commander\":true,\"name\":\"AUTOPILOT\",\"screen\":{\"x\":556,\"y\":311},\"team\":0,\"unit_id\":1},\"attack_targets\":[{\"adjacent\":false,\"cell\":{\"x\":3,\"y\":2},\"screen\":{\"x\":506,\"y\":355},\"unit_id\":5}],\"cover_faces\":[],\"kind\":\"observation\",\"move_targets\":[{\"ap\":2,\"cell\":{\"x\":1,\"y\":0},\"screen\":{\"x\":507,\"y\":275}},{\"ap\":1,\"cell\":{\"x\":2,\"y\":0},\"screen\":{\"x\":531,\"y\":293}},{\"ap\":2,\"cell\":{\"x\":4,\"y\":0},\"screen\":{\"x\":584,\"y\":313}},{\"ap\":3,\"cell\":{\"x\":5,\"y\":0},\"screen\":{\"x\":613,\"y\":334}},{\"ap\":3,\"cell\":{\"x\":1,\"y\":1},\"screen\":{\"x\":482,\"y\":295}},{\"ap\":2,\"cell\":{\"x\":2,\"y\":1},\"screen\":{\"x\":507,\"y\":313}},{\"ap\":1,\"cell\":{\"x\":3,\"y\":1},\"screen\":{\"x\":532,\"y\":333}},{\"ap\":3,\"cell\":{\"x\":4,\"y\":1},\"screen\":{\"x\":559,\"y\":337}},{\"ap\":4,\"cell\":{\"x\":5,\"y\":1},\"screen\":{\"x\":589,\"y\":359}},{\"ap\":4,\"cell\":{\"x\":1,\"y\":2},\"screen\":{\"x\":457,\"y\":315}},{\"ap\":4,\"cell\":{\"x\":4,\"y\":2},\"screen\":{\"x\":532,\"y\":362}},{\"ap\":5,\"cell\":{\"x\":5,\"y\":2},\"screen\":{\"x\":562,\"y\":386}}],\"round\":2,\"tutorial\":{\"complete\":true,\"cover_available\":false,\"defense_affordable\":true,\"display_step\":6,\"step\":\"complete\",\"total_steps\":6},\"viewport\":{\"h\":626,\"w\":1112}}",
+    "[PayloadBridge] PUSHING EXTRACTION RESULT: { \"outcome\": \"SUCCESS\", \"survivors\": 3, \"gains\": { \"neural\": 25, \"capital\": 301, \"loot\": [] }, \"note\": \"evac\", \"replay\": { \"mission_seed\": 1167583760, \"generator_version\": 1, \"rules_version\": \"alpha-1\", \"actions\": [{ \"sequence\": 2, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"select\", \"target\": { \"x\": -999, \"y\": -999, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 10, \"ap_after_dispatch\": 10, \"accepted\": true }, { \"sequence\": 4, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"move\", \"target\": { \"x\": 3, \"y\": 0, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 10, \"ap_after_dispatch\": 10, \"accepted\": true }, { \"sequence\": 7, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"brace\", \"target\": { \"x\": -999, \"y\": -999, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 7, \"ap_after_dispatch\": 5, \"accepted\": true }, { \"sequence\": 9, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"melee\", \"target\": { \"x\": 3, \"y\": 1, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 5, \"ap_after_dispatch\": 1, \"accepted\": true }, { \"sequence\": 12, \"record_type\": \"action\", \"round\": 1, \"active_team\": 0, \"actor\": { \"unit_id\": 1, \"name\": \"AUTOPILOT\", \"team\": 0 }, \"action\": \"endturn\", \"target\": { \"x\": -999, \"y\": -999, \"z\": -1 }, \"use_offhand\": false, \"ap_before\": 1, \"ap_after_dispatch\": 1, \"accepted\": true }], \"events\": [{ \"sequence\": 1, \"record_type\": \"event\", \"event\": \"tutorial_step_changed\", \"payload\": { \"step\": \"select_commander\", \"display_step\": 1, \"total_steps\": 6, \"complete\": false } }, { \"sequence\": 3, \"record_type\": \"event\", \"event\": \"tutorial_step_changed\", \"payload\": { \"step\": \"move\", \"display_step\": 2, \"total_steps\": 6, \"complete\": false } }, { \"sequenc"
+  ],
+  "page_errors": [],
+  "observations": {
+    "strategic_before": {
+      "missions": "0",
+      "history": "No completed missions in this browser."
+    },
+    "deployment_brief": {
+      "sector": "Proving Ground",
+      "faction": "HAD // HEAVY ARMOR DIVISION",
+      "seed": "1167583760",
+      "squad": "3 units · AUTOPILOT, SCOUT-3, MEDIC-2",
+      "objectives": [
+        "Select the Commander",
+        "Move and practice defense",
+        "Complete a basic attack",
+        "End turn and observe the phases",
+        "Extract to strategy"
+      ],
+      "runtime_status": "GODOT RUNTIME LOADED · PLAYABLE · BASE-10 AP"
+    },
+    "canvas_box": {
+      "x": 305,
+      "y": 52,
+      "width": 1112,
+      "height": 626
+    },
+    "move_choice": {
+      "reason": "brace-plus-melee-adjacent-visible-hostile",
+      "reserve_ap": 6,
+      "published_targets": 11,
+      "target": {
+        "cell": {
+          "x": 3,
+          "y": 0
+        },
+        "ap": 3
+      }
+    },
+    "published_attack_targets": 2,
+    "aimed_actions": {
+      "move": 1,
+      "cover": 0,
+      "attack": 1,
+      "swept": 0
+    },
+    "strategic_after": {
+      "missions": "1",
+      "history": "SUCCESS · Proving Ground · 3 survivors · seed 1167583760",
+      "neural": "75",
+      "capital": "$25,301"
+    },
+    "m03": {
+      "canonical_rationale_observed": false,
+      "signature_hits": [],
+      "decision_hits": [],
+      "decision_count": 11
+    }
+  },
+  "ledger": {
+    "extraction_id": "xcommand:1167583760:1785321892146",
+    "outcome": "SUCCESS",
+    "survivors": 3,
+    "seed": 1167583760,
+    "rules_version": "alpha-1",
+    "generator_version": 1,
+    "payload_contract_version": "1.0",
+    "action_count": 5,
+    "event_count": 30,
+    "event_histogram": {
+      "tutorial_step_changed": 8,
+      "movement_resolved": 1,
+      "damage_resolved": 4,
+      "agent_decision": 11,
+      "loot_collected": 1,
+      "unit_killed": 1,
+      "turn_started": 3,
+      "mission_resolved": 1
+    },
+    "tutorial_steps": [
+      {
+        "seq": 1,
+        "complete": false,
+        "display_step": 1,
+        "step": "select_commander",
+        "total_steps": 6
+      },
+      {
+        "seq": 3,
+        "complete": false,
+        "display_step": 2,
+        "step": "move",
+        "total_steps": 6
+      },
+      {
+        "seq": 6,
+        "complete": false,
+        "display_step": 3,
+        "step": "defense",
+        "total_steps": 6
+      },
+      {
+        "seq": 8,
+        "complete": false,
+        "display_step": 4,
+        "step": "attack",
+        "total_steps": 6
+      },
+      {
+        "seq": 10,
+        "complete": false,
+        "display_step": 5,
+        "step": "end_turn",
+        "total_steps": 6
+      },
+      {
+        "seq": 13,
+        "complete": false,
+        "display_step": 5,
+        "step": "observe_phases",
+        "total_steps": 6
+      },
+      {
+        "seq": 33,
+        "complete": false,
+        "display_step": 6,
+        "step": "extract",
+        "total_steps": 6
+      },
+      {
+        "seq": 35,
+        "complete": true,
+        "display_step": 6,
+        "step": "complete",
+        "total_steps": 6
+      }
+    ],
+    "agent_decisions": [
+      {
+        "actor": 2,
+        "ap_before": 10,
+        "decision": "melee",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "adjacent hostile",
+        "round": 1,
+        "score": 87.714,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 6,
+        "decision": "melee",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "adjacent hostile",
+        "round": 1,
+        "score": 86.75,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 2,
+        "decision": "approach",
+        "position": {
+          "x": 2,
+          "y": 1,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 59.36,
+        "team": 0
+      },
+      {
+        "actor": 2,
+        "ap_before": 1,
+        "decision": "approach",
+        "position": {
+          "x": 2,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 58.514,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 10,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 59.041,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 9,
+        "decision": "approach",
+        "position": {
+          "x": 0,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 58.36,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 8,
+        "decision": "grab",
+        "position": {
+          "x": 0,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "recover weapon at current position",
+        "round": 1,
+        "score": 70.055,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 7,
+        "decision": "throw_spear",
+        "position": {
+          "x": 0,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "legal ranged attack",
+        "round": 1,
+        "score": 87.655,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 3,
+        "decision": "approach",
+        "position": {
+          "x": 0,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 59.23,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 2,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 3,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 60.415,
+        "team": 0
+      },
+      {
+        "actor": 3,
+        "ap_before": 1,
+        "decision": "approach",
+        "position": {
+          "x": 1,
+          "y": 2,
+          "z": 0
+        },
+        "rationale": "highest deterministic legal utility",
+        "round": 1,
+        "score": 60.02,
+        "team": 0
+      }
+    ],
+    "decision_histogram": {
+      "melee": 2,
+      "approach": 7,
+      "grab": 1,
+      "throw_spear": 1
+    },
+    "m03_signature_hits": [],
+    "m03_decision_hits": []
+  },
+  "gates": {
+    "runtime_clean": {
+      "ok": true,
+      "required": true,
+      "detail": "0 page errors"
+    },
+    "full_loop": {
+      "ok": true,
+      "required": true,
+      "detail": "SUCCESS; 3 survivors; seed 1167583760"
+    },
+    "idempotence": {
+      "ok": true,
+      "required": true,
+      "detail": "forced reload does not double-apply"
+    },
+    "full_extraction_captured": {
+      "ok": true,
+      "required": true,
+      "detail": "5 actions, 30 events"
+    },
+    "base10_ap_authority": {
+      "ok": true,
+      "required": true,
+      "detail": "no record exceeds 10 AP"
+    },
+    "M01_proving_ground_completes": {
+      "ok": true,
+      "required": true,
+      "detail": "reached step 6/6"
+    },
+    "M03_canonical_rationale_observed": {
+      "ok": false,
+      "required": false,
+      "detail": "11 decisions; none canonical (melee/approach/grab/throw_spear)"
+    }
+  },
+  "findings": [
+    {
+      "severity": "INFO",
+      "module": "M03",
+      "text": "No canonical positional rationale appeared in 11 live decisions; the Proving Ground remains scenario-limited."
+    }
+  ],
+  "screenshots": [
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "strategic-console",
+      "at": "2026-07-29T10:44:21.226Z",
+      "file": "screenshots/01-strategic-console.png",
+      "bytes": 320527,
+      "sha256": "88b93d8d12d0f0f5ef2eb94709372faad1c42821c5ca6998d0b2251fa9711833"
+    },
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "tactical-booted",
+      "at": "2026-07-29T10:44:32.458Z",
+      "file": "screenshots/02-tactical-booted.png",
+      "bytes": 195041,
+      "sha256": "c1e9cce07c75320f6218749a36837d9d2f6bdb4ca973a0d5ae41372542bdc92a"
+    },
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "tutorial-1-select",
+      "at": "2026-07-29T10:44:35.558Z",
+      "file": "screenshots/03-tutorial-1-select.png",
+      "bytes": 190834,
+      "sha256": "c494a7a74fff4c5e1022e9868af38c0bf61bd1db1ce4f1680da81ec17d14eeb6"
+    },
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "tutorial-2-move",
+      "at": "2026-07-29T10:44:38.142Z",
+      "file": "screenshots/04-tutorial-2-move.png",
+      "bytes": 194390,
+      "sha256": "02b4ab436e884b634f2227db18d278d36e23e37c6f5bb83a188c710a58815586"
+    },
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "tutorial-3-defense",
+      "at": "2026-07-29T10:44:41.728Z",
+      "file": "screenshots/05-tutorial-3-defense.png",
+      "bytes": 195823,
+      "sha256": "1ef82c88f9a358211bfe623fddaff113687ebd21abac9fafdc4a8d3f725e3c3d"
+    },
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "tutorial-4-attack",
+      "at": "2026-07-29T10:44:44.535Z",
+      "file": "screenshots/06-tutorial-4-attack.png",
+      "bytes": 194276,
+      "sha256": "d7937e343125d22bc21b228fa1ede9738517f1d59f7f4d97c48a00f94a1fadd1"
+    },
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "tutorial-5-endturn",
+      "at": "2026-07-29T10:44:49.661Z",
+      "file": "screenshots/07-tutorial-5-endturn.png",
+      "bytes": 193732,
+      "sha256": "8bf2724339826b93c57a25bb79f135ac8fa423435c48254b5f391c69e8b6229e"
+    },
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "post-extract",
+      "at": "2026-07-29T10:44:55.856Z",
+      "file": "screenshots/08-post-extract.png",
+      "bytes": 324038,
+      "sha256": "879024a98aa2c05af3a3e71c7d81a15d928348860692eb69734d276e2db4877c"
+    },
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "strategic-return",
+      "at": "2026-07-29T10:44:56.461Z",
+      "file": "screenshots/09-strategic-return.png",
+      "bytes": 323990,
+      "sha256": "b57b44db63dd78bb4b8fd77199ab043e0defa5ed7c744f31dd65a4a1ccf71f34"
+    },
+    {
+      "run_id": "20260729T104417824Z-b0e26ed0",
+      "label": "after-reload",
+      "at": "2026-07-29T10:44:59.678Z",
+      "file": "screenshots/10-after-reload.png",
+      "bytes": 324672,
+      "sha256": "b577b0ec1f455390a97d91ee988349637cac395afca58a43614ebab2b6387c85"
+    }
+  ],
+  "artifacts": {
+    "extraction": {
+      "file": "extraction.json",
+      "bytes": 7300,
+      "sha256": "d9a6569908c1534f50dfe04a410ddc4aef7fb6f04d5f5569fc390a7c15c5ccc5"
+    }
+  },
+  "server": {
+    "url": "http://127.0.0.1:8781/",
+    "status": 200,
+    "marker": "1",
+    "tactical_pck": {
+      "url": "http://127.0.0.1:8781/tactical/index.pck",
+      "bytes": 261268,
+      "sha256": "e5e312c0676f156ebd28ff564c40d6254104ab9808eb29127dd1c940aa00c5ca"
+    }
+  },
+  "finished_at": "2026-07-29T10:45:00.308Z",
+  "failed_gates": [],
+  "result": "PASS"
+}

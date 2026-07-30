@@ -233,7 +233,13 @@ func _tutorial_deploy() -> void:
 		"faction": GameState.commander_faction if GameState.commander_faction != "" else "HAD",
 		"seed": 999999,
 		"squad": [{"name": "Recruit-1", "cls": "Scout"}],
-		"objectives": ["Complete Tutorial"],
+		"objectives": [
+			"Select the Commander",
+			"Move and practice defense",
+			"Complete a basic attack",
+			"End turn and observe the phases",
+			"Extract to strategy"
+		],
 		"resources": {"neural": 0, "capital": 0}
 	})
 	get_tree().change_scene_to_file("res://Main.tscn")

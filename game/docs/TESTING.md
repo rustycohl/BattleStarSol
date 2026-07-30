@@ -26,7 +26,7 @@ The headless suite verifies:
 - equal seeds produce identical generated cells;
 - different seeds produce different cells;
 - the expected number of cells and required fields are present;
-- the 24-AP scale and movement/elevation cost catalogue are consistent;
+- the Base-10 AP scale and movement/elevation cost catalogue are consistent;
 - legacy payload envelopes normalize to contract 1.0;
 - invalid payloads are rejected;
 - `Main.tscn` builds its complete grid and opposing squads;
@@ -46,13 +46,19 @@ The headless suite verifies:
   explicit weapon cover penetration;
 - selected-face vertical Wall Run, surface-state serialization, outward Wall
   Jump, and airborne Flip/Dodge;
+- the Proving Ground guide advances deterministically through Commander
+  selection, resolved movement, defense, a basic attack, the complete
+  faction-cycle return, and extraction;
+- all three player factions receive one Commander and two nearby hostile,
+  zero-AP Target Dummies in the deterministic training lane;
 - `StratLayer.tscn` builds its login surface.
 
 ## Required manual smoke pass
 
 1. F5 opens the native strategic launcher.
 2. Login, quick deploy, and proving ground both reach `Main.tscn`.
-3. Select, move, attack, end turn, evacuate, and return to strat.
+3. In Proving Ground, follow all six objective-panel steps: select, preview and
+   move, defend, attack, end turn/observe, then evacuate and return to strat.
 4. Re-run the same seed and compare map/item placement.
 5. Export a bug report and re-inject a deployment payload.
 6. Unlock one research tier and verify vault deductions.

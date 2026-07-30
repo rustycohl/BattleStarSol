@@ -18,12 +18,15 @@ const Maneuvers = preload("res://scripts/ManeuverState.gd")
 # (missing cache was a crash loop after monorepo consolidation wiped .godot/).
 const UnitScript = preload("res://scripts/Unit.gd")
 const WorldBuilderScript = preload("res://scripts/WorldBuilder.gd")
+const Ballistics = preload("res://scripts/Ballistics.gd")
+const AITacticsScript = preload("res://scripts/AITactics.gd")
 const CombatSystemScript = preload("res://scripts/CombatSystem.gd")
 const InventorySystemScript = preload("res://scripts/InventorySystem.gd")
 const Pilot = preload("res://scripts/PilotControl.gd")
 const TurnDir = preload("res://scripts/TurnDirector.gd")
 const SquadSpawn = preload("res://scripts/SquadSpawner.gd")
 const MissionResolver = preload("res://scripts/MissionResolver.gd")
+const Tutorial = preload("res://scripts/TutorialDirector.gd")
 # Aliases
 const GRID_W = Config.GRID_W
 const GRID_H = Config.GRID_H
@@ -47,6 +50,11 @@ const KINDS = Config.KINDS
 const ENEMY_WEAPONS = Config.ENEMY_WEAPONS
 const CODES = Config.CODES
 const INVALID_CELL = Config.INVALID_CELL
+const OBSERVATION_RADIUS := 2
+const OBSERVATION_MOVE_CAP := 12
+const OBSERVATION_COVER_CAP := 8
+const OBSERVATION_ATTACK_CAP := 8
+const OBSERVATION_VIEW_INTERVAL := 0.10
 
 # ---------- Unit ----------
 # ---------- State ----------
@@ -87,6 +95,8 @@ var visual_rng = RandomNumberGenerator.new()
 
 # ---------- Controller / Subsystems ----------
 var camera_controller: Node3D = null
+## Ordered terrain damage for this mission, in the order it happened.
+var terrain_changes: Array[Dictionary] = []
 var combat
 var inventory
 var turn_director = TurnDir.new()
@@ -98,6 +108,10 @@ var sel_ring: MeshInstance3D
 
 var tactical_ui: BattlestarTacticalUI
 var sfx_player: AudioStreamPlayer
+var tutorial = null
+var _observation_last: String = ""
+var _observation_view_elapsed: float = 0.0
+var _observation_view_last: String = ""
 
 func _ready() -> void:
 	cell_size = Config.cell_size
@@ -150,6 +164,7 @@ func _ready() -> void:
 
 	_spawn_squads()
 	_setup_action_router()
+	_setup_tutorial(payload)
 	WorldBuilderScript.scatter_weapons(self, mission_seed)
 	tactical_ui.build_roster()
 	_auto_select()
@@ -158,7 +173,7 @@ func _ready() -> void:
 
 	var brief = Narrative.generate_mission_brief() if Narrative else "Squad inserted."
 	if sector == "Proving Ground":
-		brief = "TUTORIAL: You pilot the Commander only. Move, grab a weapon, SPACE ends turn (allied agents then resolve)."
+		brief = "GUIDED PROVING GROUND ACTIVE: follow the objective panel. F8 is always available for extraction."
 	else:
 		brief = "%s | Pilot: Commander. Agents are autonomous until Remotes (God Mode)." % brief
 
@@ -178,6 +193,20 @@ func _build_camera_controller() -> void:
 	camera_controller.set_script(CamScript)
 	camera_controller.position = _cell_to_world(Vector2i(int(GRID_W / 2.0), int(GRID_H / 2.0)))
 	add_child(camera_controller)
+	camera_controller.set_motion_scale(_detect_motion_scale())
+
+## Reads the host's reduced-motion preference. Only the Web export can ask; any
+## failure or unavailable host keeps the authored motion rather than guessing.
+func _detect_motion_scale() -> float:
+	if not OS.has_feature("web"):
+		return 1.0
+	var reduced = JavaScriptBridge.eval(
+		"(function(){try{return !!(window.matchMedia"
+		+ " && window.matchMedia('(prefers-reduced-motion: reduce)').matches);}"
+		+ "catch(e){return false;}})()",
+		true
+	)
+	return 0.0 if bool(reduced) else 1.0
 
 # ==========================================================
 #  UNITS + FIGURES (Posture Communication)
@@ -751,7 +780,15 @@ func _setup_input_map() -> void:
 		"camera_right": [KEY_D, KEY_RIGHT],
 		"camera_elevate": [KEY_E],
 		"camera_descend": [KEY_Q],
-		"toggle_legend": [KEY_F1, KEY_TAB],
+		# Tab is reserved for keyboard focus traversal. Binding it to the help
+		# overlay made the tactical controls unreachable without a mouse: the
+		# first Tab opened help and focused its close button, and every later
+		# Tab toggled the overlay instead of advancing focus.
+		"toggle_legend": [KEY_F1],
+		# Adaptive HUD. Tab stays reserved for focus traversal.
+		"hud_next_surface": [KEY_F2],
+		"hud_cycle_opacity": [KEY_F3],
+		"hud_toggle_park": [KEY_F4],
 		"close_legend": [KEY_ESCAPE],
 		"end_turn": [KEY_SPACE, KEY_ENTER],
 		"emergency_evac": [KEY_F8],
@@ -805,6 +842,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and camera_controller.dragging:
 		camera_controller.orbit(event.relative.x * 0.4, event.relative.y * 0.4)
 	elif event is InputEventKey and event.pressed:
+		if Input.is_action_just_pressed("toggle_legend"):
+			if tactical_ui and tactical_ui.has_method("toggle_help"):
+				tactical_ui.toggle_help()
+			return
+		if Input.is_action_just_pressed("close_legend") and tactical_ui and tactical_ui.has_method("is_help_visible") and tactical_ui.is_help_visible():
+			tactical_ui.set_help_visible(false)
+			return
 		if event.keycode == KEY_ESCAPE and not pending_target_action.is_empty():
 			cancel_targeting()
 			return
@@ -863,9 +907,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif Input.is_action_just_pressed("assemble"):
 			ActionRouter.request_action(selected, "assemble")
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not busy and turn == player_faction and not game_over:
 		_update_hover()
+	_refresh_web_observation_for_view(delta)
 
 # ==========================================================
 #  ACTIONS & COMBAT RESOLUTION
@@ -1051,7 +1096,9 @@ func _on_click(use_offhand: bool) -> void:
 		if occ == selected and debris.has(cell) and _unit_accepts_human_input(selected):
 			ActionRouter.request_action(selected, "grab")
 		else:
-			perform_action(occ, "select")
+			# M01-001: selection is a recorded action. Bypassing ActionRouter
+			# strands the guided tutorial and omits the action from replay.
+			ActionRouter.request_action(occ, "select")
 		return
 
 	if selected == null:
@@ -1303,12 +1350,59 @@ func _enemy_act(u) -> void:
 		var action_scores = AIBehavior.score_actions(u, units, cells, debris, sim_rng)
 		if action_scores.is_empty():
 			break
+		var decision := String(action_scores.get("decision", "unknown"))
+		var rationale := String(action_scores.get("rationale", "highest legal utility"))
+		var decision_message := "%s [%s]: %s" % [
+			u.name,
+			decision.replace("_", " "),
+			rationale
+		]
+		GameState.record_event("agent_decision", {
+			"actor": u.unit_id,
+			"team": u.team,
+			"round": global_turn,
+			"position": {"x": u.cell.x, "y": u.cell.y, "z": u.z},
+			"ap_before": start_ap,
+			"decision": decision,
+			"rationale": rationale,
+			"score": float(action_scores.get("score", 0.0))
+		})
+		if Narrative:
+			Narrative.log_event(decision_message, "ai")
+		_hint(decision_message)
 
 		if action_scores.has("block"):
 			u.blocking = true
 			u.ap -= BLOCK_COST
 			_refresh_label(u)
 			break
+		elif action_scores.has("take_cover"):
+			var ai_cover := Vector2i(action_scores["take_cover"])
+			if (
+				MovementRules.can_take_cover(u, ai_cover, cells)
+				and u.ap >= Config.TAKE_COVER_COST
+			):
+				_enter_cover_state(u, ai_cover, Config.TAKE_COVER_COST, "agent_ai")
+			break
+		elif action_scores.has("lean_cover"):
+			if (
+				MovementRules.can_lean(u, "left")
+				and u.ap >= Config.LEAN_COST
+			):
+				u.ap -= Config.LEAN_COST
+				u.lean = "left"
+				_refresh_label(u)
+				_update_ui()
+			else:
+				break
+		elif action_scores.has("leave_cover"):
+			if (
+				MovementRules.can_leave_cover(u)
+				and u.ap >= Config.LEAVE_COVER_COST
+			):
+				_leave_cover_state(u, Config.LEAVE_COVER_COST, "agent_ai")
+			else:
+				break
 		elif action_scores.has("melee"):
 			var tgt = action_scores["melee"]
 			if is_instance_valid(tgt) and tgt.alive:
@@ -1385,6 +1479,19 @@ func _enemy_act(u) -> void:
 				await _step_enemy(u, Vector2i(path[1]))
 			else:
 				break
+		elif action_scores.has("seek_cover"):
+			var cover_route: Dictionary = action_scores["seek_cover"]
+			var cover_path: Array = cover_route.get("path", [])
+			if cover_path.size() >= 2:
+				await _step_enemy(u, Vector2i(cover_path[1]))
+			else:
+				break
+		elif action_scores.has("flank"):
+			var flank_path: Array = action_scores["flank"]
+			if flank_path.size() >= 2:
+				await _step_enemy(u, Vector2i(flank_path[1]))
+			else:
+				break
 		elif action_scores.has("step"):
 			var step_cell: Vector2i = action_scores["step"]
 			if step_cell != INVALID_CELL:
@@ -1401,6 +1508,8 @@ func _enemy_act(u) -> void:
 
 func _step_enemy(u, step: Vector2i) -> void:
 	if u == null or not u.alive or u.node == null or not is_instance_valid(u.node):
+		return
+	if MovementRules.movement_locked(u) or Maneuvers.is_committed(u.maneuver):
 		return
 	if not cells.has(step):
 		return
@@ -1956,20 +2065,73 @@ func _unit_at(c: Vector2i) :
 func _cell_free(c: Vector2i) -> bool:
 	return Pathfinder.cell_free(c, cells, units)
 
-func _in_cover(from_c: Vector2i, target_c: Vector2i) -> int:
-	var dx = from_c.x - target_c.x
-	var dy = from_c.y - target_c.y
-	if dx != 0:
-		var nx: Vector2i = target_c + Vector2i(signi(dx), 0)
-		if cells.has(nx):
-			if cells[nx]["type"] == Config.COVER: return 2
-			if cells[nx]["type"] == Config.HALF_COVER: return 1
-	if dy != 0:
-		var ny: Vector2i = target_c + Vector2i(0, signi(dy))
-		if cells.has(ny):
-			if cells[ny]["type"] == Config.COVER: return 2
-			if cells[ny]["type"] == Config.HALF_COVER: return 1
-	return 0
+## Single authority for terrain damage: it changes the cell, rebuilds the tile so
+## the world matches the simulation, and records the change in the ledger. Returns
+## the recorded delta, or an empty dictionary when nothing changed.
+func damage_terrain(cell: Vector2i, damage: int, weapon: String = "", attacker = null) -> Dictionary:
+	if damage <= 0 or not cells.has(cell):
+		return {}
+	var before: Dictionary = cells[cell]
+	var integrity_before := Ballistics.density_of(before)
+	if integrity_before <= 0:
+		return {}
+	var after: Dictionary = Ballistics.degrade_cell(before, damage)
+	var integrity_after := Ballistics.density_of(after)
+	if integrity_after == integrity_before and int(after.get("type", -1)) == int(before.get("type", -2)):
+		return {}
+	cells[cell] = after
+	if GameState:
+		GameState.cells = cells
+	var cover_before := Ballistics.effective_cover_level(before)
+	var cover_after := Ballistics.effective_cover_level(after)
+	if int(before.get("z", 0)) != int(after.get("z", 0)) or cover_before != cover_after:
+		_rebuild_tile(cell)
+	var delta := {
+		"cell": {"x": cell.x, "y": cell.y, "z": int(before.get("z", 0))},
+		"weapon": weapon,
+		"attacker": int(attacker.unit_id) if attacker != null else 0,
+		"material_before": String(before.get("material", "")),
+		"material_after": String(after.get("material", "")),
+		"integrity_before": integrity_before,
+		"integrity_after": integrity_after,
+		"cover_before": cover_before,
+		"cover_after": cover_after,
+		"destroyed": cover_after == 0 and cover_before > 0
+	}
+	terrain_changes.append(delta)
+	GameState.record_event("terrain_damaged", delta)
+	if bool(delta["destroyed"]):
+		_hint("Cover destroyed at %d,%d." % [cell.x, cell.y])
+	# A unit committed to cover that no longer protects is released rather than
+	# left holding a wall that is not there.
+	if cover_after < 2:
+		for unit in units:
+			if unit != null and bool(unit.taking_cover) and Vector2i(unit.cover_cell) == cell:
+				ActionRouter.request_action(unit, "leave_cover")
+	return delta
+
+func _rebuild_tile(cell: Vector2i) -> void:
+	if tiles_root == null or not is_instance_valid(tiles_root):
+		return
+	var existing := tiles_root.get_node_or_null("Tile_%d_%d" % [cell.x, cell.y])
+	if existing != null:
+		existing.queue_free()
+	var data: Dictionary = cells.get(cell, {})
+	WorldBuilderScript.spawn_tile(
+		tiles_root,
+		cell,
+		int(data.get("type", Config.FLOOR)),
+		int(data.get("z", 0)),
+		mission_seed,
+		String(data.get("material", ""))
+	)
+
+## Elevation-aware: the caller supplies the shooter's and target's heights so a
+## wall the shooter can see over stops protecting.
+func _in_cover(from_c: Vector2i, target_c: Vector2i, from_z: int = 0, target_z: int = 0) -> int:
+	# Derived from the material still standing in the lane, so a wall shot to
+	# rubble stops reducing damage without a second rule.
+	return AITacticsScript.cover_level(from_c, target_c, cells, from_z, target_z)
 
 func cover_options(unit) -> Array[Vector2i]:
 	return MovementRules.cover_options(unit, cells)
@@ -2234,6 +2396,11 @@ func _hp_color(u) -> Color:
 	return Color(0.95, 0.3, 0.25)
 
 func _update_ui() -> void:
+	if tutorial != null and bool(tutorial.active):
+		var tutorial_commander = _get_commander()
+		tutorial.set_defense_affordable(
+			tutorial_commander != null and int(tutorial_commander.ap) >= BLOCK_COST
+		)
 	if tactical_ui:
 		tactical_ui.update_ui()
 
@@ -2270,6 +2437,7 @@ func _update_ui() -> void:
 					_hint("Squad AP Exhausted - Pass Turn [SPACE / End Turn]")
 
 	_update_fov()
+	_publish_web_observation()
 
 func _refresh_interaction_ui() -> void:
 	if not is_inside_tree() or is_queued_for_deletion() or busy:
@@ -2311,6 +2479,310 @@ func _play_sfx(sound_name: String, pos: Variant = null) -> void:
 
 func _setup_action_router() -> void:
 	ActionRouter.bind(self)
+
+func _setup_tutorial(payload: Dictionary) -> void:
+	tutorial = Tutorial.new()
+	tutorial.guidance_changed.connect(_on_tutorial_guidance)
+	GameState.action_performed.connect(_on_tutorial_action)
+	GameState.record_added.connect(_on_tutorial_record)
+	tutorial.begin(payload, player_faction, global_turn)
+
+func _on_tutorial_guidance(snapshot: Dictionary) -> void:
+	if tactical_ui and tactical_ui.has_method("set_tutorial_guidance"):
+		tactical_ui.set_tutorial_guidance(snapshot)
+	if bool(snapshot.get("active", false)):
+		GameState.record_event("tutorial_step_changed", {
+			"step": String(snapshot.get("step_key", "")),
+			"display_step": int(snapshot.get("display_step", 0)),
+			"total_steps": int(snapshot.get("total_steps", 0)),
+			"complete": bool(snapshot.get("complete", false))
+		})
+	_publish_web_observation()
+
+func _build_web_observation() -> Dictionary:
+	if tutorial == null or not bool(tutorial.active):
+		return {}
+
+	var raw_tutorial: Dictionary = tutorial.current_snapshot()
+	var tutorial_snapshot := {
+		"step": String(raw_tutorial.get("step_key", "")),
+		"display_step": int(raw_tutorial.get("display_step", 0)),
+		"total_steps": int(raw_tutorial.get("total_steps", 0)),
+		"complete": bool(raw_tutorial.get("complete", false)),
+		"cover_available": bool(raw_tutorial.get("cover_available", false)),
+		"defense_affordable": bool(raw_tutorial.get("defense_affordable", true))
+	}
+	var viewport_size := get_viewport().get_visible_rect().size
+	var observation := {
+		"kind": "observation",
+		"round": global_turn,
+		"active_team": turn,
+		"viewport": {
+			"w": maxi(roundi(viewport_size.x), 0),
+			"h": maxi(roundi(viewport_size.y), 0)
+		},
+		"tutorial": tutorial_snapshot,
+		"accessibility": _observation_accessibility(),
+		"layout": _observation_layout(),
+		"actor": {},
+		"move_targets": [],
+		"cover_faces": [],
+		"attack_targets": []
+	}
+
+	var actor = selected
+	if actor == null or not bool(actor.alive) or int(actor.team) != player_faction:
+		actor = _get_commander()
+	if actor == null or not bool(actor.alive):
+		return {}
+
+	var actor_screen = _screen_of_cell(actor.cell)
+	if (
+		actor.node == null
+		or not is_instance_valid(actor.node)
+		or actor_screen == null
+	):
+		return {}
+	observation["actor"] = {
+		"name": String(actor.name),
+		"unit_id": int(actor.unit_id),
+		"team": int(actor.team),
+		"cell": {"x": actor.cell.x, "y": actor.cell.y, "z": int(actor.z)},
+		"ap": int(actor.ap),
+		"is_commander": bool(actor.is_commander),
+		"screen": actor_screen
+	}
+
+	var move_targets: Array = []
+	for dy in range(-OBSERVATION_RADIUS, OBSERVATION_RADIUS + 1):
+		for dx in range(-OBSERVATION_RADIUS, OBSERVATION_RADIUS + 1):
+			var candidate: Vector2i = actor.cell + Vector2i(dx, dy)
+			if candidate == actor.cell or not _cell_free(candidate):
+				continue
+			var path = Pathfinder.find_path(
+				actor.cell,
+				candidate,
+				cells,
+				units,
+				bool(actor.flying) or bool(actor.hovering)
+			)
+			if path.size() < 2:
+				continue
+			var affordable: Array[Vector2i] = ActionEconomy.affordable_path(actor, path, cells)
+			if affordable.size() != path.size() or affordable.back() != candidate:
+				continue
+			var cost := int(ActionEconomy.path_cost(actor, path, cells))
+			if cost <= 0 or cost > int(actor.ap):
+				continue
+			var screen = _screen_of_cell(candidate)
+			if screen == null:
+				continue
+			move_targets.append({
+				"cell": _observation_cell(candidate),
+				"ap": cost,
+				"screen": screen
+			})
+	observation["move_targets"] = move_targets.slice(
+		0,
+		mini(move_targets.size(), OBSERVATION_MOVE_CAP)
+	)
+
+	var cover_faces: Array = []
+	for cover_cell in cover_options(actor):
+		if cover_faces.size() >= OBSERVATION_COVER_CAP:
+			break
+		var screen = _screen_of_cell(cover_cell)
+		if screen == null:
+			continue
+		cover_faces.append({
+			"cell": _observation_cell(cover_cell),
+			"screen": screen
+		})
+	observation["cover_faces"] = cover_faces
+
+	var attack_targets: Array = []
+	for hostile in units:
+		if (
+			hostile == null
+			or not bool(hostile.alive)
+			or int(hostile.team) == int(actor.team)
+		):
+			continue
+		var distance: int = Pathfinder.cheb(actor.cell, hostile.cell)
+		if distance > OBSERVATION_RADIUS:
+			continue
+		if (
+			hostile.node == null
+			or not is_instance_valid(hostile.node)
+			or not bool(hostile.node.visible)
+		):
+			continue
+		var screen = _screen_of_cell(hostile.cell)
+		if screen == null:
+			continue
+		attack_targets.append({
+			"unit_id": int(hostile.unit_id),
+			"cell": _observation_cell(hostile.cell),
+			"adjacent": Pathfinder.is_adjacent(actor.cell, hostile.cell),
+			"screen": screen
+		})
+		if attack_targets.size() >= OBSERVATION_ATTACK_CAP:
+			break
+	observation["attack_targets"] = attack_targets
+	return observation
+
+## Bounded accessibility state. Presentation preferences only: no host, profile,
+## user-agent, or media-query surface beyond the single reduced-motion answer.
+func _observation_accessibility() -> Dictionary:
+	var reduced_motion := false
+	var motion_scale := 1.0
+	if camera_controller != null and is_instance_valid(camera_controller):
+		motion_scale = float(camera_controller.motion_scale)
+		reduced_motion = bool(camera_controller.is_reduced_motion())
+	var focused_control := ""
+	var focus_order: Array = []
+	if tactical_ui != null and is_instance_valid(tactical_ui):
+		focused_control = String(tactical_ui.focused_control_key)
+		focus_order = Array(tactical_ui.FOCUS_ORDER_KEYS)
+	return {
+		"reduced_motion": reduced_motion,
+		"motion_scale": motion_scale,
+		"focus_order": focus_order,
+		"focused_control": focused_control,
+		"focused_control_is_core": focus_order.has(focused_control)
+	}
+
+## Publishes the layout metrics the HUD actually applied, so a live viewport
+## matrix asserts against the same authority the game used to place the panels.
+func _observation_layout() -> Dictionary:
+	if tactical_ui == null or not is_instance_valid(tactical_ui):
+		return {}
+	var metrics: Dictionary = tactical_ui.last_layout_metrics
+	if metrics.is_empty():
+		return {}
+	return {
+		"tutorial_left": float(metrics.get("tutorial_left", 0.0)),
+		"tutorial_clearance": float(metrics.get("tutorial_clearance", 0.0)),
+		"tutorial_bottom": float(metrics.get("tutorial_bottom", 0.0)),
+		"action_dock_left": float(metrics.get("action_dock_left", 0.0)),
+		"action_dock_clearance": float(metrics.get("action_dock_clearance", 0.0)),
+		"action_dock_top": float(metrics.get("action_dock_top", 0.0)),
+		"action_dock_height": float(metrics.get("action_dock_height", 0.0)),
+		"status_rail_bottom": float(metrics.get("status_rail_bottom", 0.0)),
+		"event_rail_top": float(metrics.get("event_rail_top", 0.0)),
+		"event_rail_bottom": float(metrics.get("event_rail_bottom", 0.0)),
+		"event_rail_height": float(metrics.get("event_rail_height", 0.0)),
+		"event_rail_cramped": bool(metrics.get("event_rail_cramped", false)),
+		"tutorial_dock_clear": bool(metrics.get("tutorial_dock_clear", false)),
+		"event_rail_visible": bool(metrics.get("event_rail_visible", false)),
+		"constrained": bool(metrics.get("constrained", true)),
+		"auto_parked": Array(metrics.get("auto_parked", [])),
+		"surface_opacity": _observation_surface_opacity()
+	}
+
+## Per-surface transparency, so a live run can prove the adaptive HUD state rather
+## than inferring it from a screenshot.
+func _observation_surface_opacity() -> Dictionary:
+	var opacity := {}
+	if tactical_ui == null or not is_instance_valid(tactical_ui):
+		return opacity
+	for key in tactical_ui.surface_keys():
+		var surface: Dictionary = tactical_ui.surface_state(String(key))
+		opacity[String(key)] = snappedf(float(surface.get("opacity", 1.0)), 0.01)
+	return opacity
+
+func _observation_cell(cell: Vector2i) -> Dictionary:
+	return {
+		"x": cell.x,
+		"y": cell.y
+	}
+
+func _screen_of_cell(cell: Vector2i):
+	if (
+		camera_controller == null
+		or camera_controller.camera == null
+		or not is_instance_valid(camera_controller.camera)
+	):
+		return null
+	var camera: Camera3D = camera_controller.camera
+	var world_position := _cell_to_world(cell) + Vector3(0.0, 0.2, 0.0)
+	if camera.is_position_behind(world_position):
+		return null
+	var projected := camera.unproject_position(world_position)
+	return {"x": roundi(projected.x), "y": roundi(projected.y)}
+
+func _observation_view_signature() -> String:
+	if (
+		camera_controller == null
+		or camera_controller.camera == null
+		or not is_instance_valid(camera_controller.camera)
+	):
+		return ""
+	var camera: Camera3D = camera_controller.camera
+	var position := camera.global_position
+	var rotation := camera.global_rotation
+	var viewport_size := get_viewport().get_visible_rect().size
+	return "%.3f|%.3f|%.3f|%.4f|%.4f|%.4f|%d|%d" % [
+		position.x,
+		position.y,
+		position.z,
+		rotation.x,
+		rotation.y,
+		rotation.z,
+		roundi(viewport_size.x),
+		roundi(viewport_size.y)
+	]
+
+func _refresh_web_observation_for_view(delta: float) -> void:
+	if (
+		not OS.has_feature("web")
+		or tutorial == null
+		or not bool(tutorial.active)
+	):
+		return
+	_observation_view_elapsed += delta
+	if _observation_view_elapsed < OBSERVATION_VIEW_INTERVAL:
+		return
+	_observation_view_elapsed = 0.0
+	var signature := _observation_view_signature()
+	if signature.is_empty() or signature == _observation_view_last:
+		return
+	_observation_view_last = signature
+	_publish_web_observation()
+
+func _publish_web_observation() -> void:
+	if not OS.has_feature("web"):
+		return
+	var observation := _build_web_observation()
+	if observation.is_empty():
+		return
+	var serialized := JSON.stringify(observation)
+	if serialized == _observation_last:
+		return
+	_observation_last = serialized
+	JavaScriptBridge.eval(
+		"window.__gzg_observation = %s; console.log('[GZG-OBS] ' + JSON.stringify(window.__gzg_observation));"
+		% serialized
+	)
+
+func _on_tutorial_action(action: String, actor, _target_cell: Vector2i) -> void:
+	if tutorial != null:
+		tutorial.observe_action(action, actor)
+
+func _on_tutorial_record(record: Dictionary) -> void:
+	if tutorial == null or not bool(tutorial.active):
+		return
+	if (
+		String(record.get("record_type", "")) == "event"
+		and String(record.get("event", "")) == "movement_resolved"
+	):
+		var payload = record.get("payload", {})
+		if payload is Dictionary:
+			var moved_unit = get_unit_by_id(int(payload.get("actor", -1)))
+			if moved_unit != null:
+				tutorial.set_cover_available(not cover_options(moved_unit).is_empty())
+				tutorial.set_defense_affordable(int(moved_unit.ap) >= BLOCK_COST)
+	tutorial.observe_record(record)
 
 func get_unit_by_id(uid: int) :
 	for u in units:

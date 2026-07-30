@@ -1,9 +1,36 @@
 # Implementation status
 
+## 2026-07-29 isolated SOL reconstruction
+
+The dated public/source claim list below is preserved. Current reconstructed
+state is controlled by `../../MODULE-LEDGER.md` and its evidence records:
+
+- static verifier and TestRunner: PASS;
+- PlaytestRunner: PASS, 261/261;
+- M01 routing/observation, M01-004 AP recovery, and M01-005 view sync: PASS;
+- atomic live M01 tutorial: PASS, 6/6;
+- M03 cover/flank golden cases: PASS; production AI unchanged;
+- atomic evidence helper: PASS, 11/11 focused Node tests;
+- authoritative atomic browser run:
+  `20260729T104417824Z-b0e26ed0`, PASS;
+- M04 bounded reproduction artifact and clean strategic import: PASS for the
+  declared supported portion;
+- M05 overlap/focus source checks and fresh 1440x900 atomic loop: PASS; broader
+  viewport/accessibility matrix remains open;
+- full Node release suite: 39/40; the single expected failure is the unchanged
+  committed-runtime manifest rejecting the newer reconstructed source;
+- committed runtime/manifest parity and release promotion: open.
+
+The current isolated Web export was validated in the in-app browser and in the
+standalone atomic Edge run. It is not the committed public runtime and must not
+be represented as published.
+
 **As of:** 2026-07-28 pre-alpha (`0.1.1-prealpha.1`)
 **Companion:** monorepo [STATE_OF_PLAY](../../docs/STATE_OF_PLAY.md) · [TACTICAL_CORE](TACTICAL_CORE.md)
 
 This file is the **live claim list** for the Godot product tree. Alpha series docs under `docs/alpha/` are recovery history.
+The public version above is unchanged; M01–M02 below describe the isolated
+`prealpha-02` source work line and are not deployment claims.
 
 ---
 
@@ -42,13 +69,21 @@ This file is the **live claim list** for the Godot product tree. Alpha series do
 - Utility-scored AI for hostiles and autonomous squad agents
 - Mission-local death; salvage by mission type (`MissionResolver`)
 - Ordered action + event records on extraction
+- Deterministic six-step Proving Ground director driven by accepted actions
+  and resolved events, with a persistent objective panel and nearby inert
+  hostile targets for every player faction
+- Persistent first-turn truth: combined faction vocabulary, active pilot and
+  AP, visible core costs, explicit End Turn sequence, and extraction route
+- F1/Tab core-loop help overlay; advanced mobility/remotes visibly separated
+  behind the developer control
+- Persistent hostile-count label restored to the squad roster
 
 ### Presentation / tooling
 
 - Responsive tactical HUD (squad rail, ephemeral feed, action dock, fullscreen)
 - Fog-of-war style hostile hide beyond sensor radius 12
 - Bootstrap: native → StratLayer; web → Main
-- Headless `TestRunner` + `PlaytestRunner` (147 checks); static `tools/verify.ps1`
+- Headless `TestRunner` + `PlaytestRunner` (204 checks); static `tools/verify.ps1`
 
 ---
 
@@ -59,11 +94,10 @@ This file is the **live claim list** for the Godot product tree. Alpha series do
 | Mobility | Wall Run is vertical tower faces only; AI does not yet use advanced mobility |
 | Verticality | Height affects cost/LOS/fall/bonus; climbing/reach still permissive |
 | Audio | Buses/pools exist; no shipped SFX library; missing clips remain deliberately silent/null |
-| Tutorial | Proving Ground is a one-unit sandbox, not a guided mission FSM |
 | Online relay | Optional HTTP in PayloadBridge; no shipped server |
 | Models | GLB path lookup exists; no shipped character models |
 | Atlas FoW | Approximate sensor filter; no authenticated world feed |
-| Web tactical package | Fresh Godot 4.7.1 single-threaded release export committed; rebuild after Godot source changes |
+| Web tactical package | Matching Godot 4.7.1 `.02` source export rebuilt locally; live browser validation remains pending |
 
 ---
 
@@ -90,7 +124,7 @@ cd game
 .\tools\verify.ps1
 ```
 
-Expected: static PASS · PlaytestRunner 147 checks PASS · TestRunner PASS.
+Expected: static PASS · PlaytestRunner 204 checks PASS · TestRunner PASS.
 
 ---
 
@@ -98,9 +132,9 @@ Expected: static PASS · PlaytestRunner 147 checks PASS · TestRunner PASS.
 
 1. AI agents use cover and simple flanking (still no wall-run AI required)
 2. Playtest-tune Base-10 costs and agent aggression
-3. Guided Proving Ground objectives and clearer first-turn interaction
-4. Guided Proving Ground objectives
-5. Overwatch / destruction only after the above feels solid
+3. Complete the broader viewport/accessibility matrix after the passing M04
+   strategic-reimport and M05 desktop/narrow-width source increments
+4. Overwatch / destruction only after the above feels solid
 
 ---
 

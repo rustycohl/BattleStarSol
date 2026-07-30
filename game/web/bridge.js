@@ -138,7 +138,41 @@
       missions: [],
       applied_extractions: [],
       deployment_count: 0,
+      hud: defaultHudPreferences(),
     };
+  }
+
+  // Adaptive HUD preferences. Presentation only: no mechanical value is stored
+  // here, and an unreadable or hostile value falls back to the authored HUD
+  // rather than failing a deployment.
+  const HUD_SURFACE_KEYS = ["status", "feed", "tutorial", "dock"];
+  const HUD_OPACITY_MIN = 0.15;
+  const HUD_OPACITY_MAX = 1;
+
+  function defaultHudPreferences() {
+    const surfaces = {};
+    for (const key of HUD_SURFACE_KEYS) {
+      surfaces[key] = { opacity: HUD_OPACITY_MAX, parked: false };
+    }
+    return { schema: "gzg.battlestar.hud/1.0", surfaces };
+  }
+
+  function normalizeHudPreferences(candidate) {
+    const fallback = defaultHudPreferences();
+    if (!isObject(candidate)) return fallback;
+    const incoming = isObject(candidate.surfaces) ? candidate.surfaces : {};
+    const surfaces = {};
+    for (const key of HUD_SURFACE_KEYS) {
+      const entry = isObject(incoming[key]) ? incoming[key] : {};
+      const opacity = Number(entry.opacity);
+      surfaces[key] = {
+        opacity: Number.isFinite(opacity)
+          ? Math.min(HUD_OPACITY_MAX, Math.max(HUD_OPACITY_MIN, opacity))
+          : HUD_OPACITY_MAX,
+        parked: entry.parked === true,
+      };
+    }
+    return { schema: fallback.schema, surfaces };
   }
 
   function normalizeProfile(candidate) {
@@ -161,6 +195,7 @@
         ? candidate.applied_extractions.slice(-100).map(String)
         : [],
       deployment_count: Math.max(0, Number(candidate.deployment_count) || 0),
+      hud: normalizeHudPreferences(candidate.hud),
     };
   }
 
@@ -176,6 +211,18 @@
     const normalized = normalizeProfile(profile);
     storage.setItem(PROFILE_KEY, JSON.stringify(normalized));
     return normalized;
+  }
+
+  // Narrow read/write pair the tactical runtime calls across the JavaScript
+  // bridge, so the Godot side never has to know the profile's storage shape.
+  function readHudPreferences(storage = localStorage) {
+    return loadProfile(storage).hud;
+  }
+
+  function writeHudPreferences(hud, storage = localStorage) {
+    const profile = loadProfile(storage);
+    profile.hud = normalizeHudPreferences(hud);
+    return saveProfile(profile, storage).hud;
   }
 
   function normalizeAtlasSelection(data) {
@@ -256,6 +303,7 @@
     ].join("|"));
     const sector = String(target.name || "Proving Ground").slice(0, 160);
     const type = String(target.type || "coordinate");
+    const isProvingGround = sector === "Proving Ground";
     const deploy = {
       type: "deploy",
       payload_contract_version: "1.0",
@@ -270,9 +318,17 @@
         { name: "SCOUT-3", cls: "Recon" },
         { name: "MEDIC-2", cls: "Support" },
       ],
-      objectives: type === "crisis"
-        ? ["Stabilize crisis site", "Protect civilian corridors", "Extract"]
-        : ["Recon selected coordinates", "Neutralize hostiles", "Extract"],
+      objectives: isProvingGround
+        ? [
+          "Select the Commander",
+          "Move and practice defense",
+          "Complete a basic attack",
+          "End turn and observe the phases",
+          "Extract to strategy",
+        ]
+        : type === "crisis"
+          ? ["Stabilize crisis site", "Protect civilian corridors", "Extract"]
+          : ["Recon selected coordinates", "Neutralize hostiles", "Extract"],
       map: {
         target: clone(target),
       },
@@ -461,8 +517,12 @@
     applyExtraction,
     compactExtractionMessage,
     createDeployMessage,
+    defaultHudPreferences,
     defaultProfile,
     fromBase64Utf8,
+    normalizeHudPreferences,
+    readHudPreferences,
+    writeHudPreferences,
     loadProfile,
     normalizeAtlasSelection,
     normalizeExtraction,

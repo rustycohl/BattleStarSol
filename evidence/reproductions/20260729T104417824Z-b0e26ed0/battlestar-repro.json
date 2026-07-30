@@ -1,0 +1,667 @@
+{
+  "schema": "gzg.battlestar.repro/1.0",
+  "privacy": {
+    "classification": "pseudonymized-local-playtest",
+    "direct_identifiers": "excluded",
+    "excluded": [
+      "actor and squad names",
+      "A.T.L.A.S. return state and map coordinates",
+      "browser storage and profile data",
+      "console lines, screenshots, URLs, and filesystem paths"
+    ]
+  },
+  "product": {
+    "galaxy": "BattleStarSol",
+    "version": "0.1.1-prealpha.1",
+    "platform": "godot-web",
+    "harness": "gzg.battlestar.autonomous-playtest/3.0"
+  },
+  "build": {
+    "tactical_pck": {
+      "bytes": 261268,
+      "sha256": "e5e312c0676f156ebd28ff564c40d6254104ab9808eb29127dd1c940aa00c5ca"
+    },
+    "browser": {
+      "family": "chromium",
+      "version": "150.0.4078.105"
+    }
+  },
+  "mission": {
+    "deployment": {
+      "payload_contract_version": "1.0",
+      "generator_version": 1,
+      "rules_version": "alpha-1",
+      "sector": "Proving Ground",
+      "faction": "HAD // HEAVY ARMOR DIVISION",
+      "seed": 1167583760,
+      "squad": [
+        {
+          "slot": 1,
+          "class": "Heavy"
+        },
+        {
+          "slot": 2,
+          "class": "Recon"
+        },
+        {
+          "slot": 3,
+          "class": "Support"
+        }
+      ],
+      "objectives": [
+        "Select the Commander",
+        "Move and practice defense",
+        "Complete a basic attack",
+        "End turn and observe the phases",
+        "Extract to strategy"
+      ],
+      "resources": {
+        "neural": 50,
+        "capital": 25000,
+        "alloys": 100
+      }
+    },
+    "replay": {
+      "mission_seed": 1167583760,
+      "generator_version": 1,
+      "rules_version": "alpha-1",
+      "actions": [
+        {
+          "sequence": 2,
+          "record_type": "action",
+          "round": 1,
+          "active_team": 0,
+          "actor": {
+            "unit_id": 1,
+            "team": 0
+          },
+          "action": "select",
+          "target": {
+            "x": -999,
+            "y": -999,
+            "z": -1
+          },
+          "use_offhand": false,
+          "ap_before": 10,
+          "ap_after_dispatch": 10,
+          "accepted": true
+        },
+        {
+          "sequence": 4,
+          "record_type": "action",
+          "round": 1,
+          "active_team": 0,
+          "actor": {
+            "unit_id": 1,
+            "team": 0
+          },
+          "action": "move",
+          "target": {
+            "x": 3,
+            "y": 0,
+            "z": -1
+          },
+          "use_offhand": false,
+          "ap_before": 10,
+          "ap_after_dispatch": 10,
+          "accepted": true
+        },
+        {
+          "sequence": 7,
+          "record_type": "action",
+          "round": 1,
+          "active_team": 0,
+          "actor": {
+            "unit_id": 1,
+            "team": 0
+          },
+          "action": "brace",
+          "target": {
+            "x": -999,
+            "y": -999,
+            "z": -1
+          },
+          "use_offhand": false,
+          "ap_before": 7,
+          "ap_after_dispatch": 5,
+          "accepted": true
+        },
+        {
+          "sequence": 9,
+          "record_type": "action",
+          "round": 1,
+          "active_team": 0,
+          "actor": {
+            "unit_id": 1,
+            "team": 0
+          },
+          "action": "melee",
+          "target": {
+            "x": 3,
+            "y": 1,
+            "z": -1
+          },
+          "use_offhand": false,
+          "ap_before": 5,
+          "ap_after_dispatch": 1,
+          "accepted": true
+        },
+        {
+          "sequence": 12,
+          "record_type": "action",
+          "round": 1,
+          "active_team": 0,
+          "actor": {
+            "unit_id": 1,
+            "team": 0
+          },
+          "action": "endturn",
+          "target": {
+            "x": -999,
+            "y": -999,
+            "z": -1
+          },
+          "use_offhand": false,
+          "ap_before": 1,
+          "ap_after_dispatch": 1,
+          "accepted": true
+        }
+      ],
+      "events": [
+        {
+          "sequence": 1,
+          "record_type": "event",
+          "event": "tutorial_step_changed",
+          "payload": {
+            "complete": false,
+            "display_step": 1,
+            "step": "select_commander",
+            "total_steps": 6
+          }
+        },
+        {
+          "sequence": 3,
+          "record_type": "event",
+          "event": "tutorial_step_changed",
+          "payload": {
+            "complete": false,
+            "display_step": 2,
+            "step": "move",
+            "total_steps": 6
+          }
+        },
+        {
+          "sequence": 5,
+          "record_type": "event",
+          "event": "movement_resolved",
+          "payload": {
+            "actor": 1,
+            "ap_spent": 3,
+            "from": {
+              "x": 1,
+              "y": 1,
+              "z": 0
+            },
+            "mode": "run",
+            "to": {
+              "x": 3,
+              "y": 0,
+              "z": 0
+            }
+          }
+        },
+        {
+          "sequence": 6,
+          "record_type": "event",
+          "event": "tutorial_step_changed",
+          "payload": {
+            "complete": false,
+            "display_step": 3,
+            "step": "defense",
+            "total_steps": 6
+          }
+        },
+        {
+          "sequence": 8,
+          "record_type": "event",
+          "event": "tutorial_step_changed",
+          "payload": {
+            "complete": false,
+            "display_step": 4,
+            "step": "attack",
+            "total_steps": 6
+          }
+        },
+        {
+          "sequence": 10,
+          "record_type": "event",
+          "event": "tutorial_step_changed",
+          "payload": {
+            "complete": false,
+            "display_step": 5,
+            "step": "end_turn",
+            "total_steps": 6
+          }
+        },
+        {
+          "sequence": 11,
+          "record_type": "event",
+          "event": "damage_resolved",
+          "payload": {
+            "attacker": 1,
+            "damage": 1,
+            "hp_after": 9,
+            "hp_before": 10,
+            "ranged": false,
+            "target": 4,
+            "weapon": "fist"
+          }
+        },
+        {
+          "sequence": 13,
+          "record_type": "event",
+          "event": "tutorial_step_changed",
+          "payload": {
+            "complete": false,
+            "display_step": 5,
+            "step": "observe_phases",
+            "total_steps": 6
+          }
+        },
+        {
+          "sequence": 14,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 2,
+            "ap_before": 10,
+            "decision": "melee",
+            "position": {
+              "x": 2,
+              "y": 1,
+              "z": 0
+            },
+            "rationale": "adjacent hostile",
+            "round": 1,
+            "score": 87.714,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 15,
+          "record_type": "event",
+          "event": "damage_resolved",
+          "payload": {
+            "attacker": 2,
+            "damage": 1,
+            "hp_after": 8,
+            "hp_before": 9,
+            "ranged": false,
+            "target": 4,
+            "weapon": ""
+          }
+        },
+        {
+          "sequence": 16,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 2,
+            "ap_before": 6,
+            "decision": "melee",
+            "position": {
+              "x": 2,
+              "y": 1,
+              "z": 0
+            },
+            "rationale": "adjacent hostile",
+            "round": 1,
+            "score": 86.75,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 17,
+          "record_type": "event",
+          "event": "damage_resolved",
+          "payload": {
+            "attacker": 2,
+            "damage": 2,
+            "hp_after": 6,
+            "hp_before": 8,
+            "ranged": false,
+            "target": 4,
+            "weapon": ""
+          }
+        },
+        {
+          "sequence": 18,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 2,
+            "ap_before": 2,
+            "decision": "approach",
+            "position": {
+              "x": 2,
+              "y": 1,
+              "z": 0
+            },
+            "rationale": "highest deterministic legal utility",
+            "round": 1,
+            "score": 59.36,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 19,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 2,
+            "ap_before": 1,
+            "decision": "approach",
+            "position": {
+              "x": 2,
+              "y": 2,
+              "z": 0
+            },
+            "rationale": "highest deterministic legal utility",
+            "round": 1,
+            "score": 58.514,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 20,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 3,
+            "ap_before": 10,
+            "decision": "approach",
+            "position": {
+              "x": 1,
+              "y": 2,
+              "z": 0
+            },
+            "rationale": "highest deterministic legal utility",
+            "round": 1,
+            "score": 59.041,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 21,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 3,
+            "ap_before": 9,
+            "decision": "approach",
+            "position": {
+              "x": 0,
+              "y": 2,
+              "z": 0
+            },
+            "rationale": "highest deterministic legal utility",
+            "round": 1,
+            "score": 58.36,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 22,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 3,
+            "ap_before": 8,
+            "decision": "grab",
+            "position": {
+              "x": 0,
+              "y": 3,
+              "z": 0
+            },
+            "rationale": "recover weapon at current position",
+            "round": 1,
+            "score": 70.055,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 23,
+          "record_type": "event",
+          "event": "loot_collected",
+          "payload": {
+            "actor": 3,
+            "ap_spent": 1,
+            "cell": {
+              "x": 0,
+              "y": 3,
+              "z": 0
+            },
+            "items": [
+              {
+                "item": "spear",
+                "quantity": 1
+              }
+            ]
+          }
+        },
+        {
+          "sequence": 24,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 3,
+            "ap_before": 7,
+            "decision": "throw_spear",
+            "position": {
+              "x": 0,
+              "y": 3,
+              "z": 0
+            },
+            "rationale": "legal ranged attack",
+            "round": 1,
+            "score": 87.655,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 25,
+          "record_type": "event",
+          "event": "damage_resolved",
+          "payload": {
+            "attacker": 3,
+            "damage": 6,
+            "hp_after": 0,
+            "hp_before": 6,
+            "ranged": false,
+            "target": 4,
+            "weapon": "spear"
+          }
+        },
+        {
+          "sequence": 26,
+          "record_type": "event",
+          "event": "unit_killed",
+          "payload": {
+            "attacker": 3,
+            "cell": {
+              "x": 3,
+              "y": 1,
+              "z": 0
+            },
+            "target": 4,
+            "weapon": "spear"
+          }
+        },
+        {
+          "sequence": 27,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 3,
+            "ap_before": 3,
+            "decision": "approach",
+            "position": {
+              "x": 0,
+              "y": 3,
+              "z": 0
+            },
+            "rationale": "highest deterministic legal utility",
+            "round": 1,
+            "score": 59.23,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 28,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 3,
+            "ap_before": 2,
+            "decision": "approach",
+            "position": {
+              "x": 1,
+              "y": 3,
+              "z": 0
+            },
+            "rationale": "highest deterministic legal utility",
+            "round": 1,
+            "score": 60.415,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 29,
+          "record_type": "event",
+          "event": "agent_decision",
+          "payload": {
+            "actor": 3,
+            "ap_before": 1,
+            "decision": "approach",
+            "position": {
+              "x": 1,
+              "y": 2,
+              "z": 0
+            },
+            "rationale": "highest deterministic legal utility",
+            "round": 1,
+            "score": 60.02,
+            "team": 0
+          }
+        },
+        {
+          "sequence": 30,
+          "record_type": "event",
+          "event": "turn_started",
+          "payload": {
+            "active_team": 1,
+            "round": 1
+          }
+        },
+        {
+          "sequence": 31,
+          "record_type": "event",
+          "event": "turn_started",
+          "payload": {
+            "active_team": 2,
+            "round": 1
+          }
+        },
+        {
+          "sequence": 32,
+          "record_type": "event",
+          "event": "turn_started",
+          "payload": {
+            "active_team": 0,
+            "round": 2
+          }
+        },
+        {
+          "sequence": 33,
+          "record_type": "event",
+          "event": "tutorial_step_changed",
+          "payload": {
+            "complete": false,
+            "display_step": 6,
+            "step": "extract",
+            "total_steps": 6
+          }
+        },
+        {
+          "sequence": 34,
+          "record_type": "event",
+          "event": "mission_resolved",
+          "payload": {
+            "note": "evac",
+            "outcome": "SUCCESS",
+            "survivors": 3
+          }
+        },
+        {
+          "sequence": 35,
+          "record_type": "event",
+          "event": "tutorial_step_changed",
+          "payload": {
+            "complete": true,
+            "display_step": 6,
+            "step": "complete",
+            "total_steps": 6
+          }
+        }
+      ]
+    },
+    "result": {
+      "type": "extraction",
+      "payload_contract_version": "1.0",
+      "generator_version": 1,
+      "rules_version": "alpha-1",
+      "sector": "Proving Ground",
+      "seed": 1167583760,
+      "outcome": "SUCCESS",
+      "survivors": 3,
+      "gains": {
+        "neural": 25,
+        "capital": 301,
+        "alloys": 0,
+        "loot": []
+      },
+      "note": "evac"
+    }
+  },
+  "provenance": {
+    "evidence_run_id": "20260729T104417824Z-b0e26ed0",
+    "source_manifest_sha256": "a6b37fba1333c907e2904c12a1efe2cf2593bfaeb091d6f3de57e36bb1a753ff",
+    "deployment_message_id": "battlestar:1167583760:1",
+    "extraction_message_id": "xcommand:1167583760:1785321892146",
+    "correlation_id": "battlestar:1167583760:1",
+    "extracted_at": "2026-07-29T10:44:52.000Z",
+    "extracted_at_ms": 1785321892146
+  },
+  "equivalence": {
+    "supported": [
+      "validated deployment identity and normalized initial input",
+      "ordered action/event ledger and canonical digest",
+      "declared tactical result and strategic import delta",
+      "duplicate extraction idempotence"
+    ],
+    "not_claimed": [
+      "Godot mechanical re-simulation from the action ledger",
+      "native/Web or cross-platform mechanical state-hash equivalence"
+    ],
+    "mechanical_state_hash": {
+      "available": false,
+      "reason": "The current pre-alpha extraction does not emit an authoritative mechanical state hash."
+    }
+  },
+  "integrity": {
+    "canonicalization": "gzg.canonical-json/1.0",
+    "algorithm": "sha-256",
+    "mechanical_digest": "d830f0e8944e6614cd2e630b7a70a8756f5023dbe0e9fbf9ca4bb5f4e218f0f2",
+    "artifact_digest": "05fc6100c000088e02d11396edf79f183f152c22f3f4523b2f56408ab914a628"
+  }
+}

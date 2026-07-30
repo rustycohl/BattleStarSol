@@ -1,8 +1,15 @@
 # Battle/Star.SOL
 
-**Playable pre-alpha `0.1.1-prealpha.1`**
+**Playable pre-alpha `0.1.2-prealpha.1`**
 
 [Play the current Web build](https://rustycohl.github.io/BattleStarSol/)
+
+> **Work-line notice:** this checkout is the isolated pre-alpha `.02`
+> playtest-preparation codebase. The link above remains the known-good public
+> `0.1.1-prealpha.1` build. `.02` is not released and cannot be promoted until
+> every item in
+> [`docs/PREALPHA-02-RELEASE-CONTRACT.md`](docs/PREALPHA-02-RELEASE-CONTRACT.md)
+> passes.
 
 This repository contains the game: a browser-local strategic command surface,
 an embedded A.T.L.A.S. target selector, and a real Godot 4.7.1 tactical
@@ -99,6 +106,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\game\tools\rebuild-web
 - `contracts/` — pinned outer envelope and BattleStar/xCommand payload schemas
 - `docs/` — operating contract, controls, provenance, and validation evidence
 - `tests/` — browser-bridge and release-integrity checks
+- `prealpha-02-manifest.json` — machine-checkable module and promotion state
+- `tools/promote-prealpha-02.ps1` — dry-run-first guarded injection path
 - `archive/` — preserved superseded surfaces
 
 The deeper recovered implementation notes remain in

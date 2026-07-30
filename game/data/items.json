@@ -275,5 +275,21 @@
     ],
     "damage_type": "rail",
     "armor_pierce": 10
+  },
+  "grenade": {
+    "name": "Grenade",
+    "tier": 1,
+    "category": "melee",
+    "dmg": 8,
+    "range": 6,
+    "cost": 4,
+    "skills": [
+      "primitive",
+      "ballistic"
+    ],
+    "damage_type": "kinetic",
+    "armor_pierce": 3,
+    "blast_radius": 2,
+    "blast_terrain": true
   }
 }

@@ -50,7 +50,13 @@ The long-term target is full intent parity through ActionRouter for all provider
 1. Player faction AP refresh (whole squad).
 2. Human pilots Commander (or Remotes body).
 3. End Turn → squad bots AI pass (no AP re-grant).
-4. Metropoli / Kaiju faction AI passes with full AP refresh.
+4. The other two factions resolve in serialized order with full AP refresh.
+
+The serialized IDs remain `0` HAD, `1` Syndicate, and `2` Timecorps. The
+presentation layer uses combined labels—`HAD // EFD`,
+`SYNDICATE // METROPOLI`, and `TIMECORPS // KAIJU/ALIENS`—and the payload
+adapter continues to accept both current and legacy names. Display vocabulary
+must not change saved-message identity.
 
 ## Determinism
 
@@ -71,13 +77,18 @@ The long-term target is full intent parity through ActionRouter for all provider
 `MissionResolver` owns living counts, salvage compile, gains package.
 Main owns timers, hints, scene return, and PayloadBridge push.
 
-## God Mode specials
+## Developer / advanced specials
 
 Unlocked by `dev_god_mode` (or unit skill token):
 
 - Remotes / Remotes Home
 - Cover Monkey, Flip, Wall Run, Wall Jump, Frenzy (as implemented)
+- Hover and Flight controls
 - Free-fly drone camera
+
+These controls are hidden from the core action dock until the developer
+boundary is explicitly enabled. They are not required for the guided Proving
+Ground or the release-critical core loop.
 
 ## File map (tactical)
 

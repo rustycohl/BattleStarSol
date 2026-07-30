@@ -2,6 +2,8 @@ extends Node
 
 # AIBehavior.gd — Behavioral enemy decision scoring ("rip and tear")
 
+const Tactics = preload("res://scripts/AITactics.gd")
+
 func _vertical_score(u, target_cell: Vector2i, cells: Dictionary) -> float:
 	var my_h: int = cells.get(u.cell, {}).get("z", 0)
 	var tgt_h: int = cells.get(target_cell, {}).get("z", 0)
@@ -20,6 +22,7 @@ func score_actions(
 	rng: RandomNumberGenerator
 ) -> Dictionary:
 	var candidates: Array[Dictionary] = []
+	var attack_profile := _attack_profile(u)
 
 	# 1. Block decision if low HP (skipped entirely on Rip and Tear — pure aggression)
 	if GameConfig.ai_uses_defense(GameState.difficulty) and u.hp <= int(u.max_hp * GameConfig.LOW_HP_BLOCK_THRESHOLD) and u.ap >= GameConfig.BLOCK_COST and not u.blocking:
@@ -53,6 +56,12 @@ func score_actions(
 		var range_cells = int(item.get("range", 1))
 		var cat = item.get("category", "")
 		var dmg = int(item.get("dmg", 1))
+		var ignored_cover := (
+			Vector2i(u.cover_cell)
+			if bool(u.taking_cover) and String(u.lean) != "none"
+			else GameConfig.INVALID_CELL
+		)
+		var penetrates_cover := bool(item.get("penetrates_cover", false))
 
 		if u.ap >= cost and (cat == "ranged" or (cat == "melee" and range_cells > 1)):
 			if kind == "arrow":
@@ -61,7 +70,14 @@ func score_actions(
 				continue
 
 			if kind == "spear" or kind == "stringedbow":
-				var sline := _enemy_spear_line(u, units, cells, range_cells)
+				var sline := _enemy_spear_line(
+					u,
+					units,
+					cells,
+					range_cells,
+					ignored_cover,
+					penetrates_cover
+				)
 				if not sline.is_empty():
 					var tgt_cell: Vector2i = sline[sline.size() - 1]
 					var score = 75.0 + _vertical_score(u, tgt_cell, cells) + _jit(rng)
@@ -69,7 +85,15 @@ func score_actions(
 					var act_key = "throw_spear" if kind == "spear" else "fire_bow"
 					candidates.append({"key": act_key, "value": {"line": sline, "kind": kind, "cost": cost, "dmg": dmg}, "score": score})
 			else:
-				var tgt = _throw_target(u, kind, units, cells, range_cells)
+				var tgt = _throw_target(
+					u,
+					kind,
+					units,
+					cells,
+					range_cells,
+					ignored_cover,
+					penetrates_cover
+				)
 				if tgt != null:
 					var score = 65.0 + _vertical_score(u, tgt.cell, cells) + _jit(rng)
 					candidates.append({"key": "throw_item", "value": {"target": tgt, "kind": kind, "cost": cost, "dmg": dmg}, "score": score})
@@ -88,7 +112,19 @@ func score_actions(
 			var bow_range := int(bow_item.get("range", GameConfig.BOW_RANGE)) if not bow_item.is_empty() else GameConfig.BOW_RANGE
 			var bow_cost := ActionEconomy.weapon_cost(bow_item) if not bow_item.is_empty() else GameConfig.BOW_COST
 			var bow_dmg := int(bow_item.get("dmg", GameConfig.BOW_DMG)) if not bow_item.is_empty() else GameConfig.BOW_DMG
-			var bow_line := Pathfinder.line(u.cell, target.cell, bow_range, cells, u.z)
+			var bow_cover := (
+				Vector2i(u.cover_cell)
+				if bool(u.taking_cover) and String(u.lean) != "none"
+				else GameConfig.INVALID_CELL
+			)
+			var bow_line := Pathfinder.line(
+				u.cell,
+				target.cell,
+				bow_range,
+				cells,
+				u.z,
+				bow_cover
+			)
 			if not bow_line.is_empty() and bow_line.has(target.cell):
 				var score = 85.0 + _vertical_score(u, target.cell, cells) + _jit(rng)
 				# Always emit a Dictionary so Main._enemy_act can read line/cost/dmg
@@ -99,26 +135,84 @@ func score_actions(
 					"score": score
 				})
 
-	# 7. Aggressive Approach ("Rip and Tear")
-	var path := _best_approach(u, units, cells)
-	if not path.is_empty():
-		var end_cell: Vector2i = path[path.size() - 1]
-		var score = 50.0 + _vertical_score(u, end_cell, cells) + _jit(rng)
-		candidates.append({"key": "approach", "value": path, "score": score})
+	# 7. Current-cover and bounded positional tactics. These candidates use the
+	# same path, LOS, cover, and AP authorities as player actions.
+	candidates.append_array(
+		Tactics.positioning_candidates(
+			u,
+			units,
+			cells,
+			Pathfinder,
+			attack_profile
+		)
+	)
 
-	# 8. Greedy Step fallback
-	var greedy := _greedy_step(u, units, cells)
-	if greedy != GameConfig.INVALID_CELL:
-		var score = 35.0 + _jit(rng)
-		candidates.append({"key": "step", "value": greedy, "score": score})
+	# 8. Aggressive approach and greedy fallback. Positional movement retains
+	# enough AP for the cheapest available attack instead of spending to zero.
+	if not bool(u.taking_cover):
+		var attack_reserve := int(attack_profile.get("cost", GameConfig.MELEE_COST))
+		var path := _best_approach(u, units, cells)
+		if (
+			not path.is_empty()
+			and path.size() >= 2
+			and Tactics.can_afford_step_with_reserve(
+				u,
+				Vector2i(path[1]),
+				cells,
+				attack_reserve
+			)
+		):
+			var end_cell: Vector2i = path[path.size() - 1]
+			var score = 50.0 + _vertical_score(u, end_cell, cells) + _jit(rng)
+			candidates.append({
+				"key": "approach",
+				"value": path,
+				"score": score,
+				"rationale": "direct approach; retain %d AP attack reserve" % attack_reserve
+			})
+
+		var greedy := _greedy_step(u, units, cells)
+		if (
+			greedy != GameConfig.INVALID_CELL
+			and Tactics.can_afford_step_with_reserve(
+				u,
+				greedy,
+				cells,
+				attack_reserve
+			)
+		):
+			var score = 35.0 + _jit(rng)
+			candidates.append({
+				"key": "step",
+				"value": greedy,
+				"score": score,
+				"rationale": "greedy legal step; retain %d AP attack reserve" % attack_reserve
+			})
 
 	if candidates.is_empty():
 		return {}
 
-	candidates.sort_custom(func(a, b): return float(a["score"]) > float(b["score"]))
+	for i in candidates.size():
+		var candidate: Dictionary = candidates[i]
+		if not candidate.has("tie"):
+			candidate["tie"] = "%s:%06d" % [String(candidate.get("key", "")), i]
+		if not candidate.has("rationale"):
+			candidate["rationale"] = _default_rationale(String(candidate.get("key", "")))
+
+	candidates.sort_custom(func(a, b):
+		var a_score := float(a.get("score", 0.0))
+		var b_score := float(b.get("score", 0.0))
+		if not is_equal_approx(a_score, b_score):
+			return a_score > b_score
+		return String(a.get("tie", "")) < String(b.get("tie", ""))
+	)
 
 	var winner: Dictionary = candidates[0]
-	var res := {}
+	var res := {
+		"decision": String(winner["key"]),
+		"rationale": String(winner.get("rationale", "")),
+		"score": snappedf(float(winner.get("score", 0.0)), 0.001)
+	}
 	res[winner["key"]] = winner["value"]
 	return res
 
@@ -141,20 +235,84 @@ func _total_weapons(u) -> int:
 			t += int(u.inv.get(k, 0))
 	return t
 
-func _throw_target(u, _kind: String, units: Array, cells: Dictionary, rng: int):
+func _attack_profile(u) -> Dictionary:
+	var best := {
+		"kind": "fist",
+		"cost": GameConfig.MELEE_COST,
+		"range": 1,
+		"penetrates_cover": false
+	}
+	var ItemDBNode = Engine.get_main_loop().root.get_node_or_null("ItemDB")
+	if ItemDBNode == null:
+		return best
+	for kind in u.inv.keys():
+		if int(u.inv.get(kind, 0)) <= 0 or kind in ["arrow", "bow", "string"]:
+			continue
+		if kind == "stringedbow" and int(u.inv.get("arrow", 0)) <= 0:
+			continue
+		var item: Dictionary = ItemDBNode.get_item(kind)
+		if item.is_empty():
+			continue
+		var category := String(item.get("category", ""))
+		var item_range := int(item.get("range", 1))
+		if category != "ranged" and item_range <= 1:
+			continue
+		var item_cost := ActionEconomy.weapon_cost(item)
+		if (
+			item_cost < int(best["cost"])
+			or (
+				item_cost == int(best["cost"])
+				and item_range > int(best["range"])
+			)
+		):
+			best = {
+				"kind": String(kind),
+				"cost": item_cost,
+				"range": item_range,
+				"penetrates_cover": bool(item.get("penetrates_cover", false))
+			}
+	return best
+
+func _throw_target(
+	u,
+	_kind: String,
+	units: Array,
+	cells: Dictionary,
+	rng: int,
+	ignored_cover: Vector2i = GameConfig.INVALID_CELL,
+	penetrates_cover: bool = false
+):
 	var best = null
 	var bd := 1 << 30
 	for p in units:
 		if not (p.alive and p.team != u.team):
 			continue
-		if Pathfinder.cheb(u.cell, p.cell) <= rng and Pathfinder.has_los(u.cell, p.cell, cells):
+		if (
+			Pathfinder.cheb(u.cell, p.cell) <= rng
+			and Pathfinder.has_los(
+				u.cell,
+				p.cell,
+				cells,
+				u.z,
+				p.z,
+				ignored_cover,
+				penetrates_cover
+			)
+		):
 			var d := Pathfinder.cheb(u.cell, p.cell)
 			if d < bd:
 				bd = d
 				best = p
 	return best
 
-func _enemy_spear_line(u, units: Array, cells: Dictionary, rng: int) -> Array[Vector2i]:
+func _enemy_spear_line(
+	u,
+	units: Array,
+	cells: Dictionary,
+	rng: int,
+	ignored_cover: Vector2i = GameConfig.INVALID_CELL,
+	penetrates_cover: bool = false
+) -> Array[Vector2i]:
 	var best_target = null
 	var bd := 1 << 30
 	for p in units:
@@ -162,7 +320,15 @@ func _enemy_spear_line(u, units: Array, cells: Dictionary, rng: int) -> Array[Ve
 			continue
 		if Pathfinder.cheb(u.cell, p.cell) > rng:
 			continue
-		var line := Pathfinder.line(u.cell, p.cell, rng, cells)
+		var line := Pathfinder.line(
+			u.cell,
+			p.cell,
+			rng,
+			cells,
+			u.z,
+			ignored_cover,
+			penetrates_cover
+		)
 		if not line.has(p.cell):
 			continue
 		if line.size() < bd:
@@ -170,7 +336,29 @@ func _enemy_spear_line(u, units: Array, cells: Dictionary, rng: int) -> Array[Ve
 			best_target = p
 	if best_target == null:
 		return []
-	return Pathfinder.line(u.cell, best_target.cell, rng, cells)
+	return Pathfinder.line(
+		u.cell,
+		best_target.cell,
+		rng,
+		cells,
+		u.z,
+		ignored_cover,
+		penetrates_cover
+	)
+
+func _default_rationale(action: String) -> String:
+	match action:
+		"block":
+			return "low health defense"
+		"melee":
+			return "adjacent hostile"
+		"grab":
+			return "recover weapon at current position"
+		"throw_spear", "throw_item", "fire_bow":
+			return "legal ranged attack"
+		"assemble_auto", "assemble":
+			return "assemble available weapon"
+	return "highest deterministic legal utility"
 
 func _best_approach(u, units: Array, cells: Dictionary) -> Array[Vector2i]:
 	var best: Array[Vector2i] = []

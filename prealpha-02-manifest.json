@@ -1,0 +1,111 @@
+{
+  "schema": "gzg.battlestar.prealpha-injection/1.0",
+  "workline": "prealpha.02",
+  "state": "development",
+  "updated_at": "2026-07-28",
+  "source": {
+    "repository": "BattleStarSol-prealpha-02",
+    "branch": "prealpha-02",
+    "base_commit": "55ecad27bf83c56225a33dc20a62a4d305f6bc89",
+    "baseline_version": "0.1.1-prealpha.1",
+    "push_remote": "disabled"
+  },
+  "target": {
+    "repository": "BattleStarSol",
+    "required_head": "55ecad27bf83c56225a33dc20a62a4d305f6bc89",
+    "promotion_branch": "promotion/prealpha-02",
+    "candidate_version": "0.1.2-prealpha.2"
+  },
+  "release": {
+    "allow_apply": false,
+    "required_modules": [
+      "M00",
+      "M01",
+      "M02",
+      "M03",
+      "M04",
+      "M05",
+      "M06"
+    ],
+    "required_gates": [
+      "node_tests",
+      "node_syntax",
+      "godot_static",
+      "godot_test_runner",
+      "godot_playtest_runner",
+      "web_export",
+      "clean_clone",
+      "local_full_loop",
+      "local_idempotence",
+      "documentation_truth",
+      "public_workflow",
+      "public_full_loop"
+    ]
+  },
+  "modules": [
+    {
+      "id": "M00",
+      "name": "isolated work line and inherited baseline",
+      "required": true,
+      "status": "complete"
+    },
+    {
+      "id": "M01",
+      "name": "guided Proving Ground",
+      "required": true,
+      "status": "validation_pending"
+    },
+    {
+      "id": "M02",
+      "name": "first-turn clarity and status truth",
+      "required": true,
+      "status": "validation_pending"
+    },
+    {
+      "id": "M03",
+      "name": "cover-seeking and simple-flanking Agents",
+      "required": true,
+      "status": "planned"
+    },
+    {
+      "id": "M04",
+      "name": "bounded deterministic repro artifact",
+      "required": true,
+      "status": "planned"
+    },
+    {
+      "id": "M05",
+      "name": "narrow-viewport and interaction pass",
+      "required": true,
+      "status": "planned"
+    },
+    {
+      "id": "M06",
+      "name": "release decision and acceptance evidence",
+      "required": true,
+      "status": "planned"
+    }
+  ],
+  "promotion": {
+    "allowed_paths": [
+      ".github/",
+      "contracts/",
+      "docs/",
+      "game/",
+      "tests/",
+      "tools/",
+      "CHANGELOG.md",
+      "LICENSE",
+      "LICENSE-DOCUMENTATION.md",
+      "NOTICE",
+      "README.md",
+      "STATUS.md",
+      "package.json",
+      "prealpha-02-manifest.json"
+    ],
+    "blocked_paths": [
+      ".git/",
+      "archive/"
+    ]
+  }
+}
