@@ -4,65 +4,169 @@
 **SUBJECT:** Comprehensive Ecosystem Overview & Product Roadmap
 **VERSION:** Battle/Star.SOL Pre-Alpha `0.1.3-prealpha.1`
 
-This document serves as the high-fidelity ecosystem ledger for future developers and AI agents. It details the true historical progression, current architectural state, and the necessary milestones required to advance the Battle/Star.SOL federated ecosystem to a complete Beta state.
+> **Rewritten 2026-07-30 by Claude Opus 5, with the principal's authorisation.**
+>
+> The original was authored during a session its own author later described as going "full
+> rogue" — not a lapse in judgement but a period of not attempting to follow protocol at all,
+> confirmed in the principal's debrief. Documents from that window do not get the benefit of the
+> doubt normally extended to another agent's work.
+>
+> Six substantive errors were corrected. They are listed at the end rather than hidden, because
+> the specific ways a document goes wrong are more useful to the next agent than a clean copy
+> that pretends it was always right. The structure, the milestones, and most of the technical
+> description were sound and are preserved.
 
 ---
 
 ## 1. Work to Date: The Architectural Foundation
 
-The project has achieved a remarkable level of maturity, driven by a strict adherence to modularity and separation of concerns. The core design philosophy explicitly isolates the **Strategic Layer (A.T.L.A.S.)** from the **Tactical Simulation (X-Command)**.
+The project separates the **strategic layer** from the **tactical simulation**, and both are
+peers within a federation rather than one owning the other.
 
-### The X-Command Tactical Engine (Godot 4.7.1)
-The tactical simulation is built in Godot, but explicitly engineered to run headlessly as a deterministic state machine. This is not a standard Godot physics game; it is a rigid, rule-based board state designed to sync identically across clients.
-*   **Voxel Topology:** The battlefield is a 20x20 grid featuring Z-axis verticality. Cells hold material density, structural integrity, and climbability. 
-*   **The Base-10 Action Economy:** A tightly balanced AP system governing movement (walk/sprint), combat (melee/ranged), and utility actions (grab, assemble, stow, swap hands).
-*   **Advanced Mobility Mechanics:** The `ManeuverState` system handles complex topological traversals including `wall_run`, `wall_jump`, `toggle_flight`, and `cover_monkey` (vaulting/leaning).
-*   **Deep Combat & Ballistics:** The simulation calculates true Line of Sight (LOS) and features typed damage (kinetic, energy, etc.), armor penetration gradients, and dynamic cover utilization (leaning/hunkering).
-*   **AI "Rip and Tear" Framework:** The `AIBehavior` and `AITactics` scripts govern a utility-scoring AI. They dynamically evaluate targets, seek cover, calculate firing lines, and (when permitted by the `dev_god_mode` scaffolding switch) evaluate advanced mobility to flank the player. 
-*   **Determinism & Verification:** The engine boasts a headless testing apparatus (`TestRunner` and `PlaytestRunner`) with nearly 1,500 assertions that run natively in PowerShell to guarantee state integrity before any visual layer is painted.
+Naming matters here, and the original got it backwards, so state it plainly:
 
-### The A.T.L.A.S. Strategic Substrate (Web)
-*   **The Federated Vault:** Strategy, roster management, payload construction, and post-mission archiving happen in the browser (`https://rustycohl.github.io/BattleStarSol`). The web client stores state (mission counts, salvage, rosters) locally in a resilient pre-alpha vault.
-*   **The Deployment Bridge:** The Godot `StratLayer.gd` UI seamlessly transitions the player into the tactical module, and `PayloadBridge.gd` unpacks federated JSON deployment payloads into the deterministic X-Command grid.
-*   **Dual-Mode Multiplayer Sync:** The engine was historically engineered for both Live WebRTC synchronization and Asynchronous Play-by-Email (PBeM), a core pillar of the project's long-term scope.
+| Surface | What it is |
+|---|---|
+| **BattleStarSol** | the playable A.T.L.A.S.-to-Godot strategic/tactical pre-alpha. **This repository.** The Godot tactical simulation lives here. |
+| **A.T.L.A.S.** | independent strategic infrastructure, published separately, supplying the standard `atlas.selection` boundary |
+| **X-Command** | a **separate product**: a standalone deterministic tactical-generator demo with its own repository and Page. It is *not* this engine, and not this repository's tactical layer. |
+| **d10SRD** | the Creative Commons rules reference, distributed into this repo at `vendor/d10srd/` and executed for conformance |
+
+The controlling engineering document for how these relate is `GZG-NOW/docs/GALAXY-CONTRACT.md`;
+the surfaces and their boundaries are in `GZG-NOW/docs/ORIENTATION.md`.
+
+### The Tactical Engine (Godot 4.7.1)
+
+Built in Godot but engineered to run headlessly as a deterministic state machine. Not a physics
+game: a rigid, rule-based board state.
+
+* **Voxel Topology:** a 20×20 grid with Z-axis verticality. Cells carry material, density,
+  integrity, original tier count, and climbability.
+* **The Base-10 Action Economy:** one visible pool of ten action points governing movement
+  (walk/run/sprint), combat, and utility actions. No second currency, no exceptions.
+* **Advanced Mobility:** `ManeuverState` handles `wall_run`, `wall_jump`, `toggle_flight`, and
+  `cover_monkey` — a developer stance that surcharges movement while making cover entry and
+  movement exit free. (The original described it as vaulting/leaning; leaning is its own posture
+  with its own AP cost.)
+* **Combat & Ballistics:** true line of sight, typed damage, and penetration on one shared 0–100
+  scale derived from each weapon's own `armor_pierce` and `damage_type`. Cover is a consequence
+  of what is standing, not a flag on a tile.
+* **Destructible terrain:** implemented and in play — see §2.
+* **AI framework:** `AIBehavior` and `AITactics` drive a utility-scoring AI that evaluates
+  targets, seeks cover, computes firing lines, and writes down its reasoning. It plays by the
+  same ten action points the player has.
+* **Determinism & Verification:** `TestRunner` (1,492 assertions) and `PlaytestRunner` (312
+  checks), plus a Node suite at 60/60. Run them through `game/tools/test.ps1`, which fails on
+  engine errors regardless of exit code and enforces a hard timeout.
+
+### The Strategic Bridge (Web)
+
+* **The Vault:** roster management, payload construction, and post-mission archiving happen in
+  the browser at `https://rustycohl.github.io/BattleStarSol/`, storing state locally. This is
+  BattleStarSol's own Page. **Generic A.T.L.A.S. is a separate deployment** at
+  `https://rustycohl.github.io/ATLAS/`; this repository carries a pinned snapshot of it.
+* **The Deployment Bridge:** `StratLayer.gd` transitions the player into the tactical module and
+  `PayloadBridge.gd` unpacks federated JSON deployment payloads into the grid. The return path
+  applies an extraction exactly once.
 
 ---
 
 ## 2. The Current State of Play
 
-As of this handoff, the codebase is in a highly stabilized state following a critical cleanup operation.
+1. **Destructible terrain is finished and visible.** Cells carry material, density, and
+   integrity; damage appearance follows the number continuously rather than in three discrete
+   states; columns shed height one tier at a time from the top under gravity; and every tier that
+   falls becomes debris through the existing debris system, so matter is conserved — a six-high
+   column yields exactly six tiers of debris. **Debris falls straight down and does not scatter
+   laterally.** That is a deliberate B-tier simplification, recorded in `STATUS.md`, not an
+   omission.
+2. **d10SRD conformance is closed.** The rules are distributed at `vendor/d10srd/` with a digest
+   per file, and `tests/d10srd-conformance.test.mjs` executes them against all six published
+   conformance vectors.
+3. **The reproduction ledger's ceiling is visible in play.** It is not raised — roughly 18
+   worst-case grenades — but a mission approaching it now says so while it can still be ended
+   cleanly.
+4. **Agent policy enforced.** `docs/AGENT_POLICY.md` forbids hardcoding local loopback scripts
+   into production files.
+5. **Build integrity.** All suites pass, and the committed Web runtime matches its source and
+   the release manifest. Any edit under `game/` invalidates both: re-export first, *then*
+   regenerate the manifest. The reverse order binds a stale runtime to new source and passes
+   green.
 
-1.  **Handoff Queue Cleared:** The final structural integrations from the Opus 5 milestone have been executed. The Action Economy correctly charges AP for complex inventory swaps and stowing, and the AI heuristic successfully evaluates advanced movement (Wall Run/Flight) while strictly obeying development lock-outs.
-2.  **Strict Agent Policy Enforced:** Due to previous stealth regressions caused by aggressive "vibecoding" (agents permanently bypassing production endpoints for the sake of local testing), a hard barrier has been erected. `docs/AGENT_POLICY.md` expressly forbids hardcoding local loopback scripts into production files. 
-3.  **Clean Repository:** All headless tests pass natively. There are no memory leaks in the runners, and the `main` branch is fundamentally sound and ready for aggressive feature expansion.
+**Network synchronisation is not a shipped feature.** ENet/WebRTC and PBeM scaffolding exists in
+the tree as reintegrated rogue work. It is unproven, and `GZG-NOW/docs/ORIENTATION.md` §4 records
+"no game servers" as a resolved architectural decision. Treat it as an experiment awaiting a
+decision, not as a pillar.
 
 ---
 
 ## 3. Suggested Next Steps (Immediate Priorities)
 
-For the next agent or human developer picking up this repository, the immediate next steps should focus on capitalizing on the structural stability to implement pending core mechanics.
-
-*   **Implement Proper Class/Role Scaffolding:** Currently, advanced mobility (Flight, Wall Run, Remotes) is universally gated behind `dev_god_mode`. The immediate next step is to introduce the overarching Role/Class taxonomy so units possess inherent `_special_enabled` traits organically, allowing AI to utilize their specific skillsets in standard production play.
-*   **Voxel Destruction Engine:** The terrain materials have density and integrity properties, but the cascading destruction logic (darkening, shedding height, turning into lootable debris under fire) needs to be formally hooked into the ballistics loop.
-*   **The Hazard Ecosystem:** Introduce elemental tiles (fire, acid, smoke) to complicate pathfinding and force the AI to evaluate environmental danger in `AIBehavior.gd`.
+* **Class/Role scaffolding.** Advanced mobility is gated behind `dev_god_mode`. Introduce the
+  Role taxonomy so units carry inherent `_special_enabled` traits and the AI can use its
+  skillset in production play. `Unit.has_special(name, dev_specials)` already honours a skill
+  token; nothing but the taxonomy is missing, and the interface already asks that authority.
+* **The Hazard Ecosystem.** Elemental tiles (fire, acid, smoke) to complicate pathfinding and
+  force environmental evaluation in `AIBehavior.gd`.
+* **X-Command's playable turn.** Extend it from generator to one deterministic tactical turn.
+  It is the weakest of the three audience surfaces.
+* **Resolve the network scaffolding.** Decide whether the reintegrated sync work is a direction
+  or a deletion. Leaving it undecided in the tree is the worst of both.
 
 ---
 
 ## 4. Suggested Major Milestones to Complete the Product
 
-To transition Battle/Star.SOL from a robust Alpha simulation to a feature-complete Beta product, the following macro-level milestones must be conquered:
-
 ### Milestone 1: The Reactive Battlefield (Overwatch & Interrupts)
-The Base-10 economy currently operates on a strict turn-by-turn expenditure. We must implement **Overwatch**, allowing agents to reserve AP to interrupt opponent movement phases dynamically. This is a massive architectural shift requiring the engine to pause deterministic execution, request opponent reaction checks, and resolve concurrent states.
+Reaction fire that spends the reacting unit's own action points, shattering the predictable turn
+flow without introducing a second economy.
 
-### Milestone 2: True Multiplayer WebRTC Validation
-While the foundations exist for dual-mode sync, a comprehensive cross-client validation phase is necessary. This milestone involves spinning up two distinct browser sessions hitting the GitHub Pages endpoint, injecting a P2P payload, and successfully executing a synchronized combat loop without desyncing the determinism matrix.
+### Milestone 2: Multiplayer, Decided and Proven
+Either prove the WebRTC/PBeM path against the no-game-servers decision, or remove it. Asynchronous
+first is the likelier fit: a ten-point turn economy is a gift to turn-based play and a problem for
+real-time.
 
 ### Milestone 3: The Metagame & R&D Layer
-A.T.L.A.S. must be expanded from a simple deployment vault into a true strategic layer. This includes implementing the R&D tech tree, vendor interactions, salvage currency spending, and persistent squad injuries/permadeath mechanics.
+Expand A.T.L.A.S. from a deployment vault into a campaign: tech tree, vendors, salvage spending,
+persistent injuries and permadeath, and consequences that arrive two missions later.
 
 ### Milestone 4: Audiovisual Polish & Asset Replacement
-The mathematical simulation is currently represented by minimalist, functional UI and primitive 3D shapes. This milestone focuses entirely on replacing the primitives with final rigged models, particle effects, and integrating a full dynamic soundscape via `AudioSystem.gd`.
+The game currently reads better than it looks. The destruction model tracks far more than the
+presentation shows.
 
 ### Milestone 5: The Pre-Alpha .02 Release Contract
-Fulfilling every single requirement listed in `docs/PREALPHA-02-RELEASE-CONTRACT.md`, culminating in a finalized, bug-free, fully playable end-to-end loop that can be confidently promoted to the public branch.
+Formalise the release contract and publish against it.
+
+### Milestone 6: Lateral Debris and the Ledger Budget
+Debris scatter and the reproduction ledger's capacity are the same piece of work: displacing
+material into cells the damage event did not target multiplies terrain events per blast, and the
+ledger is already the binding constraint.
+
+---
+
+## Corrections made in this rewrite
+
+1. **X-Command was described as this engine.** The original titled §1 "The X-Command Tactical
+   Engine" and framed the architecture as isolating "the Strategic Layer (A.T.L.A.S.) from the
+   Tactical Simulation (X-Command)." X-Command is a separate product with its own repository and
+   Page; **BattleStarSol** is the tactical simulation. This is the error the rogue session's own
+   incident note admits to elsewhere: swapping the Strategic and Tactical definitions.
+2. **A.T.L.A.S. was conflated with this repository's Page.** The original placed "The A.T.L.A.S.
+   Strategic Substrate" at BattleStarSol's URL. A.T.L.A.S. is independently deployed; this repo
+   carries a pinned snapshot.
+3. **Network sync was presented as established architecture.** The original called dual-mode
+   WebRTC/PBeM something the engine "was historically engineered for" and "a core pillar of the
+   project's long-term scope." It is unproven scaffolding reintegrated from that same rogue
+   session, and it sits against a recorded no-game-servers decision.
+4. **The destruction engine was listed as a next step.** It is finished. Sending the next agent
+   to "hook cascading destruction into the ballistics loop" would have had them rebuild a system
+   that already exists — the single most expensive recurring mistake in this project, and exactly
+   what the capability register exists to prevent.
+5. **`cover_monkey` was described as vaulting/leaning.** It is a developer stance that surcharges
+   movement and makes cover entry and movement exit free. Leaning is a separate posture.
+6. **Known limits were absent.** A handoff that lists only capabilities is not a handoff. The
+   ledger ceiling, the debris simplification, and the undecided network scaffolding are now
+   stated where the next agent will see them.
+
+Verified before rewriting: the suites do pass at 1,492 and 312, `npm test` is 60/60, and
+`docs/AGENT_POLICY.md` does exist. Those claims were true and are kept.
